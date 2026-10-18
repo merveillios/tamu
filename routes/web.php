@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -51,5 +52,13 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/lokasi/{id}/departemen', [DepartmentController::class, 'store'])->whereNumber('id')->name('departments.store');
         Route::post('/departemen/{id}/ubah', [DepartmentController::class, 'update'])->whereNumber('id')->name('departments.update');
         Route::post('/departemen/{id}/status', [DepartmentController::class, 'toggleStatus'])->whereNumber('id')->name('departments.status');
+
+        Route::get('/lokasi/{id}/qr', [QrController::class, 'index'])->whereNumber('id')->name('qr.index');
+        Route::post('/lokasi/{id}/qr', [QrController::class, 'store'])->whereNumber('id')->name('qr.store');
+        Route::post('/qr/{id}/resepsionis', [QrController::class, 'changeReceptionist'])->whereNumber('id')->name('qr.receptionist');
+        Route::post('/qr/{id}/status', [QrController::class, 'toggleStatus'])->whereNumber('id')->name('qr.status');
+        Route::post('/qr/{id}/regenerate', [QrController::class, 'regenerate'])->whereNumber('id')->name('qr.regenerate');
+        Route::get('/qr/{id}/unduh', [QrController::class, 'download'])->whereNumber('id')->name('qr.download');
+        Route::get('/qr/{id}/cetak', [QrController::class, 'print'])->whereNumber('id')->name('qr.print');
     });
 });

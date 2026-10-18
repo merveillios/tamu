@@ -107,7 +107,28 @@ body {
     max-width: 440px;
 }
 
-/* Halaman cetak QR */
+/* Halaman cetak QR ukuran A4 (QR-5) */
+.qr-print-sheet {
+    max-width: 180mm;
+    margin: 0 auto;
+}
+
+.qr-print-logo {
+    height: 64px;
+    width: auto;
+}
+
+.qr-print-code {
+    width: 120mm;
+    max-width: 100%;
+    height: auto;
+}
+
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
 @media print {
     .no-print {
         display: none !important;

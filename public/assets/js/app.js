@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
         bootstrap.Toast.getOrCreateInstance(element).show();
     });
 
+    // Tombol data-print membuka dialog cetak browser (handler inline dilarang CSP).
+    document.querySelectorAll('[data-print]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            window.print();
+        });
+    });
+
     // Form dengan atribut data-confirm meminta konfirmasi sebelum dikirim.
     document.querySelectorAll('form[data-confirm]').forEach(function (form) {
         form.addEventListener('submit', function (event) {
