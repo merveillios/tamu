@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -36,5 +37,13 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/{id}/buka-kunci', [UserController::class, 'unlock'])->whereNumber('id')->name('users.unlock');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
+
+        Route::get('/lokasi', [LocationController::class, 'index'])->name('locations.index');
+        Route::get('/lokasi/tambah', [LocationController::class, 'create'])->name('locations.create');
+        Route::post('/lokasi/tambah', [LocationController::class, 'store'])->name('locations.store');
+        Route::get('/lokasi/{id}/ubah', [LocationController::class, 'edit'])->whereNumber('id')->name('locations.edit');
+        Route::post('/lokasi/{id}/ubah', [LocationController::class, 'update'])->whereNumber('id')->name('locations.update');
+        Route::post('/lokasi/{id}/status', [LocationController::class, 'toggleStatus'])->whereNumber('id')->name('locations.status');
+        Route::post('/lokasi/{id}/hapus', [LocationController::class, 'destroy'])->whereNumber('id')->name('locations.destroy');
     });
 });
