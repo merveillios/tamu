@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\QrStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+/**
+ * QR Code titik masuk; setiap QR terhubung ke satu lokasi dan satu akun resepsionis.
+ */
+class QrCode extends Model
+{
+    public const UPDATED_AT = null;
+
+    protected $fillable = [
+        'location_id',
+        'receptionist_id',
+        'token',
+        'label',
+        'status',
+        'created_by',
+    ];
+
+    protected $casts = [
+        'status' => QrStatus::class,
+        'revoked_at' => 'datetime',
+        'last_used_at' => 'datetime',
+    ];
+
+    /**
+     * Lokasi QR ini.
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    /**
+     * Akun resepsionis pemilik QR ini.
+     */
+    public function receptionist(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'receptionist_id');
+    }
+
+    /**
+     * Akun yang membuat QR ini.
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * Kunjungan yang tercatat lewat QR ini.
+     */
+    public function guestVisits(): HasMany
+    {
+        return $this->hasMany(GuestVisit::class);
+    }
+}
