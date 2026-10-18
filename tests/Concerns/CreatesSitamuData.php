@@ -74,7 +74,8 @@ trait CreatesSitamuData
      */
     protected function createVisit(QrCode $qr, PurposeCategory $category, array $attributes = []): GuestVisit
     {
-        static $dailyNumber = 0;
+        // Nomor besar agar tidak bentrok dengan nomor dari visit_counters saat formulir dikirim di tes yang sama.
+        static $dailyNumber = 10000;
 
         $visit = GuestVisit::create(array_merge([
             'location_id' => $qr->location_id,
