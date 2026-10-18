@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Guest\GoogleVerificationController;
+use App\Http\Controllers\Guest\GuestEntryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +19,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'home')->name('home');
+
+Route::prefix('tamu/{token}')->name('guest.')->group(function () {
+    Route::get('/', [GuestEntryController::class, 'show'])->name('show');
+    Route::get('/bantuan', [GuestEntryController::class, 'help'])->name('help');
+    Route::post('/verifikasi-google', [GoogleVerificationController::class, 'verify'])->middleware('throttle:google-verify')->name('verify');
+    Route::post('/ganti-akun', [GoogleVerificationController::class, 'switchAccount'])->name('switch');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
