@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActiveVisitController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -50,6 +51,8 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     Route::get('/kunjungan/{id}', [VisitController::class, 'show'])->whereNumber('id')->name('visits.show');
 
     Route::middleware('role:receptionist,admin,super_admin')->group(function () {
+        Route::get('/tamu', [ActiveVisitController::class, 'index'])->name('visits.active');
+        Route::get('/tamu/data', [ActiveVisitController::class, 'data'])->name('visits.active.data');
         Route::post('/kunjungan/{id}/batal', [VisitController::class, 'cancel'])->whereNumber('id')->name('visits.cancel');
     });
 
