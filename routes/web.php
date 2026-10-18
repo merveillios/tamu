@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\PurposeCategoryController;
@@ -108,6 +109,8 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
 
     Route::middleware('role:admin,super_admin')->group(function () {
         Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
+        Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+        Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
 
         Route::get('/kategori-keperluan', [PurposeCategoryController::class, 'index'])->name('categories.index');
         Route::get('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'create'])->name('categories.create');
