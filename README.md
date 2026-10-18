@@ -85,11 +85,11 @@ Tes memakai database MySQL terpisah, bukan SQLite.
 | --- | --- |
 | `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup` |
 | `app/Models` | Model Eloquent dan trait `Concerns` (termasuk `LimitedByAccess`) |
-| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService`, `VisitListService`, `HistoryService`, `ExportService` |
+| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService`, `VisitListService`, `HistoryService`, `ExportService`, `DashboardService` |
 | `app/Http/Middleware` | `SecurityHeaders`, `EnsureUserIsActive` (`active`), `EnsureRole` (`role:`) |
 | `config/sitamu.php` | Key aplikasi dari `.env` (PRD Bab 5.4) |
 | `resources/views/layouts` | Layout staf, tamu, login, cetak, dan error berbasis Volt |
-| `public/assets` | CSS identitas, JavaScript, logo, dan aset vendor (Volt, font Inter) |
+| `public/assets` | CSS identitas, JavaScript, logo, dan aset vendor (Volt, font Inter, Chart.js) |
 
 Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`. Logo sementara ada di `public/assets/img/logo.png`.
 
@@ -103,5 +103,5 @@ Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`
 | M3 — Halaman Tamu | Selesai |
 | M4 — Resepsionis & PIC | Selesai |
 | M5 — History & Ekspor | Selesai |
-| M6 — Dashboard | Belum |
+| M6 — Dashboard | Selesai |
 | M7 — Penyempurnaan | Belum |
