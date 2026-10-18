@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 class SecurityHeaders
 {
     /**
+     * Atribut request yang menandai halaman Langkah 1 tamu (tombol Google Identity Services).
+     */
+    public const ALLOW_GOOGLE_SIGN_IN = 'csp.allow_google_sign_in';
+
+    /**
      * Kebijakan CSP dasar: semua sumber hanya dari domain sendiri.
      *
      * img-src mengizinkan data: karena CSS Bootstrap memakai ikon SVG
@@ -21,15 +26,29 @@ class SecurityHeaders
         ."base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     /**
+     * Tambahan sumber Google khusus halaman Langkah 1 (Bab 12.1).
+     */
+    private const GOOGLE_SIGN_IN_SOURCES = "; script-src 'self' https://accounts.google.com/gsi/client"
+        ."; frame-src https://accounts.google.com/gsi/"
+        ."; connect-src 'self' https://accounts.google.com/gsi/"
+        ."; style-src 'self' https://accounts.google.com/gsi/style";
+
+    /**
      * Menambahkan header keamanan ke respons.
      */
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
+        $policy = self::CONTENT_SECURITY_POLICY;
+
+        if ($request->attributes->get(self::ALLOW_GOOGLE_SIGN_IN) === true) {
+            $policy .= self::GOOGLE_SIGN_IN_SOURCES;
+        }
+
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
-        $response->headers->set('Content-Security-Policy', self::CONTENT_SECURITY_POLICY);
+        $response->headers->set('Content-Security-Policy', $policy);
         $response->headers->set('Referrer-Policy', $this->referrerPolicy($request));
 
         return $response;
