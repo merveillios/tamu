@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\PurposeCategoryController;
 use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -60,5 +61,14 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/qr/{id}/regenerate', [QrController::class, 'regenerate'])->whereNumber('id')->name('qr.regenerate');
         Route::get('/qr/{id}/unduh', [QrController::class, 'download'])->whereNumber('id')->name('qr.download');
         Route::get('/qr/{id}/cetak', [QrController::class, 'print'])->whereNumber('id')->name('qr.print');
+    });
+
+    Route::middleware('role:admin,super_admin')->group(function () {
+        Route::get('/kategori-keperluan', [PurposeCategoryController::class, 'index'])->name('categories.index');
+        Route::get('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'create'])->name('categories.create');
+        Route::post('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'store'])->name('categories.store');
+        Route::get('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'edit'])->whereNumber('id')->name('categories.edit');
+        Route::post('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'update'])->whereNumber('id')->name('categories.update');
+        Route::post('/kategori-keperluan/{id}/status', [PurposeCategoryController::class, 'toggleStatus'])->whereNumber('id')->name('categories.status');
     });
 });
