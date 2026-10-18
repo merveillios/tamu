@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\VisitStatus;
 use App\Enums\VulnerableGroup;
 use App\Models\Concerns\CannotBeDeleted;
+use App\Models\Concerns\LimitedByAccess;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class GuestVisit extends Model
 {
     use CannotBeDeleted;
+    use LimitedByAccess;
 
     public $timestamps = false;
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\QrStatus;
+use App\Models\Concerns\LimitedByAccess;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class QrCode extends Model
 {
+    use LimitedByAccess;
+
     public const UPDATED_AT = null;
 
     protected $fillable = [

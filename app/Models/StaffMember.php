@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\CannotBeDeleted;
+use App\Models\Concerns\LimitedByAccess;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class StaffMember extends Model
 {
     use CannotBeDeleted;
+    use LimitedByAccess;
 
     protected $fillable = [
         'department_id',
