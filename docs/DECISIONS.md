@@ -85,6 +85,33 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Keputusan:** `php artisan db:seed` menjalankan `LocalSampleSeeder` hanya jika `APP_ENV=local`. Password akun contoh dibuat acak dan ditampilkan sekali di konsol.
 - **Alasan:** A-4 melarang password di kode dan A-10 melarang data dummy di produksi.
 
+## 2026-10-18 — Library QR Code
+
+- **Konteks:** Bab 5.1 mengizinkan `endroid/qr-code` tanpa menyebut versi; versi 6 mensyaratkan PHP 8.2.
+- **Keputusan:** `endroid/qr-code` 5.1 (turunannya `bacon/bacon-qr-code` dan `dasprid/enum`). Gambar memakai koreksi galat tinggi, sisi 600 px ditambah margin (hasil 648 px). Halaman cetak memakai SVG sebagai data URI sehingga tidak perlu `{!! !!}`.
+- **Alasan:** Kompatibel dengan PHP 8.1; koreksi galat tinggi menjaga QR tercetak tetap terbaca walau sedikit rusak.
+
+## 2026-10-18 — Service master data di M2
+
+- **Konteks:** Bab 5.2 hanya mencantumkan `QrService`, sedangkan Bab 5.3 meminta aturan bisnis di Service.
+- **Keputusan:** Menambah `LocationService`, `DepartmentService`, `PurposeCategoryService`, dan `StaffMemberService`. Keunikan nama departemen dan petugas dicek di service; collation `utf8mb4_unicode_ci` membuat perbandingan tidak membedakan huruf besar/kecil.
+- **Alasan:** Controller tetap tipis dan setiap aksi tercatat di audit log dari satu tempat.
+
+## 2026-10-18 — Lokasi untuk kategori keperluan dan petugas
+
+- **Konteks:** Admin memantau kunjungan hanya di lokasinya, tetapi mengelola kategori dan petugas di semua lokasi (Bab 3, Bab 17 No. 27).
+- **Keputusan:** `AccessScope::manageableLocations()` mengembalikan semua lokasi untuk Super Admin dan Admin, dan tidak ada lokasi untuk peran lain. `findManageableLocationOrDeny()` dipakai saat menambah kategori; ID departemen dan petugas tetap dicari lewat `findOrDeny()`.
+- **Alasan:** Filter cakupan tetap di satu titik pusat (A-6) tanpa mencampur aturan pemantauan dan pengelolaan.
+
+## 2026-10-18 — Detail perilaku master data
+
+- **Konteks:** Beberapa hal tidak dijawab eksplisit oleh PRD.
+- **Keputusan:**
+  - Lokasi kategori keperluan dan petugas ditentukan saat dibuat dan tidak dapat dipindah, seperti departemen (DEP-1), karena saran departemen bergantung pada lokasi.
+  - QR yang sudah dicabut tetap ditampilkan di bawah daftar sebagai riwayat, tanpa tombol aksi; server menolak perubahan status atau regenerate pada QR itu.
+  - Ganti resepsionis hanya untuk QR yang belum dicabut; kunjungan aktif ikut berpindah karena cakupan resepsionis dihitung dari kepemilikan QR.
+- **Alasan:** Pilihan paling sederhana dan aman (A-8).
+
 ## 2026-10-18 — Lingkungan tes
 
 - **Konteks:** A-15 mewajibkan tes memakai MySQL/MariaDB terpisah.
