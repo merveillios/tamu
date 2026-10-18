@@ -276,12 +276,12 @@ class VisitService
         }
 
         $closedFrom = $visit->status;
-        $previousStatus = VisitStatusLog::query()
+        // value() pada Eloquent menerapkan cast, sehingga hasilnya sudah berupa VisitStatus.
+        $target = VisitStatusLog::query()
             ->where('visit_id', $visit->id)
             ->where('to_status', $closedFrom)
             ->latest('id')
-            ->value('from_status');
-        $target = VisitStatus::tryFrom((string) $previousStatus) ?? VisitStatus::Waiting;
+            ->value('from_status') ?? VisitStatus::Waiting;
 
         $previous = [
             'completed_at' => $visit->completed_at?->format('Y-m-d H:i:s'),
