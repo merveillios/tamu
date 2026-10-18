@@ -1,0 +1,200 @@
+/*
+ * Penugasan PIC: polling daftar (PIC-4), tombol Terima (PIC-2), dan modal Hasil (PIC-3).
+ * Jumlah penugasan baru tampil di judul tab dan badge menu.
+ */
+(function () {
+    var root = document.querySelector('[data-assignments]');
+
+    if (!root) {
+        return;
+    }
+
+    var el = SiTamu.el;
+    var pollSeconds = parseInt(root.dataset.poll, 10) || 30;
+    var baseTitle = document.title;
+    var knownIds = null;
+    var timer = null;
+    var currentVisit = null;
+    var modalElement = document.getElementById('completeModal');
+    var form = document.querySelector('[data-complete-form]');
+    var resultInput = document.getElementById('complete_result');
+
+    function actionUrl(template, id) {
+        return template.replace('__ID__', id);
+    }
+
+    function cell(label, content, className) {
+        var td = el('td', className);
+        td.setAttribute('data-label', label);
+
+        if (content instanceof Node) {
+            td.appendChild(content);
+        } else {
+            td.textContent = content === null || content === undefined || content === '' ? '–' : content;
+        }
+
+        return td;
+    }
+
+    function actions(row) {
+        var wrap = el('div', 'd-flex flex-wrap gap-1 justify-content-end justify-content-md-start');
+
+        if (row.actions.accept) {
+            var accept = el('button', 'btn btn-sm btn-primary', 'Terima');
+            accept.type = 'button';
+            accept.addEventListener('click', function () { acceptVisit(row, accept); });
+            wrap.appendChild(accept);
+        }
+
+        if (row.actions.complete) {
+            var complete = el('button', 'btn btn-sm btn-success', 'Selesai');
+            complete.type = 'button';
+            complete.addEventListener('click', function () { openComplete(row); });
+            wrap.appendChild(complete);
+        }
+
+        var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
+        detail.href = row.detail_url;
+        wrap.appendChild(detail);
+
+        return wrap;
+    }
+
+    function renderRow(row) {
+        var tr = el('tr');
+        var purpose = el('div');
+        purpose.appendChild(el('div', 'fw-bold', row.category));
+        purpose.appendChild(el('div', 'small text-gray-600 text-break', row.purpose));
+
+        if (knownIds && !knownIds.has(row.id)) {
+            tr.classList.add('row-new');
+        }
+
+        if (row.waiting_long) {
+            tr.classList.add('row-waiting-long');
+        }
+
+        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
+        tr.appendChild(cell('Nama', row.name, 'fw-bold'));
+        tr.appendChild(cell('Instansi', row.organization));
+        tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
+        tr.appendChild(cell('Keperluan', purpose));
+        tr.appendChild(cell('Ditemui', row.served_by));
+        tr.appendChild(cell('Lokasi', row.location));
+        tr.appendChild(cell('Jam datang', row.check_in));
+        tr.appendChild(cell('Menunggu', row.waiting_minutes + ' mnt'));
+        tr.appendChild(cell('Aksi', actions(row)));
+
+        return tr;
+    }
+
+    function renderGroup(name, rows) {
+        var tbody = root.querySelector('[data-group="' + name + '"]');
+        tbody.textContent = '';
+
+        if (rows.length === 0) {
+            var empty = el('tr');
+            var td = el('td', 'text-center text-gray-600 py-4', 'Tidak ada data.');
+            td.colSpan = 10;
+            empty.appendChild(td);
+            tbody.appendChild(empty);
+        }
+
+        rows.forEach(function (row) {
+            tbody.appendChild(renderRow(row));
+        });
+
+        root.querySelector('[data-group-count="' + name + '"]').textContent = rows.length;
+    }
+
+    function render(data) {
+        renderGroup('new', data.new);
+        renderGroup('reviewing', data.reviewing);
+
+        knownIds = knownIds || new Set();
+        data.new.concat(data.reviewing).forEach(function (row) { knownIds.add(row.id); });
+
+        document.title = (data.new_count > 0 ? '(' + data.new_count + ') ' : '') + baseTitle;
+        document.querySelectorAll('[data-assignment-badge]').forEach(function (badge) {
+            badge.textContent = data.new_count;
+            badge.hidden = data.new_count === 0;
+        });
+        document.querySelector('[data-server-time]').textContent = data.server_time;
+    }
+
+    function load() {
+        return SiTamu.request(root.dataset.url).then(function (result) {
+            if (result.body.ok) {
+                render(result.body.data);
+            }
+        });
+    }
+
+    function startPolling() {
+        stopPolling();
+        timer = window.setInterval(load, pollSeconds * 1000);
+    }
+
+    function stopPolling() {
+        if (timer) {
+            window.clearInterval(timer);
+            timer = null;
+        }
+    }
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            load();
+            startPolling();
+        }
+    });
+
+    function acceptVisit(row, button) {
+        button.disabled = true;
+
+        SiTamu.request(actionUrl(root.dataset.acceptUrl, row.id), 'POST').then(function (result) {
+            SiTamu.toast(result.body.ok ? result.body.data.message : result.body.error.message, result.body.ok ? 'success' : 'error');
+            load();
+        });
+    }
+
+    function showError(message) {
+        var box = form.querySelector('[data-modal-error]');
+        box.textContent = message;
+        box.classList.toggle('d-none', !message);
+    }
+
+    function openComplete(row) {
+        currentVisit = row;
+        form.reset();
+        showError('');
+        form.querySelector('[data-complete-guest]').textContent = 'No. ' + row.number + ' · ' + row.name + ' · ' + row.category;
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+    }
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var submit = form.querySelector('[type="submit"]');
+        submit.disabled = true;
+
+        SiTamu.request(actionUrl(root.dataset.completeUrl, currentVisit.id), 'POST', { result: resultInput.value })
+            .then(function (result) {
+                if (result.body.ok || result.status === 409) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                    SiTamu.toast(result.body.ok ? result.body.data.message : result.body.error.message, result.body.ok ? 'success' : 'error');
+                    load();
+                    return;
+                }
+
+                showError(result.body.error ? result.body.error.message : 'Terjadi kesalahan. Silakan coba lagi.');
+            })
+            .finally(function () {
+                submit.disabled = false;
+            });
+    });
+
+    load();
+    startPolling();
+})();

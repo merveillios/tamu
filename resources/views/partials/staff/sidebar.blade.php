@@ -53,6 +53,9 @@
                     <a href="{{ url($item['path']) }}" class="nav-link">
                         <span class="sidebar-icon"><x-icon :name="$item['icon']" class="icon icon-xs me-2" /></span>
                         <span class="sidebar-text">{{ $item['label'] }}</span>
+                        @if ($item['path'] === 'admin/penugasan')
+                            <span class="badge bg-danger ms-1 menu-badge" data-assignment-badge @if ($newAssignmentCount === 0) hidden @endif>{{ $newAssignmentCount }}</span>
+                        @endif
                     </a>
                 </li>
             @endforeach

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ActiveVisitController;
+use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -59,6 +60,13 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     Route::middleware('role:receptionist')->group(function () {
         Route::get('/kunjungan/{id}/departemen', [VisitController::class, 'departments'])->whereNumber('id')->name('visits.departments');
         Route::post('/kunjungan/{id}/tugaskan', [VisitController::class, 'assign'])->whereNumber('id')->name('visits.assign');
+    });
+
+    Route::middleware('role:pic')->group(function () {
+        Route::get('/penugasan', [AssignmentController::class, 'index'])->name('assignments.index');
+        Route::get('/penugasan/data', [AssignmentController::class, 'data'])->name('assignments.data');
+        Route::post('/kunjungan/{id}/terima', [AssignmentController::class, 'accept'])->whereNumber('id')->name('visits.accept');
+        Route::post('/kunjungan/{id}/selesai', [AssignmentController::class, 'complete'])->whereNumber('id')->name('visits.complete');
     });
 
     Route::middleware('role:admin')->group(function () {

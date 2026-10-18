@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
+use App\Services\VisitListService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +28,15 @@ class AppServiceProvider extends ServiceProvider
     {
         // Tampilan paginasi mengikuti Bootstrap bawaan Volt.
         Paginator::useBootstrapFive();
+
+        // Badge jumlah penugasan baru di menu PIC (PIC-4).
+        View::composer('partials.staff.sidebar', function ($view) {
+            $user = auth()->user();
+
+            $view->with('newAssignmentCount', $user?->role === UserRole::Pic
+                ? app(VisitListService::class)->newAssignmentCount($user)
+                : 0);
+        });
 
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinutes(
