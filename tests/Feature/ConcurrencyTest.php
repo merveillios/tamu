@@ -36,6 +36,11 @@ class ConcurrencyTest extends TestCase
     {
         parent::setUp();
 
+        // Tes ini mengosongkan tabel; tolak berjalan bila database bukan database khusus tes.
+        if (! str_ends_with((string) config('database.connections.mysql.database'), '_test')) {
+            $this->markTestSkipped('ConcurrencyTest hanya berjalan pada database bernama *_test.');
+        }
+
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh');
             RefreshDatabaseState::$migrated = true;
