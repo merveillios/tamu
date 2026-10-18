@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\PurposeCategoryController;
 use App\Http\Controllers\Admin\QrController;
+use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -70,5 +71,12 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'edit'])->whereNumber('id')->name('categories.edit');
         Route::post('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'update'])->whereNumber('id')->name('categories.update');
         Route::post('/kategori-keperluan/{id}/status', [PurposeCategoryController::class, 'toggleStatus'])->whereNumber('id')->name('categories.status');
+
+        Route::get('/petugas', [StaffMemberController::class, 'index'])->name('staff.index');
+        Route::get('/petugas/tambah', [StaffMemberController::class, 'create'])->name('staff.create');
+        Route::post('/petugas/tambah', [StaffMemberController::class, 'store'])->name('staff.store');
+        Route::get('/petugas/{id}/ubah', [StaffMemberController::class, 'edit'])->whereNumber('id')->name('staff.edit');
+        Route::post('/petugas/{id}/ubah', [StaffMemberController::class, 'update'])->whereNumber('id')->name('staff.update');
+        Route::post('/petugas/{id}/status', [StaffMemberController::class, 'toggleStatus'])->whereNumber('id')->name('staff.status');
     });
 });
