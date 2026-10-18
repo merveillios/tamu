@@ -15,6 +15,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
 });
 
+Route::post('/logout', [LoginController::class, 'destroy'])->middleware(['auth', 'active'])->name('logout');
+
 Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });

@@ -21,7 +21,7 @@
                             Ganti Password
                         </a>
                         <div role="separator" class="dropdown-divider my-1"></div>
-                        <form method="POST" action="{{ url('/logout') }}">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="dropdown-item d-flex align-items-center">
                                 <x-icon name="logout" class="dropdown-icon text-danger me-2" />
