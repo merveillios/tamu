@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use App\Services\GuestQrResolver;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
@@ -31,6 +33,19 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // Validasi AJAX staf memakai konvensi respons JSON Bab 10.
+        $this->renderable(function (ValidationException $e, Request $request) {
+            if (! $request->expectsJson() || ! $request->is('admin/*')) {
+                return null;
+            }
+
+            return response()->json([
+                'ok' => false,
+                'error' => ['code' => 'VALIDATION_ERROR', 'message' => collect($e->errors())->flatten()->first()],
+                'errors' => $e->errors(),
+            ], 422);
         });
 
         // QR tidak aktif menampilkan halaman tamu dengan pesan seragam TAM-6.
