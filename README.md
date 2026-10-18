@@ -39,6 +39,12 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
    php artisan sitamu:create-superadmin
    ```
 
+   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, departemen, petugas, kategori, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
+
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
 5. Jalankan server pengembangan dan buka `http://127.0.0.1:8000`:
 
    ```bash
@@ -65,7 +71,8 @@ Tes memakai database MySQL terpisah, bukan SQLite.
 | Lokasi | Isi |
 | --- | --- |
 | `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup` |
-| `app/Models` | Model Eloquent dan trait `Concerns` |
+| `app/Models` | Model Eloquent dan trait `Concerns` (termasuk `LimitedByAccess`) |
+| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService` |
 | `app/Http/Middleware` | `SecurityHeaders`, `EnsureUserIsActive` (`active`), `EnsureRole` (`role:`) |
 | `config/sitamu.php` | Key aplikasi dari `.env` (PRD Bab 5.4) |
 | `resources/views/layouts` | Layout staf, tamu, login, cetak, dan error berbasis Volt |
@@ -78,7 +85,7 @@ Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`
 | Milestone | Status |
 | --- | --- |
 | M0 — Fondasi | Selesai |
-| M1 — Autentikasi, Akun & AccessScope | Belum |
+| M1 — Autentikasi, Akun & AccessScope | Selesai |
 | M2 — Master Data | Belum |
 | M3 — Halaman Tamu | Belum |
 | M4 — Resepsionis & PIC | Belum |
