@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\GuestVisit;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Data tamu lama berdasarkan email terverifikasi (PRD Bab 9.4, TAM-15 sampai TAM-17).
@@ -55,7 +55,7 @@ class ReturningGuestService
     /**
      * Riwayat kunjungan email ini, terbaru di atas, tanpa telepon, alamat, dan alasan batal (TAM-17).
      */
-    public function history(string $email): LengthAwarePaginator
+    public function history(string $email): Paginator
     {
         return GuestVisit::query()
             ->where('email', $email)
