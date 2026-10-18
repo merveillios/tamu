@@ -9,6 +9,9 @@ return [
 
     'institution_name' => env('INSTITUTION_NAME', 'Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur (Disperindag)'),
 
+    // Reverse proxy tepercaya: kosong, '*', atau daftar IP/CIDR dipisah koma (Bab 5.5).
+    'trusted_proxies' => env('TRUSTED_PROXIES', ''),
+
     'login' => [
         'max_attempts' => (int) env('LOGIN_MAX_ATTEMPTS', 5),
         'lock_minutes' => (int) env('LOGIN_LOCK_MINUTES', 15),
