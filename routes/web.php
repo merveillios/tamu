@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
@@ -45,5 +46,10 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/lokasi/{id}/ubah', [LocationController::class, 'update'])->whereNumber('id')->name('locations.update');
         Route::post('/lokasi/{id}/status', [LocationController::class, 'toggleStatus'])->whereNumber('id')->name('locations.status');
         Route::post('/lokasi/{id}/hapus', [LocationController::class, 'destroy'])->whereNumber('id')->name('locations.destroy');
+
+        Route::get('/lokasi/{id}/departemen', [DepartmentController::class, 'index'])->whereNumber('id')->name('departments.index');
+        Route::post('/lokasi/{id}/departemen', [DepartmentController::class, 'store'])->whereNumber('id')->name('departments.store');
+        Route::post('/departemen/{id}/ubah', [DepartmentController::class, 'update'])->whereNumber('id')->name('departments.update');
+        Route::post('/departemen/{id}/status', [DepartmentController::class, 'toggleStatus'])->whereNumber('id')->name('departments.status');
     });
 });
