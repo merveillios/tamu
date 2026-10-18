@@ -5,24 +5,40 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Services\AccessScope;
+use App\Services\DashboardService;
+use App\Services\VisitService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Halaman awal panel staf. Isi dashboard per peran dibangun di M6 (DSH-1 sampai DSH-5).
+ * Dashboard per peran (DSH-1 sampai DSH-5).
  */
 class DashboardController extends Controller
 {
     /**
-     * Menampilkan halaman awal staf.
+     * Admin dan Super Admin melihat dashboard; Resepsionis dan PIC langsung ke halaman kerjanya (DSH-5).
      */
-    public function index(Request $request, AccessScope $scope): View
+    public function index(Request $request, AccessScope $scope, DashboardService $dashboard): View|RedirectResponse
     {
         $user = $request->user();
 
-        return view('admin.home', [
-            // USR-2: Admin tanpa lokasi tetap bisa login tetapi diberi tahu.
-            'adminWithoutLocation' => $user->role === UserRole::Admin && $scope->locationIds($user) === [],
-        ]);
+        return match ($user->role) {
+            UserRole::Receptionist => redirect()->route('admin.visits.active'),
+            UserRole::Pic => redirect()->route('admin.assignments.index'),
+            UserRole::Admin => view('admin.dashboard.admin', [
+                // USR-2: Admin tanpa lokasi tetap bisa login tetapi diberi tahu.
+                'adminWithoutLocation' => $scope->locationIds($user) === [],
+                'counts' => $dashboard->counts($user),
+                'activeVisits' => $dashboard->activePreview($user),
+                'cancelReasons' => VisitService::CANCEL_REASONS,
+            ]),
+            UserRole::SuperAdmin => view('admin.dashboard.super', [
+                'overview' => $dashboard->overview($user),
+                'perLocation' => $dashboard->perLocation($user),
+                'chart' => $dashboard->dailyVisits($user),
+                'latestVisits' => $dashboard->latestVisits($user),
+            ]),
+        };
     }
 }

@@ -153,6 +153,11 @@ body {
     font-size: 0.7rem;
 }
 
+.dashboard-chart {
+    position: relative;
+    height: 280px;
+}
+
 /* Tabel menjadi kartu di layar < 768 px (Bab 12.5) */
 @media (max-width: 767.98px) {
     .table-cards thead {
