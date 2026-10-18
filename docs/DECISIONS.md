@@ -141,6 +141,12 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Keputusan:** Baris daftar dirender di browser dari JSON polling (`/admin/tamu/data`, `/admin/penugasan/data`) memakai `textContent`, tanpa HTML dari server, sehingga tampilan awal dan hasil polling selalu sama. Bunyi notifikasi PIC (opsional pada PIC-4) belum dibuat.
 - **Alasan:** Satu jalur render lebih sederhana dan aman terhadap XSS (A-7).
 
+## 2026-10-18 — Tampilan ponsel (M7)
+
+- **Konteks:** Bab 12.5 mewajibkan tabel Tamu Aktif dan Penugasan berubah menjadi kartu di layar < 768 px, dan semua halaman nyaman di layar 360 px.
+- **Keputusan:** Tamu Aktif, Penugasan, History, detail kunjungan, dan dashboard memakai kelas `table-cards` (baris menjadi kartu berlabel). Tabel master data yang jarang dibuka dari ponsel (Pengguna, Lokasi, Departemen, QR, Kategori, Petugas, Audit Log) tetap berupa tabel dengan gulir horizontal di dalam kartu.
+- **Alasan:** Halaman operasional harian dipakai dari ponsel; halaman pengaturan umumnya dibuka dari komputer.
+
 ## 2026-10-18 — Lingkungan tes
 
 - **Konteks:** A-15 mewajibkan tes memakai MySQL/MariaDB terpisah.
