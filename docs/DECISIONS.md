@@ -129,6 +129,18 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Keputusan:** Keunikan dijamin oleh `INSERT ... ON DUPLICATE KEY UPDATE ... LAST_INSERT_ID()` di MySQL dan unique key (`location_id`, `visit_date`, `daily_number`). Tes otomatis menguji urutan nomor per lokasi dan per hari; uji kiriman yang benar-benar paralel dilakukan manual.
 - **Alasan:** PHPUnit menjalankan request berurutan dalam satu proses sehingga tidak dapat mensimulasikan dua koneksi paralel dengan andal.
 
+## 2026-10-18 — Kode respons aksi kunjungan (M4)
+
+- **Konteks:** Bab 7.1 meminta transisi tidak sah ditolak 422, sedangkan Bab 7.2 meminta 409 bila status sudah diubah petugas lain.
+- **Keputusan:** Aksi pada kunjungan yang sudah ditutup (Selesai/Dibatalkan), misalnya penugasan, mendapat 422 `INVALID_TRANSITION`. Aksi pada kunjungan aktif yang statusnya sudah berbeda dari yang diharapkan (misalnya Selesai saat masih Menunggu, Terima kedua kali, atau Batal yang kalah balapan) mendapat 409 `STATUS_CONFLICT`, karena biasanya berasal dari daftar yang belum diperbarui. Batal pada kunjungan yang sudah ditutup juga 409 karena skenario umumnya adalah dua petugas menekan tombol bersamaan.
+- **Alasan:** Antarmuka memuat ulang daftar pada 409 sehingga petugas langsung melihat status terbaru.
+
+## 2026-10-18 — Daftar Tamu Aktif dan Penugasan
+
+- **Konteks:** RSP-5 dan RSP-7 meminta aksi tanpa reload dan pembaruan otomatis.
+- **Keputusan:** Baris daftar dirender di browser dari JSON polling (`/admin/tamu/data`, `/admin/penugasan/data`) memakai `textContent`, tanpa HTML dari server, sehingga tampilan awal dan hasil polling selalu sama. Bunyi notifikasi PIC (opsional pada PIC-4) belum dibuat.
+- **Alasan:** Satu jalur render lebih sederhana dan aman terhadap XSS (A-7).
+
 ## 2026-10-18 — Lingkungan tes
 
 - **Konteks:** A-15 mewajibkan tes memakai MySQL/MariaDB terpisah.
