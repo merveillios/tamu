@@ -47,7 +47,7 @@ class PasswordChangeTest extends TestCase
         $user = $this->staff();
 
         $this->post('/login', ['email' => $user->email, 'password' => self::PASSWORD]);
-        $this->get('/admin')->assertOk();
+        $this->get('/admin/password')->assertOk();
 
         // Password diganti dari perangkat lain atau direset Super Admin.
         $user->forceFill(['password' => 'password-baru-123'])->save();
@@ -55,7 +55,7 @@ class PasswordChangeTest extends TestCase
         // Request nyata selalu memuat ulang akun dari database; di tes guard menyimpan akun lama di memori.
         $this->app['auth']->forgetGuards();
 
-        $this->get('/admin')->assertRedirect(route('login'));
+        $this->get('/admin/password')->assertRedirect(route('login'));
         $this->assertGuest();
     }
 

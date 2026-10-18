@@ -67,7 +67,7 @@ class LayoutTest extends TestCase
     private function assertMenu(UserRole $role, array $visible, array $hidden): void
     {
         $html = $this->actingAs(User::factory()->role($role)->create())
-            ->get('/admin')
+            ->get('/admin/password')
             ->assertOk()
             ->getContent();
 
