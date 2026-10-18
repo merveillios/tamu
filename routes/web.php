@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Guest\GoogleVerificationController;
 use App\Http\Controllers\Guest\GuestEntryController;
+use App\Http\Controllers\Guest\GuestFormController;
 use App\Http\Controllers\Guest\GuestHistoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,9 @@ Route::prefix('tamu/{token}')->name('guest.')->group(function () {
     Route::post('/verifikasi-google', [GoogleVerificationController::class, 'verify'])->middleware('throttle:google-verify')->name('verify');
     Route::post('/ganti-akun', [GoogleVerificationController::class, 'switchAccount'])->name('switch');
     Route::get('/riwayat', [GuestHistoryController::class, 'show'])->name('history');
+    Route::get('/formulir', [GuestFormController::class, 'show'])->name('form');
+    Route::post('/formulir', [GuestFormController::class, 'store'])->middleware('throttle:guest-form')->name('store');
+    Route::get('/terima-kasih', [GuestFormController::class, 'thanks'])->name('thanks');
 });
 
 Route::middleware('guest')->group(function () {
