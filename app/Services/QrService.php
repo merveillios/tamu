@@ -7,6 +7,7 @@ use App\Models\Location;
 use App\Models\QrCode;
 use App\Models\User;
 use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\Result\ResultInterface;
@@ -143,11 +144,15 @@ class QrService
 
     /**
      * Membangun gambar QR dengan koreksi galat tinggi agar tetap terbaca walau cetakan rusak sebagian.
+     *
+     * Encoding ISO-8859-1 dipakai karena URL selalu ASCII; dengan UTF-8 (bawaan library) QR
+     * menyisipkan penanda ECI yang gagal dibaca sebagian aplikasi pemindai.
      */
     private function build(QrCode $qr, WriterInterface $writer): ResultInterface
     {
         return Builder::create()
             ->writer($writer)
+            ->encoding(new Encoding('ISO-8859-1'))
             ->data($this->url($qr))
             ->errorCorrectionLevel(ErrorCorrectionLevel::High)
             ->size(self::IMAGE_SIZE)
