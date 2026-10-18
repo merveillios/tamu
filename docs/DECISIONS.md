@@ -112,6 +112,23 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
   - Ganti resepsionis hanya untuk QR yang belum dicabut; kunjungan aktif ikut berpindah karena cakupan resepsionis dihitung dari kepemilikan QR.
 - **Alasan:** Pilihan paling sederhana dan aman (A-8).
 
+## 2026-10-18 — Detail halaman tamu (M3)
+
+- **Konteks:** Beberapa detail alur tamu tidak dijawab eksplisit oleh PRD.
+- **Keputusan:**
+  - Hasil verifikasi email, nonce Google, dan token formulir disimpan di session dengan kunci per QR (`guest.{qr_id}.*`), sehingga verifikasi di satu QR tidak berlaku di QR lain.
+  - Nonce dipakai sekali (diambil dengan `pull`). Bila verifikasi gagal, server mengirim nonce baru dan tombol Google diinisialisasi ulang tanpa memuat ulang halaman.
+  - Token formulir (TAM-14) dikonsumsi sebelum validasi; bila validasi gagal, formulir yang tampil ulang mendapat token baru.
+  - Honeypot terisi menampilkan halaman terima kasih generik tanpa nomor urut.
+  - Waktu verifikasi Google disimpan sebagai `email_verified_at`.
+- **Alasan:** Pilihan paling sederhana yang tetap memenuhi TAM-8, TAM-11, dan TAM-14.
+
+## 2026-10-18 — Uji nomor urut bersamaan
+
+- **Konteks:** DoD M3 meminta dua kiriman bersamaan mendapat nomor berbeda.
+- **Keputusan:** Keunikan dijamin oleh `INSERT ... ON DUPLICATE KEY UPDATE ... LAST_INSERT_ID()` di MySQL dan unique key (`location_id`, `visit_date`, `daily_number`). Tes otomatis menguji urutan nomor per lokasi dan per hari; uji kiriman yang benar-benar paralel dilakukan manual.
+- **Alasan:** PHPUnit menjalankan request berurutan dalam satu proses sehingga tidak dapat mensimulasikan dua koneksi paralel dengan andal.
+
 ## 2026-10-18 — Lingkungan tes
 
 - **Konteks:** A-15 mewajibkan tes memakai MySQL/MariaDB terpisah.
