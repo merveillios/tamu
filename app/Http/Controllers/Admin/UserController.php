@@ -92,6 +92,19 @@ class UserController extends Controller
     }
 
     /**
+     * Mengaktifkan atau menonaktifkan akun (USR-4, USR-5).
+     */
+    public function toggleStatus(Request $request, int $id, UserAccountService $accounts): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+        $accounts->setActive($user, ! $user->is_active, $request->user());
+
+        $message = $user->is_active ? "Akun {$user->name} diaktifkan." : "Akun {$user->name} dinonaktifkan.";
+
+        return back()->with('success', $message);
+    }
+
+    /**
      * Data pilihan untuk form akun: peran, departemen aktif per lokasi, dan lokasi.
      *
      * @return array<string, mixed>

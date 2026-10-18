@@ -31,5 +31,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/tambah', [UserController::class, 'store'])->name('users.store');
         Route::get('/pengguna/{id}/ubah', [UserController::class, 'edit'])->whereNumber('id')->name('users.edit');
         Route::post('/pengguna/{id}/ubah', [UserController::class, 'update'])->whereNumber('id')->name('users.update');
+        Route::post('/pengguna/{id}/status', [UserController::class, 'toggleStatus'])->whereNumber('id')->name('users.status');
     });
 });

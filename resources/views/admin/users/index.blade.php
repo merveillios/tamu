@@ -86,6 +86,7 @@
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                @include('admin.users.partials.actions', ['user' => $user])
                             </div>
                         </td>
                     </tr>
