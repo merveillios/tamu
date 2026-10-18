@@ -97,6 +97,36 @@ class AccessScope
     }
 
     /**
+     * Lokasi yang boleh dipilih saat mengelola kategori keperluan dan petugas.
+     * Admin mengelola keduanya di semua lokasi (Bab 3, Bab 17 No. 27), berbeda
+     * dengan pemantauan kunjungan yang dibatasi lokasi yang ditugaskan.
+     */
+    public function manageableLocations(User $user): Builder
+    {
+        $query = Location::query();
+
+        return $user->hasRole(UserRole::SuperAdmin, UserRole::Admin) ? $query : $query->whereIn('id', []);
+    }
+
+    /**
+     * Mencari lokasi master data berdasarkan ID; di luar cakupan berakhir 404 seragam.
+     */
+    public function findManageableLocationOrDeny(int|string $id, User $user): Location
+    {
+        $location = $this->manageableLocations($user)->whereKey($id)->first();
+
+        if ($location !== null) {
+            return $location;
+        }
+
+        if (Location::query()->whereKey($id)->exists()) {
+            $this->audit->record('access.denied', null, ['model' => 'Location', 'id' => (int) $id], $user);
+        }
+
+        abort(404);
+    }
+
+    /**
      * Mencari data berdasarkan ID di dalam cakupan akun. Di luar cakupan atau
      * tidak ada selalu berakhir 404 yang seragam; percobaan akses ke data yang
      * benar-benar ada dicatat sebagai access.denied.
