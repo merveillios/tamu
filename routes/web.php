@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\UserController;
@@ -33,5 +34,7 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/{id}/ubah', [UserController::class, 'update'])->whereNumber('id')->name('users.update');
         Route::post('/pengguna/{id}/status', [UserController::class, 'toggleStatus'])->whereNumber('id')->name('users.status');
         Route::post('/pengguna/{id}/buka-kunci', [UserController::class, 'unlock'])->whereNumber('id')->name('users.unlock');
+
+        Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
     });
 });
