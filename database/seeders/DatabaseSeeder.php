@@ -2,21 +2,22 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Data contoh hanya diisi di lingkungan lokal; produksi tidak pernah diberi data dummy (A-10).
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        if (! app()->environment('local')) {
+            $this->command?->warn('Seeder data contoh hanya berjalan jika APP_ENV=local.');
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+            return;
+        }
+
+        $this->command?->info('Akun contoh baru (catat password ini, tidak ditampilkan lagi):');
+        $this->call(LocalSampleSeeder::class);
     }
 }
