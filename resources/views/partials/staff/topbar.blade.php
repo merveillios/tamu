@@ -16,7 +16,7 @@
                         </div>
                     </a>
                     <div class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
-                        <a class="dropdown-item d-flex align-items-center" href="{{ url('/admin/password') }}">
+                        <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.password.edit') }}">
                             <x-icon name="key" class="dropdown-icon text-gray-400 me-2" />
                             Ganti Password
                         </a>
