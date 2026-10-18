@@ -105,6 +105,17 @@ class UserController extends Controller
     }
 
     /**
+     * Membuka kunci akun yang terkunci karena gagal login (AUTH-4).
+     */
+    public function unlock(Request $request, int $id, UserAccountService $accounts): RedirectResponse
+    {
+        $user = User::findOrFail($id);
+        $accounts->unlock($user, $request->user());
+
+        return back()->with('success', "Kunci akun {$user->name} telah dibuka.");
+    }
+
+    /**
      * Data pilihan untuk form akun: peran, departemen aktif per lokasi, dan lokasi.
      *
      * @return array<string, mixed>
