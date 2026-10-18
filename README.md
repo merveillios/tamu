@@ -8,6 +8,7 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
 
 - PHP 8.1, Laravel 10 (tanpa starter kit), MySQL 8.0+ atau MariaDB 10.6+
 - `endroid/qr-code` 5.1 untuk gambar QR Code
+- `phpoffice/phpspreadsheet` 5.8 dan `dompdf/dompdf` 3.1 untuk ekspor Excel dan PDF
 - Blade, Bootstrap 5.1 (bawaan template [Volt](https://github.com/themesberg/volt-bootstrap-5-dashboard)), JavaScript vanilla
 - Tidak butuh Node, cron, atau queue worker di server
 
@@ -84,7 +85,7 @@ Tes memakai database MySQL terpisah, bukan SQLite.
 | --- | --- |
 | `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup` |
 | `app/Models` | Model Eloquent dan trait `Concerns` (termasuk `LimitedByAccess`) |
-| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService`, `VisitListService` |
+| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService`, `VisitListService`, `HistoryService`, `ExportService` |
 | `app/Http/Middleware` | `SecurityHeaders`, `EnsureUserIsActive` (`active`), `EnsureRole` (`role:`) |
 | `config/sitamu.php` | Key aplikasi dari `.env` (PRD Bab 5.4) |
 | `resources/views/layouts` | Layout staf, tamu, login, cetak, dan error berbasis Volt |
@@ -101,6 +102,6 @@ Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`
 | M2 — Master Data | Selesai |
 | M3 — Halaman Tamu | Selesai |
 | M4 — Resepsionis & PIC | Selesai |
-| M5 — History & Ekspor | Belum |
+| M5 — History & Ekspor | Selesai |
 | M6 — Dashboard | Belum |
 | M7 — Penyempurnaan | Belum |
