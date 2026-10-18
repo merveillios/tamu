@@ -130,6 +130,61 @@ body {
     white-space: pre-line;
 }
 
+/* Tamu Aktif dan Penugasan: sorotan baris (RSP-7, RSP-8, PIC-4) */
+.row-new {
+    animation: row-flash 3s ease-out;
+}
+
+@keyframes row-flash {
+    from {
+        background-color: rgba(var(--sitamu-primary-rgb), 0.18);
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
+.row-waiting-long {
+    background-color: #fff7ed;
+}
+
+.menu-badge {
+    font-size: 0.7rem;
+}
+
+/* Tabel menjadi kartu di layar < 768 px (Bab 12.5) */
+@media (max-width: 767.98px) {
+    .table-cards thead {
+        display: none;
+    }
+
+    .table-cards tr {
+        display: block;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .table-cards td {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border: 0;
+        padding: 0.25rem 0;
+        white-space: normal;
+        text-align: right;
+    }
+
+    .table-cards td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6b7280;
+        text-align: left;
+    }
+}
+
 /* Halaman error dan login */
 .error-code {
     font-size: 5rem;
