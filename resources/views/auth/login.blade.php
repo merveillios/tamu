@@ -3,11 +3,11 @@
 @section('title', 'Login Staf')
 
 @section('content')
-    @error('email')
-        <div class="alert alert-danger small" role="alert">{{ $message }}</div>
-    @enderror
+    @if ($errors->any())
+        <div class="alert alert-danger small" role="alert">{{ $errors->first() }}</div>
+    @endif
 
-    <form method="POST" action="{{ url('/login') }}" class="mt-4">
+    <form method="POST" action="{{ route('login.store') }}" class="mt-4">
         @csrf
 
         <div class="form-group mb-4">

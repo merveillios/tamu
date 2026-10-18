@@ -12,6 +12,7 @@ Route::view('/', 'home')->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
+    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
 });
 
 Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(function () {
