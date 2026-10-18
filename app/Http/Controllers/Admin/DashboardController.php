@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Services\AccessScope;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -13,8 +16,13 @@ class DashboardController extends Controller
     /**
      * Menampilkan halaman awal staf.
      */
-    public function index(): View
+    public function index(Request $request, AccessScope $scope): View
     {
-        return view('admin.home');
+        $user = $request->user();
+
+        return view('admin.home', [
+            // USR-2: Admin tanpa lokasi tetap bisa login tetapi diberi tahu.
+            'adminWithoutLocation' => $user->role === UserRole::Admin && $scope->locationIds($user) === [],
+        ]);
     }
 }
