@@ -1,6 +1,7 @@
 /*
  * Penugasan PIC: polling daftar (PIC-4), tombol Terima (PIC-2), dan modal Hasil (PIC-3).
- * Jumlah penugasan baru tampil di judul tab dan badge menu.
+ * Jumlah penugasan baru tampil di judul tab dan badge menu; bunyi singkat diputar bila
+ * PIC sudah mengaktifkannya lewat tombol di halaman.
  */
 (function () {
     var root = document.querySelector('[data-assignments]');
@@ -18,6 +19,54 @@
     var modalElement = document.getElementById('completeModal');
     var form = document.querySelector('[data-complete-form]');
     var resultInput = document.getElementById('complete_result');
+    var soundButton = document.querySelector('[data-sound-toggle]');
+    var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    var audioContext = null;
+    var soundEnabled = false;
+
+    // Dua nada pendek dari Web Audio API; tidak perlu file audio sehingga tetap sesuai CSP 'self'.
+    function playNotification() {
+        if (!soundEnabled || !audioContext) {
+            return;
+        }
+
+        var start = audioContext.currentTime;
+
+        [0, 0.2].forEach(function (offset) {
+            var oscillator = audioContext.createOscillator();
+            var gain = audioContext.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 880;
+            gain.gain.setValueAtTime(0.0001, start + offset);
+            gain.gain.exponentialRampToValueAtTime(0.3, start + offset + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, start + offset + 0.15);
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            oscillator.start(start + offset);
+            oscillator.stop(start + offset + 0.16);
+        });
+    }
+
+    function updateSoundButton() {
+        soundButton.textContent = soundEnabled ? 'Matikan bunyi notifikasi' : 'Aktifkan bunyi notifikasi';
+        soundButton.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        soundButton.classList.toggle('btn-primary', soundEnabled);
+        soundButton.classList.toggle('btn-outline-gray-800', !soundEnabled);
+    }
+
+    if (soundButton && AudioContextClass) {
+        soundButton.hidden = false;
+
+        // Browser hanya mengizinkan audio setelah interaksi pengguna, jadi AudioContext dibuat saat tombol diklik.
+        soundButton.addEventListener('click', function () {
+            audioContext = audioContext || new AudioContextClass();
+            audioContext.resume();
+            soundEnabled = !soundEnabled;
+            updateSoundButton();
+            playNotification();
+        });
+    }
 
     function actionUrl(template, id) {
         return template.replace('__ID__', id);
@@ -108,11 +157,18 @@
     }
 
     function render(data) {
+        // Pemuatan pertama tidak dianggap penugasan baru agar bunyi tidak berbunyi saat halaman dibuka.
+        var hasFreshAssignment = knownIds !== null && data.new.some(function (row) { return !knownIds.has(row.id); });
+
         renderGroup('new', data.new);
         renderGroup('reviewing', data.reviewing);
 
         knownIds = knownIds || new Set();
         data.new.concat(data.reviewing).forEach(function (row) { knownIds.add(row.id); });
+
+        if (hasFreshAssignment) {
+            playNotification();
+        }
 
         document.title = (data.new_count > 0 ? '(' + data.new_count + ') ' : '') + baseTitle;
         document.querySelectorAll('[data-assignment-badge]').forEach(function (badge) {

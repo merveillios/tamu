@@ -7,9 +7,13 @@
         <div class="alert alert-warning" role="alert">Akun ini belum dihubungkan ke departemen.</div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-3 small">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 small">
         <span class="text-gray-600">Daftar diperbarui otomatis setiap {{ config('sitamu.poll_interval_seconds') }} detik.</span>
-        <span class="text-gray-500">Diperbarui <span data-server-time>–</span></span>
+        <div class="d-flex align-items-center gap-3">
+            {{-- Disembunyikan sampai JavaScript memastikan browser mendukung Web Audio (PIC-4). --}}
+            <button type="button" class="btn btn-sm btn-outline-gray-800" data-sound-toggle aria-pressed="false" hidden>Aktifkan bunyi notifikasi</button>
+            <span class="text-gray-500">Diperbarui <span data-server-time>–</span></span>
+        </div>
     </div>
 
     <div data-assignments
