@@ -139,6 +139,34 @@ Tanpa origin yang terdaftar, tombol "Pilih akun Google" tidak muncul atau menola
 
 Untuk mencoba halaman tamu secara lokal, buka menu **Lokasi → QR → Cetak** sebagai Super Admin; URL di bawah QR mengikuti `APP_URL`.
 
+## Mencoba halaman tamu dari ponsel
+
+Ponsel tidak bisa membuka `localhost` milik laptop, dan Google hanya mengizinkan tombol login di alamat `https://` atau `localhost`. Karena itu, uji dari ponsel memakai *tunnel* HTTPS sementara, misalnya Cloudflare Tunnel (gratis, tanpa akun):
+
+1. Jalankan aplikasi di laptop:
+
+   ```bash
+   php artisan serve --host=127.0.0.1 --port=8000
+   ```
+
+2. Di terminal lain, buka tunnel lalu catat alamat `https://….trycloudflare.com` yang muncul:
+
+   ```bash
+   cloudflared tunnel --url http://127.0.0.1:8000
+   ```
+
+3. Di `.env`, ubah `APP_URL` menjadi alamat tunnel tersebut dan isi `TRUSTED_PROXIES=*` agar Laravel tahu permintaan datang lewat HTTPS. Setelah itu muat ulang konfigurasi:
+
+   ```bash
+   php artisan config:clear
+   ```
+
+4. Tambahkan alamat tunnel ke **Authorized JavaScript origins** pada Client ID di Google Cloud Console. Perubahan di Google bisa butuh beberapa menit sebelum berlaku.
+5. Buka **Lokasi → QR → Cetak** di laptop. Gambar QR dibuat ulang dari `APP_URL` setiap kali dibuka, jadi tidak perlu membuat QR baru. Pindai dengan kamera ponsel.
+6. Selesai menguji, hentikan tunnel (`Ctrl+C`), kembalikan `APP_URL` dan `TRUSTED_PROXIES`, lalu jalankan lagi `php artisan config:clear`.
+
+Catatan: alamat *quick tunnel* berubah setiap kali dijalankan, sehingga origin di Google perlu ditambahkan ulang. Selama tunnel aktif, aplikasi lokal bisa dibuka siapa pun yang tahu alamatnya, jadi jangan biarkan tunnel menyala tanpa perlu.
+
 ## Tes dan kerapian kode
 
 Tes memakai database MySQL terpisah, bukan SQLite.
@@ -153,6 +181,8 @@ Tes memakai database MySQL terpisah, bukan SQLite.
    ```bash
    vendor/bin/pint --test
    ```
+
+`ConcurrencyTest` menjalankan beberapa proses PHP paralel (`tests/Support/concurrent-worker.php`) untuk membuktikan nomor urut tidak bentrok dan satu penugasan tidak bisa diterima dua kali. Tes ini menyimpan data sungguhan di database tes lalu mengosongkannya, jadi pastikan `.env.testing` **selalu** menunjuk database khusus tes (`sitamu_test`), bukan database utama.
 
 ## Struktur penting
 
