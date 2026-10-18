@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\PurposeCategoryController;
 use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VisitController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Guest\GoogleVerificationController;
 use App\Http\Controllers\Guest\GuestEntryController;
@@ -46,6 +47,21 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::post('/password', [PasswordController::class, 'update'])->name('password.update');
 
+    Route::get('/kunjungan/{id}', [VisitController::class, 'show'])->whereNumber('id')->name('visits.show');
+
+    Route::middleware('role:receptionist,admin,super_admin')->group(function () {
+        Route::post('/kunjungan/{id}/batal', [VisitController::class, 'cancel'])->whereNumber('id')->name('visits.cancel');
+    });
+
+    Route::middleware('role:receptionist')->group(function () {
+        Route::get('/kunjungan/{id}/departemen', [VisitController::class, 'departments'])->whereNumber('id')->name('visits.departments');
+        Route::post('/kunjungan/{id}/tugaskan', [VisitController::class, 'assign'])->whereNumber('id')->name('visits.assign');
+    });
+
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/kunjungan/{id}/buka-kembali', [VisitController::class, 'reopen'])->whereNumber('id')->name('visits.reopen');
+    });
+
     Route::middleware('role:super_admin')->group(function () {
         Route::get('/pengguna', [UserController::class, 'index'])->name('users.index');
         Route::get('/pengguna/tambah', [UserController::class, 'create'])->name('users.create');
@@ -80,6 +96,8 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     });
 
     Route::middleware('role:admin,super_admin')->group(function () {
+        Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
+
         Route::get('/kategori-keperluan', [PurposeCategoryController::class, 'index'])->name('categories.index');
         Route::get('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'create'])->name('categories.create');
         Route::post('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'store'])->name('categories.store');
