@@ -61,6 +61,30 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Keputusan:** M0 menyediakan `/` (beranda informasi), `GET /login` (tampilan form saja), dan `/admin` (beranda staf sementara).
 - **Alasan:** Agar layout tamu, login, dan staf dapat diperiksa dan dites sejak M0. Ketiganya diganti atau dilengkapi di milestone terkait.
 
+## 2026-10-18 — Service tambahan di M1
+
+- **Konteks:** Bab 5.2 tidak mencantumkan service untuk login dan akun staf, tetapi Bab 5.3 meminta aturan bisnis berada di Service, bukan di controller.
+- **Keputusan:** Menambah `LoginService` (pemeriksaan kredensial dan penguncian akun, AUTH-1) dan `UserAccountService` (USR-1, USR-2, USR-4, USR-5, AUTH-4).
+- **Alasan:** Controller tetap tipis dan aturan USR-4/USR-5 dapat dites langsung.
+
+## 2026-10-18 — Pesan login untuk akun nonaktif dan terkunci
+
+- **Konteks:** AUTH-1 meminta pesan gagal selalu "Email atau password salah."
+- **Keputusan:** Akun nonaktif dan akun terkunci juga mendapat pesan yang sama; alasan sebenarnya (`unknown_email`, `wrong_password`, `locked`, `inactive`) hanya tercatat di `audit_logs.detail`. Password benar pada akun nonaktif tidak menambah hitungan gagal.
+- **Alasan:** Tidak membocorkan keberadaan atau status akun.
+
+## 2026-10-18 — Cakupan Admin pada lokasi dan cache AccessScope
+
+- **Konteks:** Bab 12.2 membatasi QR Admin per lokasi tetapi membebaskan departemen, kategori, dan petugas di semua lokasi.
+- **Keputusan:** `Location::forUser()` untuk Admin hanya mengembalikan lokasi yang ditugaskan (dipakai untuk filter pemantauan). Departemen, kategori, dan petugas tanpa filter untuk Admin. Hasil `locationIds()` dan daftar QR resepsionis di-cache di atribut request, bukan di properti service.
+- **Alasan:** Cache per request tidak terbawa ke request berikutnya, termasuk di tes yang menjalankan banyak request pada satu instance aplikasi.
+
+## 2026-10-18 — Data contoh lokal
+
+- **Konteks:** CRUD lokasi dan departemen baru dibuat di M2, padahal form akun M1 membutuhkannya.
+- **Keputusan:** `php artisan db:seed` menjalankan `LocalSampleSeeder` hanya jika `APP_ENV=local`. Password akun contoh dibuat acak dan ditampilkan sekali di konsol.
+- **Alasan:** A-4 melarang password di kode dan A-10 melarang data dummy di produksi.
+
 ## 2026-10-18 — Lingkungan tes
 
 - **Konteks:** A-15 mewajibkan tes memakai MySQL/MariaDB terpisah.
