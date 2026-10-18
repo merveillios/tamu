@@ -126,8 +126,9 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 ## 2026-10-18 — Uji nomor urut bersamaan
 
 - **Konteks:** DoD M3 meminta dua kiriman bersamaan mendapat nomor berbeda.
-- **Keputusan:** Keunikan dijamin oleh `INSERT ... ON DUPLICATE KEY UPDATE ... LAST_INSERT_ID()` di MySQL dan unique key (`location_id`, `visit_date`, `daily_number`). Tes otomatis menguji urutan nomor per lokasi dan per hari; uji kiriman yang benar-benar paralel dilakukan manual.
-- **Alasan:** PHPUnit menjalankan request berurutan dalam satu proses sehingga tidak dapat mensimulasikan dua koneksi paralel dengan andal.
+- **Keputusan:** Keunikan dijamin oleh `INSERT ... ON DUPLICATE KEY UPDATE ... LAST_INSERT_ID()` di MySQL dan unique key (`location_id`, `visit_date`, `daily_number`). Tes urutan nomor per lokasi dan per hari ada di `GuestFormTest`.
+- **Pembaruan 2026-10-19:** Kiriman yang benar-benar paralel kini dites otomatis di `ConcurrencyTest`. Tes ini menjalankan beberapa proses PHP (`tests/Support/concurrent-worker.php`) dengan koneksi MySQL masing-masing, yang mulai pada waktu yang sama: 10 kiriman serentak harus mendapat nomor 1–10 tanpa celah, dan dua klik Terima serentak hanya boleh satu yang berhasil. Tes ini terbukti gagal bila penghitung diganti `max() + 1`. Karena proses anak tidak dapat melihat data di dalam transaksi tes, kelas ini menyimpan data sungguhan lalu mengosongkan tabel setelah tiap tes.
+- **Alasan:** Satu proses PHPUnit menjalankan request berurutan sehingga tidak dapat membuktikan keamanan terhadap koneksi paralel.
 
 ## 2026-10-18 — Kode respons aksi kunjungan (M4)
 
