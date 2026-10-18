@@ -52,6 +52,17 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
    php artisan serve
    ```
 
+## Verifikasi Google untuk halaman tamu
+
+Halaman tamu memakai Google Identity Services. Isi `GOOGLE_CLIENT_ID` di `.env` dengan OAuth Client ID (jenis *Web application*) milik instansi, lalu di Google Cloud Console → *Credentials* → Client ID tersebut, tambahkan setiap alamat yang dipakai ke **Authorized JavaScript origins**, misalnya:
+
+- `http://localhost:8000` dan `http://127.0.0.1:8000` untuk pengembangan lokal
+- domain produksi, misalnya `https://sitamu.contoh.go.id`
+
+Tanpa origin yang terdaftar, tombol "Pilih akun Google" tidak muncul atau menolak login. Client secret tidak dibutuhkan.
+
+Untuk mencoba halaman tamu secara lokal, buka menu **Lokasi → QR → Cetak** sebagai Super Admin; URL di bawah QR mengikuti `APP_URL`.
+
 ## Tes dan kerapian kode
 
 Tes memakai database MySQL terpisah, bukan SQLite.
@@ -73,7 +84,7 @@ Tes memakai database MySQL terpisah, bukan SQLite.
 | --- | --- |
 | `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup` |
 | `app/Models` | Model Eloquent dan trait `Concerns` (termasuk `LimitedByAccess`) |
-| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService` |
+| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService` |
 | `app/Http/Middleware` | `SecurityHeaders`, `EnsureUserIsActive` (`active`), `EnsureRole` (`role:`) |
 | `config/sitamu.php` | Key aplikasi dari `.env` (PRD Bab 5.4) |
 | `resources/views/layouts` | Layout staf, tamu, login, cetak, dan error berbasis Volt |
@@ -88,7 +99,7 @@ Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`
 | M0 — Fondasi | Selesai |
 | M1 — Autentikasi, Akun & AccessScope | Selesai |
 | M2 — Master Data | Selesai |
-| M3 — Halaman Tamu | Belum |
+| M3 — Halaman Tamu | Selesai |
 | M4 — Resepsionis & PIC | Belum |
 | M5 — History & Ekspor | Belum |
 | M6 — Dashboard | Belum |
