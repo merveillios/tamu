@@ -1,0 +1,115 @@
+/*
+ * Gaya SiTamu di atas Volt (PRD Bab 5.6 dan Bab 13).
+ * Warna identitas instansi cukup diubah di blok :root ini.
+ */
+:root {
+    --sitamu-primary: #1e40af;
+    --sitamu-primary-hover: #1e3a8a;
+    --sitamu-primary-rgb: 30, 64, 175;
+    --sitamu-sidebar-bg: #172554;
+
+    --bs-primary: var(--sitamu-primary);
+    --bs-primary-rgb: var(--sitamu-primary-rgb);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Warna utama Volt diganti warna instansi */
+.btn-primary {
+    background-color: var(--sitamu-primary);
+    border-color: var(--sitamu-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--sitamu-primary-hover);
+    border-color: var(--sitamu-primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--sitamu-primary);
+    border-color: var(--sitamu-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--sitamu-primary);
+    border-color: var(--sitamu-primary);
+}
+
+.sidebar.sitamu-sidebar,
+.navbar-theme-primary {
+    background-color: var(--sitamu-sidebar-bg) !important;
+}
+
+.sitamu-sidebar .nav-item.active > .nav-link {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--sitamu-primary);
+    box-shadow: 0 0 0 0.18rem rgba(var(--sitamu-primary-rgb), 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--sitamu-primary);
+    border-color: var(--sitamu-primary);
+}
+
+/* Logo dan identitas */
+.brand-logo {
+    height: 40px;
+    width: auto;
+}
+
+.brand-logo-sm {
+    height: 28px;
+    width: auto;
+}
+
+.avatar-initial {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: var(--sitamu-primary);
+    color: #fff;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Halaman tamu: satu kolom mobile-first (Bab 12.5) */
+.guest-shell {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 2.5rem;
+}
+
+.guest-location-badge {
+    font-size: 0.875rem;
+    white-space: normal;
+}
+
+/* Halaman error dan login */
+.error-code {
+    font-size: 5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--sitamu-primary);
+}
+
+.auth-card {
+    max-width: 440px;
+}
+
+/* Halaman cetak QR */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
