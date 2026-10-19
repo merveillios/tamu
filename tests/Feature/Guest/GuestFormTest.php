@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Guest;
 
+use App\Enums\UserRole;
 use App\Enums\VisitStatus;
 use App\Models\GuestVisit;
 use App\Models\PurposeCategory;
@@ -179,6 +180,54 @@ class GuestFormTest extends TestCase
         $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr), [
             'signature' => $this->signatureDataUrl(withInk: false),
         ]))->assertSessionHasErrors(['signature' => 'Tanda tangan wajib dibubuhkan.']);
+    }
+
+    public function test_categories_are_grouped_by_active_department(): void
+    {
+        $location = $this->createLocation();
+        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
+        $industry = $this->createDepartment($location, 'Bidang Industri Agro');
+        $secretariat = $this->createDepartment($location, 'Sekretariat');
+        $inactive = $this->createDepartment($location, 'Bidang Lama');
+        $inactive->update(['is_active' => false]);
+
+        foreach ([
+            ['Bagaimana cara mengurus izin usaha industri?', $industry],
+            ['Bagaimana cara ikut pelatihan IKM?', $industry],
+            ['Saya ingin mengantar surat', $secretariat],
+            ['Pertanyaan lama', $inactive],
+            ['Lainnya', null],
+        ] as [$name, $department]) {
+            PurposeCategory::create(['location_id' => $location->id, 'name' => $name, 'suggested_department_id' => $department?->id]);
+        }
+
+        $this->verifiedAs($qr, 'tamu@contoh.test')
+            ->get("/tamu/{$qr->token}/formulir")
+            ->assertOk()
+            ->assertSeeInOrder([
+                '<optgroup label="Bidang Industri Agro">',
+                'Bagaimana cara ikut pelatihan IKM?',
+                'Bagaimana cara mengurus izin usaha industri?',
+                '<optgroup label="Sekretariat">',
+                'Saya ingin mengantar surat',
+                '<optgroup label="Umum">',
+                'Lainnya',
+                'Pertanyaan lama',
+            ], false)
+            ->assertDontSee('Bidang Lama');
+    }
+
+    public function test_categories_without_department_are_not_grouped(): void
+    {
+        $location = $this->createLocation();
+        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
+        $category = $this->createCategory($location);
+
+        $this->verifiedAs($qr, 'tamu@contoh.test')
+            ->get("/tamu/{$qr->token}/formulir")
+            ->assertOk()
+            ->assertSee($category->name)
+            ->assertDontSee('<optgroup', false);
     }
 
     public function test_category_from_other_location_is_rejected(): void

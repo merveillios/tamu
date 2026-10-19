@@ -79,6 +79,33 @@ class PurposeCategoryTest extends TestCase
             ->assertSeeInOrder(['Zebra', 'Alfa', 'Beta']);
     }
 
+    public function test_index_groups_by_department_with_general_group_last(): void
+    {
+        $location = $this->createLocation();
+        $admin = $this->createAdmin($location);
+        $secretariat = $this->createDepartment($location, 'Sekretariat');
+        $industry = $this->createDepartment($location, 'Bidang Industri Agro');
+        PurposeCategory::create(['location_id' => $location->id, 'name' => 'Lainnya']);
+        PurposeCategory::create(['location_id' => $location->id, 'name' => 'Saya ingin mengantar surat', 'suggested_department_id' => $secretariat->id]);
+        PurposeCategory::create(['location_id' => $location->id, 'name' => 'Bagaimana cara mengurus izin usaha?', 'suggested_department_id' => $industry->id]);
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
+            ->assertOk()
+            ->assertSeeInOrder(['Bidang Industri Agro', 'Bagaimana cara mengurus izin usaha?', 'Sekretariat', 'Saya ingin mengantar surat', 'Umum', 'Lainnya']);
+    }
+
+    public function test_question_accepts_up_to_150_characters(): void
+    {
+        $location = $this->createLocation();
+        $admin = $this->createAdmin($location);
+        $url = "/admin/kategori-keperluan/tambah?location_id={$location->id}";
+
+        $this->actingAs($admin)->post($url, ['name' => str_repeat('a', 150)])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post($url, ['name' => str_repeat('b', 151)])
+            ->assertSessionHasErrors(['name' => 'Pertanyaan wajib diisi (2–150 karakter).']);
+        $this->assertDatabaseHas('purpose_categories', ['name' => str_repeat('a', 150)]);
+    }
+
     public function test_updates_and_toggles_category(): void
     {
         $location = $this->createLocation();
