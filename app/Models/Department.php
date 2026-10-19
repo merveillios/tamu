@@ -43,6 +43,14 @@ class Department extends Model
     }
 
     /**
+     * QR Code yang diarahkan ke departemen ini.
+     */
+    public function qrCodes(): HasMany
+    {
+        return $this->hasMany(QrCode::class);
+    }
+
+    /**
      * Akun PIC departemen ini.
      */
     public function picUsers(): HasMany
