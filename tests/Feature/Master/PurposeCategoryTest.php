@@ -29,7 +29,7 @@ class PurposeCategoryTest extends TestCase
                 'suggested_department_id' => $department->id,
                 'sort_order' => 2,
             ])
-            ->assertRedirect(route('admin.categories.index', ['location_id' => $other->id]));
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $other->id, 'departemen' => $department->id]));
 
         $category = PurposeCategory::firstOrFail();
         $this->assertSame([$other->id, $department->id, 2], [$category->location_id, $category->suggested_department_id, $category->sort_order]);
@@ -92,6 +92,44 @@ class PurposeCategoryTest extends TestCase
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
             ->assertOk()
             ->assertSeeInOrder(['Bidang Industri Agro', 'Bagaimana cara mengurus izin usaha?', 'Sekretariat', 'Saya ingin mengantar surat', 'Umum', 'Lainnya']);
+    }
+
+    public function test_index_lists_every_active_department_and_opens_requested_one(): void
+    {
+        $location = $this->createLocation();
+        $admin = $this->createAdmin($location);
+        $empty = $this->createDepartment($location, 'Bidang Kosong');
+        $inactive = $this->createDepartment($location, 'Bidang Lama');
+        $inactive->update(['is_active' => false]);
+        PurposeCategory::create(['location_id' => $location->id, 'name' => 'Pertanyaan lama', 'suggested_department_id' => $inactive->id]);
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen={$empty->id}")
+            ->assertOk()
+            ->assertSeeInOrder(['Bidang Kosong', 'Belum ada pertanyaan.', 'Umum (tanpa departemen)', 'Pertanyaan lama', 'Departemen Bidang Lama nonaktif'])
+            ->assertSee("id=\"section-{$empty->id}\" class=\"accordion-collapse collapse show\"", false)
+            ->assertSee('id="section-umum" class="accordion-collapse collapse "', false)
+            ->assertSee(route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $empty->id]));
+    }
+
+    public function test_create_prefills_department_and_saving_returns_to_its_section(): void
+    {
+        $location = $this->createLocation();
+        $admin = $this->createAdmin($location);
+        $department = $this->createDepartment($location);
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan/tambah?location_id={$location->id}&departemen={$department->id}")
+            ->assertOk()
+            ->assertSee("value=\"{$department->id}\" selected", false);
+
+        $this->actingAs($admin)
+            ->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'Bagaimana cara ikut pelatihan?', 'suggested_department_id' => $department->id])
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $department->id]));
+
+        $category = PurposeCategory::where('name', 'Bagaimana cara ikut pelatihan?')->firstOrFail();
+        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/ubah", ['name' => $category->name])
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => 'umum']));
+        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/status")
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => 'umum']));
     }
 
     public function test_question_accepts_up_to_150_characters(): void
