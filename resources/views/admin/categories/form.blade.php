@@ -13,16 +13,6 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">Pertanyaan</label>
-                        <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" required maxlength="150"
-                               class="form-control @error('name') is-invalid @enderror" aria-describedby="name_error">
-                        @error('name')
-                            <div class="invalid-feedback" id="name_error">{{ $message }}</div>
-                        @enderror
-                        <div class="form-text">Pilihan yang dilihat tamu di formulir. Contoh: Bagaimana cara mengurus izin usaha industri?</div>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="suggested_department_id" class="form-label">Departemen (opsional)</label>
                         <select name="suggested_department_id" id="suggested_department_id"
                                 class="form-select @error('suggested_department_id') is-invalid @enderror" aria-describedby="suggested_department_id_error">
@@ -39,6 +29,16 @@
                         <div class="form-text">Di formulir tamu, pertanyaan tampil di bawah nama departemen ini. Departemen ini juga dipilih otomatis sebagai saran saat resepsionis menugaskan kunjungan.</div>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Pertanyaan</label>
+                        <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" required maxlength="150"
+                               class="form-control @error('name') is-invalid @enderror" aria-describedby="name_error">
+                        @error('name')
+                            <div class="invalid-feedback" id="name_error">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Pilihan yang dilihat tamu di formulir. Contoh: Bagaimana cara mengurus izin usaha industri?</div>
+                    </div>
+
                     <div class="mb-4">
                         <label for="sort_order" class="form-label">Urutan tampil</label>
                         <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $category->sort_order ?? 0) }}" min="0" max="999"
@@ -51,7 +51,7 @@
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="{{ route('admin.categories.index', ['location_id' => $location->id]) }}" class="btn btn-gray-200">Batal</a>
+                        <a href="{{ $backUrl }}" class="btn btn-gray-200">Batal</a>
                     </div>
                 </form>
             </div>
