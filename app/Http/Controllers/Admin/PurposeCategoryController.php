@@ -24,19 +24,20 @@ class PurposeCategoryController extends Controller
     }
 
     /**
-     * Daftar departemen sebuah lokasi; departemen dibuka untuk melihat pertanyaannya.
-     * Parameter `departemen` (ID departemen atau `umum`) menentukan bagian yang terbuka.
+     * Daftar departemen sebuah lokasi. Dengan parameter `departemen` (ID departemen atau `umum`),
+     * halaman menampilkan pertanyaan departemen itu.
      */
     public function index(Request $request): View
     {
         $locations = $this->scope->manageableLocations($request->user())->orderBy('name')->get(['id', 'name']);
         $location = $this->selectedLocation($request, $locations->first()?->id);
+        $sections = $location === null ? collect() : $this->sections($request, $location);
 
         return view('admin.categories.index', [
             'locations' => $locations,
             'location' => $location,
-            'sections' => $location === null ? collect() : $this->sections($request, $location),
-            'openSection' => (string) $request->query('departemen', ''),
+            'sections' => $sections,
+            'section' => $sections->firstWhere('key', (string) $request->query('departemen', '')),
         ]);
     }
 
