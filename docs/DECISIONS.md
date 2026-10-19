@@ -130,6 +130,12 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Pembaruan 2026-10-19:** Kiriman yang benar-benar paralel kini dites otomatis di `ConcurrencyTest`. Tes ini menjalankan beberapa proses PHP (`tests/Support/concurrent-worker.php`) dengan koneksi MySQL masing-masing, yang mulai pada waktu yang sama: 10 kiriman serentak harus mendapat nomor 1–10 tanpa celah, dan dua klik Terima serentak hanya boleh satu yang berhasil. Tes ini terbukti gagal bila penghitung diganti `max() + 1`. Karena proses anak tidak dapat melihat data di dalam transaksi tes, kelas ini menyimpan data sungguhan lalu mengosongkan tabel setelah tiap tes.
 - **Alasan:** Satu proses PHPUnit menjalankan request berurutan sehingga tidak dapat membuktikan keamanan terhadap koneksi paralel.
 
+## 2026-10-19 — Pertanyaan dikelompokkan per departemen (mengubah KAT-1)
+
+- **Konteks:** KAT-1 menampilkan kategori keperluan sebagai daftar polos dan saran departemen tidak ditampilkan kepada tamu. Pemilik proyek meminta dropdown formulir tamu berisi nama departemen, dengan daftar pertanyaan yang disiapkan admin di bawahnya.
+- **Keputusan:** Tabel dan aturan kategori tetap; satu kategori = satu pertanyaan, dan saran departemennya menjadi grup. Formulir tamu memakai `<optgroup>` berjudul nama departemen; grup urut nama departemen, pertanyaan di dalam grup urut `sort_order` lalu nama. Pertanyaan tanpa departemen, atau yang departemennya nonaktif, masuk grup "Umum" di paling bawah. Bila tidak ada satu pun pertanyaan yang punya departemen, dropdown tetap polos. Judul grup tidak dapat dipilih; tamu tetap memilih pertanyaan, sehingga saran departemen ke resepsionis (RSP) dan isian `purpose_category_name` tidak berubah. Halaman admin memakai label "Pertanyaan" dan urutan yang sama dengan formulir tamu; URL `/admin/kategori-keperluan` tidak diubah. Panjang nama dinaikkan dari 100 menjadi 150 karakter (validasi Bab 11.3, `purpose_categories.name`, dan `guest_visits.purpose_category_name`) lewat migrasi `ALTER TABLE` karena proyek tidak memakai `doctrine/dbal`.
+- **Alasan:** Memakai kolom saran departemen yang sudah ada menghindari tabel baru, dan data kunjungan lama tetap utuh. `<optgroup>` adalah dropdown bawaan browser, sehingga di ponsel tampil sebagai daftar berjudul tanpa JavaScript tambahan.
+
 ## 2026-10-19 — Tanda tangan cukup sekali (mengubah TAM-9)
 
 - **Konteks:** TAM-9 dan Bab 6.6.1 meminta tanda tangan digambar setiap kunjungan. Pemilik proyek meminta tamu yang sudah pernah tanda tangan tidak perlu tanda tangan lagi.
