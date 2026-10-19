@@ -10,7 +10,7 @@
         ['label' => 'Penugasan', 'path' => 'admin/penugasan', 'icon' => 'clipboard-check', 'roles' => [UserRole::Pic]],
         ['label' => 'History', 'path' => 'admin/history', 'icon' => 'clock', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Lokasi', 'path' => 'admin/lokasi', 'icon' => 'location', 'roles' => [UserRole::SuperAdmin]],
-        ['label' => 'Kategori Keperluan', 'path' => 'admin/kategori-keperluan', 'icon' => 'tag', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
+        ['label' => 'Pertanyaan', 'path' => 'admin/kategori-keperluan', 'icon' => 'tag', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Petugas', 'path' => 'admin/petugas', 'icon' => 'identification', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Pengguna', 'path' => 'admin/pengguna', 'icon' => 'users', 'roles' => [UserRole::SuperAdmin]],
         ['label' => 'Audit Log', 'path' => 'admin/audit-log', 'icon' => 'document-text', 'roles' => [UserRole::SuperAdmin]],

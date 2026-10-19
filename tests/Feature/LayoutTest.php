@@ -44,7 +44,7 @@ class LayoutTest extends TestCase
     {
         $this->assertMenu(
             UserRole::Admin,
-            ['Dashboard', 'Tamu Aktif', 'History', 'Kategori Keperluan', 'Petugas', 'Ganti Password'],
+            ['Dashboard', 'Tamu Aktif', 'History', 'Pertanyaan', 'Petugas', 'Ganti Password'],
             ['Penugasan', 'Lokasi', 'Pengguna', 'Audit Log'],
         );
     }
@@ -53,7 +53,7 @@ class LayoutTest extends TestCase
     {
         $this->assertMenu(
             UserRole::SuperAdmin,
-            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'Kategori Keperluan', 'Petugas', 'Pengguna', 'Audit Log', 'Ganti Password'],
+            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'Pertanyaan', 'Petugas', 'Pengguna', 'Audit Log', 'Ganti Password'],
             ['Penugasan'],
         );
     }

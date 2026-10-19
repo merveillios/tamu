@@ -61,7 +61,7 @@ class PurposeCategoryTest extends TestCase
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Konsultasi']);
 
         $this->actingAs($admin)->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'konsultasi'])
-            ->assertSessionHasErrors(['name' => 'Nama kategori sudah digunakan di lokasi ini.']);
+            ->assertSessionHasErrors(['name' => 'Pertanyaan ini sudah ada di lokasi ini.']);
         $this->actingAs($admin)->post("/admin/kategori-keperluan/tambah?location_id={$other->id}", ['name' => 'Konsultasi'])
             ->assertSessionHasNoErrors();
     }

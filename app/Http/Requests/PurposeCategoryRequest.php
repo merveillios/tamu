@@ -60,9 +60,9 @@ class PurposeCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.unique' => 'Nama kategori sudah digunakan di lokasi ini.',
-            'name.*' => 'Nama kategori wajib diisi (2–100 karakter).',
-            'suggested_department_id.*' => 'Saran departemen harus departemen aktif di lokasi yang sama.',
+            'name.unique' => 'Pertanyaan ini sudah ada di lokasi ini.',
+            'name.*' => 'Pertanyaan wajib diisi (2–100 karakter).',
+            'suggested_department_id.*' => 'Departemen harus departemen aktif di lokasi yang sama.',
             'sort_order.*' => 'Urutan tampil berupa angka 0–999.',
         ];
     }

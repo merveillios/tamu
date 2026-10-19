@@ -64,7 +64,7 @@ class PurposeCategoryController extends Controller
         $category = $categories->create($location, $request->validated(), $request->user());
 
         return redirect()->route('admin.categories.index', ['location_id' => $location->id])
-            ->with('success', "Kategori {$category->name} berhasil ditambahkan.");
+            ->with('success', "Pertanyaan \"{$category->name}\" berhasil ditambahkan.");
     }
 
     /**
@@ -86,7 +86,7 @@ class PurposeCategoryController extends Controller
         $categories->update($category, $request->validated(), $request->user());
 
         return redirect()->route('admin.categories.index', ['location_id' => $category->location_id])
-            ->with('success', "Kategori {$category->name} berhasil diperbarui.");
+            ->with('success', "Pertanyaan \"{$category->name}\" berhasil diperbarui.");
     }
 
     /**
@@ -97,7 +97,7 @@ class PurposeCategoryController extends Controller
         $category = $this->scope->findOrDeny(PurposeCategory::class, $id, $request->user());
         $categories->setActive($category, ! $category->is_active, $request->user());
 
-        $message = $category->is_active ? "Kategori {$category->name} diaktifkan." : "Kategori {$category->name} dinonaktifkan.";
+        $message = $category->is_active ? "Pertanyaan \"{$category->name}\" diaktifkan." : "Pertanyaan \"{$category->name}\" dinonaktifkan.";
 
         return back()->with('success', $message);
     }

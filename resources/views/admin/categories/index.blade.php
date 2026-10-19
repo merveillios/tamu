@@ -1,6 +1,6 @@
 @extends('layouts.staff')
 
-@section('title', 'Kategori Keperluan')
+@section('title', 'Pertanyaan')
 
 @section('content')
     @if ($errors->any())
@@ -28,7 +28,7 @@
                     <div class="col-12 col-md-8"><span class="fw-bold">{{ $location->name }}</span></div>
                 @endif
                 <div class="col-12 col-md-4 d-grid">
-                    <a href="{{ route('admin.categories.create', ['location_id' => $location->id]) }}" class="btn btn-primary">Tambah Kategori</a>
+                    <a href="{{ route('admin.categories.create', ['location_id' => $location->id]) }}" class="btn btn-primary">Tambah Pertanyaan</a>
                 </div>
             </div>
         </div>
@@ -68,7 +68,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="text-center text-gray-600 py-4">
-                                Belum ada kategori. Formulir tamu di lokasi ini baru bisa dibuka setelah ada minimal satu kategori aktif.
+                                Belum ada pertanyaan. Formulir tamu di lokasi ini baru bisa dibuka setelah ada minimal satu pertanyaan aktif.
                             </td>
                         </tr>
                     @endforelse
