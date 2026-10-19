@@ -66,7 +66,7 @@ class PurposeCategoryTest extends TestCase
             ->assertSessionHasNoErrors();
     }
 
-    public function test_index_orders_by_sort_order_then_name(): void
+    public function test_department_page_orders_by_sort_order_then_name(): void
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
@@ -74,41 +74,58 @@ class PurposeCategoryTest extends TestCase
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Beta', 'sort_order' => 2]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Alfa', 'sort_order' => 2]);
 
-        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen=umum")
             ->assertOk()
             ->assertSeeInOrder(['Zebra', 'Alfa', 'Beta']);
     }
 
-    public function test_index_groups_by_department_with_general_group_last(): void
+    public function test_index_lists_departments_without_their_questions(): void
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
         $secretariat = $this->createDepartment($location, 'Sekretariat');
         $industry = $this->createDepartment($location, 'Bidang Industri Agro');
+        $this->createDepartment($location, 'Bidang Kosong');
+        $inactive = $this->createDepartment($location, 'Bidang Lama');
+        $inactive->update(['is_active' => false]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Lainnya']);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Saya ingin mengantar surat', 'suggested_department_id' => $secretariat->id]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Bagaimana cara mengurus izin usaha?', 'suggested_department_id' => $industry->id]);
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
             ->assertOk()
-            ->assertSeeInOrder(['Bidang Industri Agro', 'Bagaimana cara mengurus izin usaha?', 'Sekretariat', 'Saya ingin mengantar surat', 'Umum', 'Lainnya']);
+            ->assertSeeInOrder(['Bidang Industri Agro', 'Bidang Kosong', 'Sekretariat', 'Umum (tanpa departemen)'])
+            ->assertSee(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $industry->id]))
+            ->assertSee('Lihat pertanyaan')
+            ->assertDontSee('Bidang Lama')
+            ->assertDontSee('Bagaimana cara mengurus izin usaha?');
     }
 
-    public function test_index_lists_every_active_department_and_opens_requested_one(): void
+    public function test_department_page_shows_only_its_questions(): void
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
+        $industry = $this->createDepartment($location, 'Bidang Industri Agro');
         $empty = $this->createDepartment($location, 'Bidang Kosong');
         $inactive = $this->createDepartment($location, 'Bidang Lama');
         $inactive->update(['is_active' => false]);
+        PurposeCategory::create(['location_id' => $location->id, 'name' => 'Bagaimana cara mengurus izin usaha?', 'suggested_department_id' => $industry->id]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Pertanyaan lama', 'suggested_department_id' => $inactive->id]);
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen={$industry->id}")
+            ->assertOk()
+            ->assertSee('Bagaimana cara mengurus izin usaha?')
+            ->assertDontSee('Pertanyaan lama')
+            ->assertSee(route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $industry->id]));
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen={$empty->id}")
             ->assertOk()
-            ->assertSeeInOrder(['Bidang Kosong', 'Belum ada pertanyaan.', 'Umum (tanpa departemen)', 'Pertanyaan lama', 'Departemen Bidang Lama nonaktif'])
-            ->assertSee("id=\"section-{$empty->id}\" class=\"accordion-collapse collapse show\"", false)
-            ->assertSee('id="section-umum" class="accordion-collapse collapse "', false)
-            ->assertSee(route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $empty->id]));
+            ->assertSee('Belum ada pertanyaan di departemen ini.');
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen=umum")
+            ->assertOk()
+            ->assertSeeInOrder(['Umum (tanpa departemen)', 'Pertanyaan lama', 'Departemen Bidang Lama nonaktif'])
+            ->assertDontSee('Bagaimana cara mengurus izin usaha?');
     }
 
     public function test_create_prefills_department_and_saving_returns_to_its_section(): void
