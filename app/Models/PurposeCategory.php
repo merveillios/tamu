@@ -64,7 +64,8 @@ class PurposeCategory extends Model
      */
     public static function groupByDepartment(Collection $categories): Collection
     {
-        $groups = $categories->groupBy(fn (self $category) => $category->groupName() ?? '')
+        // toBase(): except() pada koleksi Eloquent memfilter ID model, bukan kunci grup.
+        $groups = $categories->toBase()->groupBy(fn (self $category) => $category->groupName() ?? '')
             ->sortKeys(SORT_NATURAL | SORT_FLAG_CASE);
 
         return $groups->has('') ? $groups->except('')->put('', $groups->get('')) : $groups;
