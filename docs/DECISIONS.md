@@ -130,6 +130,12 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 - **Pembaruan 2026-10-19:** Kiriman yang benar-benar paralel kini dites otomatis di `ConcurrencyTest`. Tes ini menjalankan beberapa proses PHP (`tests/Support/concurrent-worker.php`) dengan koneksi MySQL masing-masing, yang mulai pada waktu yang sama: 10 kiriman serentak harus mendapat nomor 1–10 tanpa celah, dan dua klik Terima serentak hanya boleh satu yang berhasil. Tes ini terbukti gagal bila penghitung diganti `max() + 1`. Karena proses anak tidak dapat melihat data di dalam transaksi tes, kelas ini menyimpan data sungguhan lalu mengosongkan tabel setelah tiap tes.
 - **Alasan:** Satu proses PHPUnit menjalankan request berurutan sehingga tidak dapat membuktikan keamanan terhadap koneksi paralel.
 
+## 2026-10-19 — Tanda tangan cukup sekali (mengubah TAM-9)
+
+- **Konteks:** TAM-9 dan Bab 6.6.1 meminta tanda tangan digambar setiap kunjungan. Pemilik proyek meminta tamu yang sudah pernah tanda tangan tidak perlu tanda tangan lagi.
+- **Keputusan:** Formulir hanya menampilkan kotak tanda tangan bila email terverifikasi belum punya tanda tangan di kunjungan mana pun. Untuk tamu yang sudah punya, server menyalin gambar tanda tangan terbaru email itu ke `visit_signatures` kunjungan baru, dan input `signature` dari browser diabaikan (aturan `exclude`). Tamu lama yang belum punya tanda tangan tetap diminta sekali. Persetujuan pemrosesan data (TAM-7) tetap dicentang setiap kunjungan.
+- **Alasan:** Menyalin gambar menjaga relasi satu tanda tangan per kunjungan (Bab 9.2), sehingga detail kunjungan dan ekspor Excel/PDF tetap menampilkan tanda tangan di setiap baris tanpa perubahan lain.
+
 ## 2026-10-18 — Kode respons aksi kunjungan (M4)
 
 - **Konteks:** Bab 7.1 meminta transisi tidak sah ditolak 422, sedangkan Bab 7.2 meminta 409 bila status sudah diubah petugas lain.
