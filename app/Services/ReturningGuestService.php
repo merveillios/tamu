@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\GuestVisit;
+use App\Models\VisitSignature;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Data tamu lama berdasarkan email terverifikasi (PRD Bab 9.4, TAM-15 sampai TAM-17).
@@ -17,6 +19,23 @@ class ReturningGuestService
      * Kolom data diri yang diambil dari kunjungan terakhir (TAM-16).
      */
     public const PROFILE_FIELDS = ['vulnerable_group', 'name', 'organization', 'phone', 'address'];
+
+    /**
+     * Mengecek apakah email ini sudah punya tanda tangan dari kunjungan sebelumnya.
+     */
+    public function hasSignature(string $email): bool
+    {
+        return $this->signatureQuery($email)->exists();
+    }
+
+    /**
+     * Gambar tanda tangan dari kunjungan terbaru email ini yang memiliki tanda tangan.
+     * Dipakai ulang agar tamu lama cukup tanda tangan sekali pada kunjungan pertama.
+     */
+    public function latestSignature(string $email): ?string
+    {
+        return $this->signatureQuery($email)->orderByDesc('visit_id')->value('image');
+    }
 
     /**
      * Tamu lama = pernah tercatat di lokasi mana pun dengan email yang sama.
@@ -68,5 +87,14 @@ class ReturningGuestService
             ->orderByDesc('id')
             ->simplePaginate(config('sitamu.guest.history_per_page'))
             ->withQueryString();
+    }
+
+    /**
+     * Tanda tangan milik kunjungan-kunjungan email ini, tanpa JOIN ke daftar kunjungan.
+     */
+    private function signatureQuery(string $email): Builder
+    {
+        return VisitSignature::query()
+            ->whereIn('visit_id', GuestVisit::query()->where('email', $email)->select('id'));
     }
 }

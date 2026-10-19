@@ -108,21 +108,25 @@
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label class="form-label" for="signature_canvas">Tanda tangan</label>
-                <canvas id="signature_canvas" class="signature-canvas @error('signature') is-invalid @enderror"
-                        data-signature-canvas aria-describedby="signature_help signature_error"></canvas>
-                <input type="hidden" name="signature" data-signature-input>
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <span class="small text-gray-600" id="signature_help">Gunakan jari, stylus, atau mouse.</span>
-                    <button type="button" class="btn btn-sm btn-outline-gray-800" data-signature-clear>Hapus Tanda Tangan</button>
+            @if ($needsSignature)
+                <div class="mb-3">
+                    <label class="form-label" for="signature_canvas">Tanda tangan</label>
+                    <canvas id="signature_canvas" class="signature-canvas @error('signature') is-invalid @enderror"
+                            data-signature-canvas aria-describedby="signature_help signature_error"></canvas>
+                    <input type="hidden" name="signature" data-signature-input>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="small text-gray-600" id="signature_help">Gunakan jari, stylus, atau mouse. Cukup sekali; kunjungan berikutnya tidak perlu tanda tangan lagi.</span>
+                        <button type="button" class="btn btn-sm btn-outline-gray-800" data-signature-clear>Hapus Tanda Tangan</button>
+                    </div>
+                    @if ($errors->has('signature'))
+                        <div class="small text-danger mt-1" id="signature_error">{{ $errors->first('signature') }}</div>
+                    @elseif ($errors->any())
+                        <div class="small text-danger mt-1" id="signature_error">Silakan bubuhkan tanda tangan kembali.</div>
+                    @endif
                 </div>
-                @if ($errors->has('signature'))
-                    <div class="small text-danger mt-1" id="signature_error">{{ $errors->first('signature') }}</div>
-                @elseif ($errors->any())
-                    <div class="small text-danger mt-1" id="signature_error">Silakan bubuhkan tanda tangan kembali.</div>
-                @endif
-            </div>
+            @else
+                <p class="small text-gray-600 mb-3">Tanda tangan diambil dari kunjungan pertama Anda.</p>
+            @endif
 
             <div class="form-check mb-4">
                 <input class="form-check-input @error('consent') is-invalid @enderror" type="checkbox" name="consent" value="1" id="consent" required
@@ -139,6 +143,8 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/signature-pad.js') }}"></script>
+    @if ($needsSignature)
+        <script src="{{ asset('assets/js/signature-pad.js') }}"></script>
+    @endif
     <script src="{{ asset('assets/js/guest-form.js') }}"></script>
 @endpush

@@ -45,6 +45,8 @@ class GuestFormController extends Controller
             'location' => $qr->location,
             'email' => $email,
             'profile' => $returning->latestProfile($email),
+            // Tanda tangan cukup sekali; tamu yang sudah punya tanda tangan tidak diminta lagi.
+            'needsSignature' => ! $returning->hasSignature($email),
             'categories' => PurposeCategory::query()
                 ->where('location_id', $qr->location_id)
                 ->where('is_active', true)
@@ -60,8 +62,13 @@ class GuestFormController extends Controller
      * Menyimpan kunjungan. Urutan pemeriksaan: honeypot, email di session, token sekali
      * pakai, lalu validasi; nomor urut baru diambil setelah semua lolos.
      */
-    public function store(Request $request, string $token, SignatureService $signatures, VisitService $visits): View|RedirectResponse
-    {
+    public function store(
+        Request $request,
+        string $token,
+        SignatureService $signatures,
+        VisitService $visits,
+        ReturningGuestService $returning,
+    ): View|RedirectResponse {
         $qr = $this->resolver->resolve($token);
 
         // TAM-8: honeypot terisi berarti bot; tampilkan sukses palsu tanpa menyimpan apa pun.
@@ -82,13 +89,18 @@ class GuestFormController extends Controller
         $form = app(GuestVisitRequest::class);
         $data = $form->guestData();
 
+        // Tamu lama memakai salinan tanda tangan terakhirnya agar detail dan ekspor tetap lengkap.
+        $signaturePng = $form->reusesSignature()
+            ? $returning->latestSignature($email)
+            : $signatures->normalize($data['signature']);
+
         $visit = $visits->recordGuestVisit(
             $qr,
             PurposeCategory::findOrFail($data['purpose_category_id']),
             $data,
             $email,
             $this->guestSession->verifiedAt($qr) ?? now(),
-            $signatures->normalize($data['signature']),
+            $signaturePng,
             $request->ip(),
         );
 

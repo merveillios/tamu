@@ -16,10 +16,16 @@ use Illuminate\Validation\Rule;
  * Validasi formulir buku tamu (TAM-3, TAM-7, TAM-9, TAM-16, PRD Bab 11.1).
  *
  * Email tidak pernah dibaca dari input; untuk tamu lama, data diri diambil dari
- * database dan input browser untuk field tersebut diabaikan.
+ * database dan input browser untuk field tersebut diabaikan. Tamu yang sudah punya
+ * tanda tangan dari kunjungan sebelumnya tidak perlu tanda tangan lagi.
  */
 class GuestVisitRequest extends FormRequest
 {
+    /**
+     * True bila tanda tangan diambil dari kunjungan sebelumnya, bukan dari formulir.
+     */
+    private bool $reusesSignature = false;
+
     /**
      * Formulir tamu tidak memerlukan login.
      */
@@ -41,11 +47,28 @@ class GuestVisitRequest extends FormRequest
 
         $this->merge($clean);
 
-        $profile = $this->returningProfile();
+        $email = app(GuestSessionService::class)->verifiedEmail($this->qr());
+
+        if ($email === null) {
+            return;
+        }
+
+        $returning = app(ReturningGuestService::class);
+        $profile = $returning->latestProfile($email);
 
         if ($profile !== null) {
             $this->merge($profile);
         }
+
+        $this->reusesSignature = $returning->hasSignature($email);
+    }
+
+    /**
+     * Apakah tanda tangan kunjungan ini disalin dari kunjungan sebelumnya.
+     */
+    public function reusesSignature(): bool
+    {
+        return $this->reusesSignature;
     }
 
     /**
@@ -68,7 +91,8 @@ class GuestVisitRequest extends FormRequest
             'organization' => ['required', 'string', 'min:2', 'max:150'],
             'phone' => ['required', 'string', 'max:30', new IndonesianPhone()],
             'address' => ['required', 'string', 'min:5', 'max:255'],
-            'signature' => ['required', 'string', new ValidSignatureImage()],
+            // Tamu lama: input tanda tangan dari browser diabaikan dan tidak ikut divalidasi.
+            'signature' => $this->reusesSignature ? ['exclude'] : ['required', 'string', new ValidSignatureImage()],
             'consent' => ['required', 'in:1'],
         ];
     }
@@ -117,17 +141,5 @@ class GuestVisitRequest extends FormRequest
     private function qr(): QrCode
     {
         return app(GuestQrResolver::class)->resolve((string) $this->route('token'));
-    }
-
-    /**
-     * Data diri kunjungan terakhir bila email di session milik tamu lama.
-     *
-     * @return array<string, string>|null
-     */
-    private function returningProfile(): ?array
-    {
-        $email = app(GuestSessionService::class)->verifiedEmail($this->qr());
-
-        return $email === null ? null : app(ReturningGuestService::class)->latestProfile($email);
     }
 }
