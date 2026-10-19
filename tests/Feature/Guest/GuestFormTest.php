@@ -5,6 +5,7 @@ namespace Tests\Feature\Guest;
 use App\Enums\VisitStatus;
 use App\Models\GuestVisit;
 use App\Models\PurposeCategory;
+use App\Models\VisitSignature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\InteractsWithGuestPages;
 use Tests\TestCase;
@@ -96,6 +97,41 @@ class GuestFormTest extends TestCase
         ]);
     }
 
+    public function test_returning_guest_with_signature_does_not_sign_again(): void
+    {
+        [$qr, $category] = $this->usableQr();
+        $previous = $this->createVisit($qr, $category, ['email' => 'lama@contoh.test']);
+        $previousPng = $this->pngFrom($this->signatureDataUrl());
+        VisitSignature::create(['visit_id' => $previous->id, 'image' => $previousPng, 'size_bytes' => strlen($previousPng), 'sha256' => hash('sha256', $previousPng)]);
+        $this->verifiedAs($qr, 'lama@contoh.test');
+
+        $this->get("/tamu/{$qr->token}/formulir")
+            ->assertOk()
+            ->assertSee('Tanda tangan diambil dari kunjungan pertama Anda.')
+            ->assertDontSee('data-signature-canvas', false);
+
+        $payload = $this->guestPayload($category, session("guest.{$qr->id}.form_token"), [
+            // Tanda tangan dari browser diabaikan; yang dipakai salinan dari kunjungan sebelumnya.
+            'signature' => $this->signatureDataUrl(500, 200),
+        ]);
+        $this->post("/tamu/{$qr->token}/formulir", $payload)->assertStatus(303);
+
+        $latest = GuestVisit::latest('id')->firstOrFail();
+        $this->assertSame($previousPng, VisitSignature::findOrFail($latest->id)->image);
+    }
+
+    public function test_returning_guest_without_signature_must_still_sign(): void
+    {
+        [$qr, $category] = $this->usableQr();
+        $this->createVisit($qr, $category, ['email' => 'lama@contoh.test']);
+        $this->verifiedAs($qr, 'lama@contoh.test');
+
+        $this->get("/tamu/{$qr->token}/formulir")->assertOk()->assertSee('data-signature-canvas', false);
+
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, session("guest.{$qr->id}.form_token"), ['signature' => null]))
+            ->assertSessionHasErrors(['signature' => 'Tanda tangan wajib dibubuhkan.']);
+    }
+
     public function test_used_form_token_does_not_save_twice(): void
     {
         [$qr, $category] = $this->usableQr();
@@ -168,6 +204,11 @@ class GuestFormTest extends TestCase
     /**
      * Mengirim formulir valid sebagai tamu dengan email tertentu.
      */
+    private function pngFrom(string $dataUrl): string
+    {
+        return base64_decode(substr($dataUrl, strlen('data:image/png;base64,')));
+    }
+
     private function submitAs($qr, PurposeCategory $category, string $email): void
     {
         $this->flushSession();
