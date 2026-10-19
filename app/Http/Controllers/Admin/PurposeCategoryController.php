@@ -23,20 +23,21 @@ class PurposeCategoryController extends Controller
     }
 
     /**
-     * Daftar kategori sebuah lokasi, urut sesuai urutan tampil lalu nama.
+     * Daftar kategori sebuah lokasi, dikelompokkan per departemen seperti di formulir tamu,
+     * lalu urut sesuai urutan tampil dan nama.
      */
     public function index(Request $request): View
     {
         $locations = $this->scope->manageableLocations($request->user())->orderBy('name')->get(['id', 'name']);
         $location = $this->selectedLocation($request, $locations->first()?->id);
 
-        $categories = $location === null ? collect() : PurposeCategory::query()
+        $categories = $location === null ? collect() : PurposeCategory::groupByDepartment(PurposeCategory::query()
             ->forUser($request->user())
             ->where('location_id', $location->id)
-            ->with('suggestedDepartment:id,name')
+            ->with('suggestedDepartment:id,name,is_active')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get();
+            ->get())->flatten(1);
 
         return view('admin.categories.index', [
             'locations' => $locations,

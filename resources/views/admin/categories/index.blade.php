@@ -37,9 +37,9 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
+                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Pertanyaan</th>
                         <th class="border-gray-200">Urutan</th>
-                        <th class="border-gray-200">Nama</th>
-                        <th class="border-gray-200">Saran departemen</th>
                         <th class="border-gray-200">Status</th>
                         <th class="border-gray-200">Aksi</th>
                     </tr>
@@ -47,9 +47,15 @@
                 <tbody>
                     @forelse ($categories as $category)
                         <tr>
+                            <td>
+                                @if ($category->groupName() !== null)
+                                    {{ $category->groupName() }}
+                                @else
+                                    <span class="text-gray-500">Umum</span>
+                                @endif
+                            </td>
+                            <td class="fw-bold text-wrap">{{ $category->name }}</td>
                             <td>{{ $category->sort_order }}</td>
-                            <td class="fw-bold">{{ $category->name }}</td>
-                            <td>{{ $category->suggestedDepartment?->name ?? '–' }}</td>
                             <td>
                                 <span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                             </td>
