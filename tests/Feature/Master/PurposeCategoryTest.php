@@ -50,6 +50,10 @@ class PurposeCategoryTest extends TestCase
                 ->assertSessionHasErrors('suggested_department_id');
         }
 
+        $this->actingAs($admin)
+            ->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'Tanpa departemen'])
+            ->assertSessionHasErrors(['suggested_department_id' => 'Pilih departemen yang aktif di lokasi ini.']);
+
         $this->assertDatabaseCount('purpose_categories', 0);
     }
 
@@ -62,7 +66,8 @@ class PurposeCategoryTest extends TestCase
 
         $this->actingAs($admin)->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'konsultasi'])
             ->assertSessionHasErrors(['name' => 'Pertanyaan ini sudah ada di lokasi ini.']);
-        $this->actingAs($admin)->post("/admin/kategori-keperluan/tambah?location_id={$other->id}", ['name' => 'Konsultasi'])
+        $this->actingAs($admin)
+            ->post("/admin/kategori-keperluan/tambah?location_id={$other->id}", ['name' => 'Konsultasi', 'suggested_department_id' => $this->createDepartment($other)->id])
             ->assertSessionHasNoErrors();
     }
 
@@ -125,28 +130,46 @@ class PurposeCategoryTest extends TestCase
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen=umum")
             ->assertOk()
             ->assertSeeInOrder(['Umum (tanpa departemen)', 'Pertanyaan lama', 'Departemen Bidang Lama nonaktif'])
-            ->assertDontSee('Bagaimana cara mengurus izin usaha?');
+            ->assertDontSee('Bagaimana cara mengurus izin usaha?')
+            ->assertDontSee('Tambah Pertanyaan');
     }
 
-    public function test_create_prefills_department_and_saving_returns_to_its_section(): void
+    public function test_general_row_is_hidden_when_every_question_has_a_department(): void
+    {
+        $location = $this->createLocation();
+        $admin = $this->createAdmin($location);
+        $this->createCategory($location, $this->createDepartment($location));
+
+        $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
+            ->assertOk()
+            ->assertDontSee('Umum (tanpa departemen)');
+    }
+
+    public function test_create_locks_department_and_saving_returns_to_its_page(): void
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
         $department = $this->createDepartment($location);
+        $other = $this->createDepartment($location);
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan/tambah?location_id={$location->id}&departemen={$department->id}")
             ->assertOk()
-            ->assertSee("value=\"{$department->id}\" selected", false);
+            ->assertSee("value=\"{$department->name}\" class=\"form-control\" readonly", false)
+            ->assertSee("<input type=\"hidden\" name=\"suggested_department_id\" value=\"{$department->id}\">", false)
+            ->assertDontSee('<select name="suggested_department_id"', false);
 
         $this->actingAs($admin)
             ->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'Bagaimana cara ikut pelatihan?', 'suggested_department_id' => $department->id])
             ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $department->id]));
 
         $category = PurposeCategory::where('name', 'Bagaimana cara ikut pelatihan?')->firstOrFail();
-        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/ubah", ['name' => $category->name])
-            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => 'umum']));
+        $this->actingAs($admin)->get("/admin/kategori-keperluan/{$category->id}/ubah")
+            ->assertOk()
+            ->assertSee('<select name="suggested_department_id"', false);
+        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/ubah", ['name' => $category->name, 'suggested_department_id' => $other->id])
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $other->id]));
         $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/status")
-            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => 'umum']));
+            ->assertRedirect(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $other->id]));
     }
 
     public function test_question_accepts_up_to_150_characters(): void
@@ -154,9 +177,10 @@ class PurposeCategoryTest extends TestCase
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
         $url = "/admin/kategori-keperluan/tambah?location_id={$location->id}";
+        $departmentId = $this->createDepartment($location)->id;
 
-        $this->actingAs($admin)->post($url, ['name' => str_repeat('a', 150)])->assertSessionHasNoErrors();
-        $this->actingAs($admin)->post($url, ['name' => str_repeat('b', 151)])
+        $this->actingAs($admin)->post($url, ['name' => str_repeat('a', 150), 'suggested_department_id' => $departmentId])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post($url, ['name' => str_repeat('b', 151), 'suggested_department_id' => $departmentId])
             ->assertSessionHasErrors(['name' => 'Pertanyaan wajib diisi (2–150 karakter).']);
         $this->assertDatabaseHas('purpose_categories', ['name' => str_repeat('a', 150)]);
     }
@@ -165,14 +189,15 @@ class PurposeCategoryTest extends TestCase
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin($location);
+        $department = $this->createDepartment($location);
         $category = PurposeCategory::create(['location_id' => $location->id, 'name' => 'Lama']);
 
-        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/ubah", ['name' => 'Baru', 'sort_order' => 5])
+        $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/ubah", ['name' => 'Baru', 'sort_order' => 5, 'suggested_department_id' => $department->id])
             ->assertSessionHasNoErrors();
         $this->actingAs($admin)->post("/admin/kategori-keperluan/{$category->id}/status");
 
         $category->refresh();
-        $this->assertSame(['Baru', 5, false], [$category->name, $category->sort_order, $category->is_active]);
+        $this->assertSame(['Baru', 5, false, $department->id], [$category->name, $category->sort_order, $category->is_active, $category->suggested_department_id]);
         $this->assertDatabaseHas('audit_logs', ['action' => 'purpose_category.deactivate', 'entity_id' => $category->id]);
     }
 

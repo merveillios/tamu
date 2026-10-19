@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * Validasi buat QR dan ganti akun resepsionis QR (QR-2, QR-6, Bab 11.3).
+ * Lokasi dan departemen hanya divalidasi saat membuat QR.
  */
 class QrRequest extends FormRequest
 {
@@ -30,13 +31,14 @@ class QrRequest extends FormRequest
     }
 
     /**
-     * Akun resepsionis wajib aktif dan berperan resepsionis.
+     * Akun resepsionis wajib aktif dan berperan resepsionis. Saat membuat QR, lokasi
+     * wajib dipilih dan departemen wajib departemen aktif di lokasi tersebut.
      *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'label' => ['nullable', 'string', 'max:100'],
             'receptionist_id' => [
                 'required',
@@ -44,6 +46,17 @@ class QrRequest extends FormRequest
                 Rule::exists('users', 'id')->where('role', UserRole::Receptionist->value)->where('is_active', true),
             ],
         ];
+
+        if ($this->routeIs('admin.qr.store')) {
+            $rules['location_id'] = ['required', 'integer', Rule::exists('locations', 'id')->whereNull('deleted_at')];
+            $rules['department_id'] = [
+                'required',
+                'integer',
+                Rule::exists('departments', 'id')->where('location_id', (int) $this->input('location_id'))->where('is_active', true),
+            ];
+        }
+
+        return $rules;
     }
 
     /**
@@ -54,6 +67,8 @@ class QrRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'location_id.*' => 'Pilih lokasi QR.',
+            'department_id.*' => 'Pilih departemen aktif di lokasi yang dipilih.',
             'label.*' => 'Label maksimal 100 karakter.',
             'receptionist_id.*' => 'Pilih akun resepsionis yang aktif.',
         ];

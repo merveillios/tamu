@@ -13,18 +13,25 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="suggested_department_id" class="form-label">Departemen (opsional)</label>
-                        <select name="suggested_department_id" id="suggested_department_id"
-                                class="form-select @error('suggested_department_id') is-invalid @enderror" aria-describedby="suggested_department_id_error">
-                            <option value="">Tanpa departemen (grup Umum)</option>
-                            @foreach ($departments as $department)
-                                <option value="{{ $department->id }}" @selected((int) old('suggested_department_id', $category->suggested_department_id) === $department->id)>
-                                    {{ $department->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        @if ($fixedDepartment !== null)
+                            {{-- Ditambah dari halaman departemen: departemen sudah ditentukan dan tidak dipilih lagi. --}}
+                            <label for="department_name" class="form-label">Departemen</label>
+                            <input type="text" id="department_name" value="{{ $fixedDepartment->name }}" class="form-control" readonly>
+                            <input type="hidden" name="suggested_department_id" value="{{ $fixedDepartment->id }}">
+                        @else
+                            <label for="suggested_department_id" class="form-label">Departemen</label>
+                            <select name="suggested_department_id" id="suggested_department_id" required
+                                    class="form-select @error('suggested_department_id') is-invalid @enderror" aria-describedby="suggested_department_id_error">
+                                <option value="">Pilih departemen</option>
+                                @foreach ($departments as $department)
+                                    <option value="{{ $department->id }}" @selected((int) old('suggested_department_id', $category->suggested_department_id) === $department->id)>
+                                        {{ $department->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @endif
                         @error('suggested_department_id')
-                            <div class="invalid-feedback" id="suggested_department_id_error">{{ $message }}</div>
+                            <div class="invalid-feedback d-block" id="suggested_department_id_error">{{ $message }}</div>
                         @enderror
                         <div class="form-text">Di formulir tamu, pertanyaan tampil di bawah nama departemen ini. Departemen ini juga dipilih otomatis sebagai saran saat resepsionis menugaskan kunjungan.</div>
                     </div>

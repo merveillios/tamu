@@ -111,7 +111,7 @@ class PurposeCategoryController extends Controller
 
     /**
      * Bagian halaman: satu per departemen aktif (urut nama, termasuk yang belum punya pertanyaan),
-     * lalu Umum untuk pertanyaan tanpa departemen aktif. Pertanyaan urut sesuai urutan tampil lalu nama.
+     * lalu Umum bila ada pertanyaan lama tanpa departemen aktif. Pertanyaan urut sesuai urutan tampil lalu nama.
      *
      * @return Collection<int, array{key: string, department: ?Department, categories: Collection<int, PurposeCategory>}>
      */
@@ -138,7 +138,8 @@ class PurposeCategoryController extends Controller
                 'department' => $department,
                 'categories' => $categories->get($department->id, collect()),
             ])
-            ->push(['key' => 'umum', 'department' => null, 'categories' => $categories->get('umum', collect())]);
+            ->when($categories->has('umum'), fn (Collection $sections) => $sections
+                ->push(['key' => 'umum', 'department' => null, 'categories' => $categories->get('umum')]));
     }
 
     /**
@@ -160,24 +161,28 @@ class PurposeCategoryController extends Controller
     }
 
     /**
-     * Data form: pertanyaan, lokasinya, departemen aktif di lokasi itu, dan alamat tombol Batal.
+     * Data form: pertanyaan, lokasinya, departemen aktif di lokasi itu, departemen terkunci, dan alamat tombol Batal.
      *
      * @return array<string, mixed>
      */
     private function formData(PurposeCategory $category, Location $location): array
     {
+        $departments = Department::query()
+            ->where('location_id', $location->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        // Pertanyaan baru dari halaman departemen: departemennya dikunci, tidak dipilih lagi.
+        $fixedDepartment = $category->exists ? null : $departments->firstWhere('id', $category->suggested_department_id);
+        $section = $category->exists ? $this->sectionKey($category) : $fixedDepartment?->id;
+
         return [
             'category' => $category,
             'location' => $location,
-            'backUrl' => route('admin.categories.index', [
-                'location_id' => $location->id,
-                'departemen' => $category->exists ? $this->sectionKey($category) : ($category->suggested_department_id ?? 'umum'),
-            ]),
-            'departments' => Department::query()
-                ->where('location_id', $location->id)
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'departments' => $departments,
+            'fixedDepartment' => $fixedDepartment,
+            'backUrl' => route('admin.categories.index', array_filter(['location_id' => $location->id, 'departemen' => $section])),
         ];
     }
 }

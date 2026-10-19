@@ -58,7 +58,12 @@ class LocalSampleSeeder extends Seeder
         $receptionist = $this->seedAccount('Resepsionis Pintu Timur', 'resepsionis@sitamu.test', UserRole::Receptionist);
         QrCode::firstOrCreate(
             ['location_id' => $headquarters->id, 'label' => 'Pintu Timur'],
-            ['receptionist_id' => $receptionist->id, 'token' => bin2hex(random_bytes(32)), 'status' => 'active'],
+            [
+                'department_id' => $departments['Sekretariat']->id,
+                'receptionist_id' => $receptionist->id,
+                'token' => bin2hex(random_bytes(32)),
+                'status' => 'active',
+            ],
         );
 
         foreach ($departments as $department) {

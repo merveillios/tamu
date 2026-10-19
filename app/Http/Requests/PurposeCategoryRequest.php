@@ -31,7 +31,7 @@ class PurposeCategoryRequest extends FormRequest
     }
 
     /**
-     * Nama unik per lokasi; saran departemen harus aktif di lokasi yang sama.
+     * Nama unik per lokasi; departemen wajib dan harus aktif di lokasi yang sama.
      *
      * @return array<string, mixed>
      */
@@ -45,7 +45,7 @@ class PurposeCategoryRequest extends FormRequest
                 Rule::unique('purpose_categories', 'name')->where('location_id', $locationId)->ignore($this->route('id')),
             ],
             'suggested_department_id' => [
-                'nullable', 'integer',
+                'required', 'integer',
                 Rule::exists('departments', 'id')->where('location_id', $locationId)->where('is_active', true),
             ],
             'sort_order' => ['integer', 'min:0', 'max:999'],
@@ -62,7 +62,7 @@ class PurposeCategoryRequest extends FormRequest
         return [
             'name.unique' => 'Pertanyaan ini sudah ada di lokasi ini.',
             'name.*' => 'Pertanyaan wajib diisi (2–150 karakter).',
-            'suggested_department_id.*' => 'Departemen harus departemen aktif di lokasi yang sama.',
+            'suggested_department_id.*' => 'Pilih departemen yang aktif di lokasi ini.',
             'sort_order.*' => 'Urutan tampil berupa angka 0–999.',
         ];
     }

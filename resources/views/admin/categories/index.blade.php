@@ -70,8 +70,13 @@
                     </div>
                     <div class="col-12 col-md-4 d-flex gap-2">
                         <a href="{{ route('admin.categories.index', ['location_id' => $location->id]) }}" class="btn btn-gray-200 flex-fill">Kembali</a>
-                        <a href="{{ route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $section['key']]) }}" class="btn btn-primary flex-fill">Tambah Pertanyaan</a>
+                        @if ($section['department'] !== null)
+                            <a href="{{ route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $section['key']]) }}" class="btn btn-primary flex-fill">Tambah Pertanyaan</a>
+                        @endif
                     </div>
+                    @if ($section['department'] === null)
+                        <p class="col-12 small text-gray-600 mb-0">Pertanyaan di sini belum punya departemen aktif. Tekan Ubah untuk memilih departemennya.</p>
+                    @endif
                 </div>
             </div>
 
