@@ -47,12 +47,14 @@ class GuestFormController extends Controller
             'profile' => $returning->latestProfile($email),
             // Tanda tangan cukup sekali; tamu yang sudah punya tanda tangan tidak diminta lagi.
             'needsSignature' => ! $returning->hasSignature($email),
-            'categories' => PurposeCategory::query()
+            // Pilihan keperluan dikelompokkan per departemen; nama departemen menjadi judul grup.
+            'categoryGroups' => PurposeCategory::groupByDepartment(PurposeCategory::query()
                 ->where('location_id', $qr->location_id)
                 ->where('is_active', true)
+                ->with('suggestedDepartment:id,name,is_active')
                 ->orderBy('sort_order')
                 ->orderBy('name')
-                ->get(['id', 'name']),
+                ->get(['id', 'name', 'suggested_department_id'])),
             'vulnerableGroups' => VulnerableGroup::cases(),
             'formToken' => $this->guestSession->newFormToken($qr),
         ]);

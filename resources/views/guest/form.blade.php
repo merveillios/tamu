@@ -31,8 +31,18 @@
                 <select name="purpose_category_id" id="purpose_category_id" required data-purpose-category
                         class="form-select @error('purpose_category_id') is-invalid @enderror" aria-describedby="purpose_category_id_error">
                     <option value="">Pilih keperluan</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}" @selected((int) old('purpose_category_id') === $category->id)>{{ $category->name }}</option>
+                    {{-- Grup hanya dipakai bila ada kategori yang punya departemen; grup tanpa departemen berjudul Umum. --}}
+                    @php($grouped = $categoryGroups->keys()->contains(fn ($group) => $group !== ''))
+                    @foreach ($categoryGroups as $group => $categories)
+                        @if ($grouped)
+                            <optgroup label="{{ $group !== '' ? $group : 'Umum' }}">
+                        @endif
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" @selected((int) old('purpose_category_id') === $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                        @if ($grouped)
+                            </optgroup>
+                        @endif
                     @endforeach
                 </select>
                 @error('purpose_category_id')
