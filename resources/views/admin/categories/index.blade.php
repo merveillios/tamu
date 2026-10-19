@@ -27,59 +27,81 @@
                 @else
                     <div class="col-12 col-md-8"><span class="fw-bold">{{ $location->name }}</span></div>
                 @endif
-                <div class="col-12 col-md-4 d-grid">
-                    <a href="{{ route('admin.categories.create', ['location_id' => $location->id]) }}" class="btn btn-primary">Tambah Pertanyaan</a>
-                </div>
+                <p class="col-12 small text-gray-600 mb-0">Tekan departemen untuk melihat dan menambah pertanyaannya.</p>
             </div>
         </div>
 
-        <div class="card card-body border-0 shadow table-wrapper table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="border-gray-200">Departemen</th>
-                        <th class="border-gray-200">Pertanyaan</th>
-                        <th class="border-gray-200">Urutan</th>
-                        <th class="border-gray-200">Status</th>
-                        <th class="border-gray-200">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($categories as $category)
-                        <tr>
-                            <td>
-                                @if ($category->groupName() !== null)
-                                    {{ $category->groupName() }}
-                                @else
-                                    <span class="text-gray-500">Umum</span>
-                                @endif
-                            </td>
-                            <td class="fw-bold text-wrap">{{ $category->name }}</td>
-                            <td>{{ $category->sort_order }}</td>
-                            <td>
-                                <span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-wrap gap-1">
-                                    <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                    <form method="POST" action="{{ route('admin.categories.status', $category->id) }}">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
-                                            {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                        </button>
-                                    </form>
+        @if ($sections->every(fn ($section) => $section['categories']->isEmpty()))
+            <div class="alert alert-info" role="alert">
+                Belum ada pertanyaan. Formulir tamu di lokasi ini baru bisa dibuka setelah ada minimal satu pertanyaan aktif.
+            </div>
+        @endif
+
+        {{-- Tanpa data-bs-parent agar beberapa departemen bisa terbuka bersamaan. --}}
+        <div class="accordion" id="question-sections">
+            @foreach ($sections as $section)
+                @php($open = $section['key'] === $openSection)
+                <div class="accordion-item border-0 shadow mb-2">
+                    <h2 class="accordion-header" id="section-{{ $section['key'] }}-heading">
+                        <button type="button" class="accordion-button {{ $open ? '' : 'collapsed' }}" data-bs-toggle="collapse"
+                                data-bs-target="#section-{{ $section['key'] }}" aria-expanded="{{ $open ? 'true' : 'false' }}" aria-controls="section-{{ $section['key'] }}">
+                            <span class="fw-bold me-auto">{{ $section['department']?->name ?? 'Umum (tanpa departemen)' }}</span>
+                            <span class="small text-gray-600 me-3">{{ $section['categories']->count() }} pertanyaan</span>
+                        </button>
+                    </h2>
+                    <div id="section-{{ $section['key'] }}" class="accordion-collapse collapse {{ $open ? 'show' : '' }}" aria-labelledby="section-{{ $section['key'] }}-heading">
+                        <div class="accordion-body">
+                            @if ($section['categories']->isEmpty())
+                                <p class="text-gray-600">Belum ada pertanyaan.</p>
+                            @else
+                                <div class="table-responsive mb-3">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-gray-200">Pertanyaan</th>
+                                                <th class="border-gray-200">Urutan</th>
+                                                <th class="border-gray-200">Status</th>
+                                                <th class="border-gray-200">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($section['categories'] as $category)
+                                                <tr>
+                                                    <td class="text-wrap">
+                                                        <span class="fw-bold">{{ $category->name }}</span>
+                                                        {{-- Di bagian Umum, departemen yang masih tercatat berarti sudah nonaktif. --}}
+                                                        @if ($section['department'] === null && $category->suggestedDepartment !== null)
+                                                            <div class="small text-gray-500">Departemen {{ $category->suggestedDepartment->name }} nonaktif</div>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $category->sort_order }}</td>
+                                                    <td>
+                                                        <span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex flex-wrap gap-1">
+                                                            <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                                            <form method="POST" action="{{ route('admin.categories.status', $category->id) }}">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                                                    {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center text-gray-600 py-4">
-                                Belum ada pertanyaan. Formulir tamu di lokasi ini baru bisa dibuka setelah ada minimal satu pertanyaan aktif.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            @endif
+                            <a href="{{ route('admin.categories.create', ['location_id' => $location->id, 'departemen' => $section['key']]) }}" class="btn btn-sm btn-primary">
+                                Tambah pertanyaan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     @endif
 @endsection
