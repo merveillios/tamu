@@ -14,7 +14,7 @@
 
                     <div class="mb-3">
                         <label for="name" class="form-label">Pertanyaan</label>
-                        <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" required maxlength="100"
+                        <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}" required maxlength="150"
                                class="form-control @error('name') is-invalid @enderror" aria-describedby="name_error">
                         @error('name')
                             <div class="invalid-feedback" id="name_error">{{ $message }}</div>

@@ -41,7 +41,7 @@ class PurposeCategoryRequest extends FormRequest
 
         return [
             'name' => [
-                'required', 'string', 'min:2', 'max:100',
+                'required', 'string', 'min:2', 'max:150',
                 Rule::unique('purpose_categories', 'name')->where('location_id', $locationId)->ignore($this->route('id')),
             ],
             'suggested_department_id' => [
@@ -61,7 +61,7 @@ class PurposeCategoryRequest extends FormRequest
     {
         return [
             'name.unique' => 'Pertanyaan ini sudah ada di lokasi ini.',
-            'name.*' => 'Pertanyaan wajib diisi (2–100 karakter).',
+            'name.*' => 'Pertanyaan wajib diisi (2–150 karakter).',
             'suggested_department_id.*' => 'Departemen harus departemen aktif di lokasi yang sama.',
             'sort_order.*' => 'Urutan tampil berupa angka 0–999.',
         ];
