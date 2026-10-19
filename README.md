@@ -128,44 +128,79 @@ php artisan sitamu:create-superadmin
 
 Setelah login dengan akun baru, buka **Pengguna** untuk membuka kunci, mengaktifkan kembali, atau mereset password akun lama, lalu nonaktifkan akun darurat bila tidak diperlukan lagi. Semua langkah ini tercatat di Audit Log.
 
-## Verifikasi Google untuk halaman tamu
+## Kunci dan pengaturan yang dibutuhkan
 
-Halaman tamu memakai Google Identity Services. Isi `GOOGLE_CLIENT_ID` di `.env` dengan OAuth Client ID (jenis *Web application*) milik instansi, lalu di Google Cloud Console → *Credentials* → Client ID tersebut, tambahkan setiap alamat yang dipakai ke **Authorized JavaScript origins**, misalnya:
+Semua pengaturan ada di `.env` (contoh lengkap di `.env.example`). File `.env` **tidak boleh** di-commit atau dibagikan.
 
-- `http://localhost:8000` dan `http://127.0.0.1:8000` untuk pengembangan lokal
-- domain produksi, misalnya `https://sitamu.contoh.go.id`
+| Key di `.env` | Wajib | Cara mendapatkan / isi |
+| --- | --- | --- |
+| `APP_KEY` | Ya | Dibuat otomatis dengan `php artisan key:generate`. Rahasia; simpan cadangannya. |
+| `APP_URL` | Ya | Alamat aplikasi yang dibuka pengguna, tanpa garis miring di akhir. Lokal: `http://localhost:8000`. Produksi: domain HTTPS resmi. **QR dibuat dari nilai ini.** |
+| `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Ya | Kredensial MySQL/MariaDB. Laragon bawaan: host `127.0.0.1`, port `3306`, user `root`, password kosong. |
+| `GOOGLE_CLIENT_ID` | Ya, untuk halaman tamu | OAuth Client ID dari Google Cloud (lihat langkah di bawah), bentuknya `angka-acak.apps.googleusercontent.com`. Nilai ini publik, bukan rahasia. |
+| `TRUSTED_PROXIES` | Hanya di balik proxy/tunnel | Kosong bila tidak memakai proxy. `*` saat tes lewat tunnel. Di produksi: IP/CIDR proxy, misalnya `10.0.0.5`. |
+| `APP_ENV`, `APP_DEBUG`, `SESSION_SECURE_COOKIE` | Ya | Lokal: `local`, `true`, `false`. Produksi: `production`, `false`, `true`. |
+| `INSTITUTION_NAME` | Tidak | Nama instansi yang tampil di halaman dan ekspor. |
 
-Tanpa origin yang terdaftar, tombol "Pilih akun Google" tidak muncul atau menolak login. Client secret tidak dibutuhkan.
+**Yang tidak dibutuhkan:**
+- **API key Google** (`AIza…`): tidak dipakai sama sekali. Jangan dimasukkan ke `.env`.
+- **Client secret Google** (`GOCSPX-…`): tidak dipakai. Login tamu hanya butuh Client ID; server memverifikasi token lewat endpoint publik Google.
+- Akun/kunci pihak ketiga lain (email, WhatsApp, SMS): tidak ada.
 
-Untuk mencoba halaman tamu secara lokal, buka menu **Lokasi → QR → Cetak** sebagai Super Admin; URL di bawah QR mengikuti `APP_URL`.
+Bila API key atau client secret pernah terlihat orang lain, hapus API key-nya dan klik **Reset secret** pada Client ID. Aplikasi tetap berjalan karena tidak memakai keduanya.
+
+### Membuat Google Client ID
+
+1. Buka [Google Cloud Console → Google Auth Platform](https://console.cloud.google.com/auth/clients) dan pilih atau buat project milik instansi.
+2. Bila diminta, isi **Branding** (nama aplikasi "SiTamu" dan email kontak). Tidak perlu menambah *scope* apa pun; aplikasi hanya membaca email.
+3. Buka **Clients → Create client**, pilih jenis **Web application**.
+4. Di **Authorized JavaScript origins**, tambahkan setiap alamat yang dipakai, persis tanpa garis miring dan tanpa path:
+   - `http://localhost:8000` dan `http://localhost` untuk pengembangan lokal
+   - alamat tunnel saat tes dari ponsel, misalnya `https://abc-123.trycloudflare.com`
+   - domain produksi, misalnya `https://sitamu.contoh.go.id`
+
+   **Authorized redirect URIs** biarkan kosong.
+5. Klik **Create**, salin **Client ID** ke `GOOGLE_CLIENT_ID` di `.env`, lalu jalankan `php artisan config:clear`. Client secret yang muncul tidak perlu disimpan.
+6. Buka **Audience**:
+   - selama tahap uji, tambahkan email Gmail penguji di **Test users** (maks. 100 email), atau
+   - untuk dipakai tamu umum, klik **Publish app** agar statusnya *In production*. Karena hanya meminta email, aplikasi tidak perlu verifikasi Google.
+7. Tunggu beberapa menit (kadang sampai sekitar 1 jam) sampai perubahan di Google berlaku.
+
+Pesan error yang sering muncul:
+- **"tidak mematuhi kebijakan OAuth 2.0 … daftarkan asal JavaScript"**: alamat di address bar belum ada di Authorized JavaScript origins, atau perubahannya belum berlaku.
+- **"Akses diblokir" / "access blocked"**: aplikasi masih *Testing* dan email yang dipakai belum ada di Test users.
+- **Tombol Google tidak muncul**: `GOOGLE_CLIENT_ID` kosong atau salah, atau halaman dibuka lewat alamat yang tidak terdaftar (misalnya `127.0.0.1` padahal yang terdaftar `localhost`).
+
+Untuk mencoba halaman tamu secara lokal, buka menu **Lokasi → QR → Cetak** sebagai Super Admin; isi QR mengikuti `APP_URL`.
 
 ## Mencoba halaman tamu dari ponsel
 
-Ponsel tidak bisa membuka `localhost` milik laptop, dan Google hanya mengizinkan tombol login di alamat `https://` atau `localhost`. Karena itu, uji dari ponsel memakai *tunnel* HTTPS sementara, misalnya Cloudflare Tunnel (gratis, tanpa akun):
+Ponsel tidak bisa membuka `localhost` milik laptop, dan Google hanya mengizinkan tombol login di alamat `https://` atau `localhost`. Karena itu, uji dari ponsel memakai *tunnel* HTTPS sementara. Tidak perlu deploy. Contoh di bawah memakai Cloudflare Tunnel (gratis, tanpa akun):
 
-1. Jalankan aplikasi di laptop:
+1. Pastikan MySQL menyala. Di Laragon, klik **Start All**. Bila MySQL mati, halaman menampilkan error `SQLSTATE[HY000] [2002] No connection`.
+2. Jalankan aplikasi di laptop:
 
    ```bash
    php artisan serve --host=127.0.0.1 --port=8000
    ```
 
-2. Di terminal lain, buka tunnel lalu catat alamat `https://….trycloudflare.com` yang muncul:
+3. Di terminal lain, buka tunnel lalu catat alamat `https://….trycloudflare.com` yang muncul. Bila `cloudflared` belum terpasang, pasang dulu dengan `winget install Cloudflare.cloudflared`, lalu buka terminal baru.
 
    ```bash
    cloudflared tunnel --url http://127.0.0.1:8000
    ```
 
-3. Di `.env`, ubah `APP_URL` menjadi alamat tunnel tersebut dan isi `TRUSTED_PROXIES=*` agar Laravel tahu permintaan datang lewat HTTPS. Setelah itu muat ulang konfigurasi:
+4. Di `.env`, ubah `APP_URL` menjadi alamat tunnel tersebut dan isi `TRUSTED_PROXIES=*`, agar Laravel tahu permintaan aslinya datang lewat HTTPS. Setelah itu muat ulang konfigurasi:
 
    ```bash
    php artisan config:clear
    ```
 
-4. Tambahkan alamat tunnel ke **Authorized JavaScript origins** pada Client ID di Google Cloud Console. Perubahan di Google bisa butuh beberapa menit sebelum berlaku.
-5. Buka **Lokasi → QR → Cetak** di laptop. Gambar QR dibuat ulang dari `APP_URL` setiap kali dibuka, jadi tidak perlu membuat QR baru. Pindai dengan kamera ponsel.
-6. Selesai menguji, hentikan tunnel (`Ctrl+C`), kembalikan `APP_URL` dan `TRUSTED_PROXIES`, lalu jalankan lagi `php artisan config:clear`.
+5. Tambahkan alamat tunnel ke **Authorized JavaScript origins** pada Client ID di Google Cloud Console (lihat langkah 4 di atas), lalu tunggu beberapa menit.
+6. Buka **Lokasi → QR → Cetak** di laptop. Gambar QR dibuat ulang dari `APP_URL` setiap kali dibuka, jadi tidak perlu membuat QR baru. Pindai dengan kamera ponsel.
+7. Selesai menguji, hentikan tunnel (`Ctrl+C`), kembalikan `APP_URL=http://localhost:8000` dan kosongkan `TRUSTED_PROXIES`, lalu jalankan lagi `php artisan config:clear`.
 
-Catatan: alamat *quick tunnel* berubah setiap kali dijalankan, sehingga origin di Google perlu ditambahkan ulang. Selama tunnel aktif, aplikasi lokal bisa dibuka siapa pun yang tahu alamatnya, jadi jangan biarkan tunnel menyala tanpa perlu.
+Catatan: alamat *quick tunnel* berubah setiap kali dijalankan, sehingga langkah 4–5 perlu diulang tiap kali tes. Selama tunnel aktif, aplikasi lokal bisa dibuka siapa pun yang tahu alamatnya, jadi jangan biarkan tunnel menyala tanpa perlu. Untuk dipakai tamu sungguhan, aplikasi tetap harus dipasang di server dengan domain resmi (lihat **Instalasi server produksi**).
 
 ## Tes dan kerapian kode
 
