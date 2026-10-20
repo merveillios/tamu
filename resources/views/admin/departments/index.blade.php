@@ -20,7 +20,7 @@
         <div class="input-group">
             <input type="text" name="name" id="new_department" class="form-control" maxlength="100" required
                    placeholder="Contoh: Bidang Perdagangan Dalam Negeri">
-            <button type="submit" class="btn btn-primary">Tambah</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
     </form>
 
@@ -50,10 +50,10 @@
                                         data-bs-target="#rename-{{ $department->id }}" aria-expanded="false" aria-controls="rename-{{ $department->id }}">
                                     Ubah nama
                                 </button>
-                                <form method="POST" action="{{ route('admin.departments.status', $department->id) }}"
-                                      @if ($department->is_active) data-confirm="Nonaktifkan departemen {{ $department->name }}? Departemen tidak lagi muncul di pilihan penugasan." @endif>
+                                <form method="POST" action="{{ route('admin.departments.status', $department->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm {{ $department->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                    <button type="submit" class="btn btn-sm {{ $department->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                            @if ($department->is_active) data-deactivate-message="Nonaktifkan departemen {{ $department->name }}? Departemen tidak lagi muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
                                         {{ $department->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                 </form>
@@ -67,6 +67,7 @@
                                 <label class="visually-hidden" for="rename-input-{{ $department->id }}">Nama baru {{ $department->name }}</label>
                                 <input type="text" name="name" id="rename-input-{{ $department->id }}" class="form-control" value="{{ $department->name }}" maxlength="100" required>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
+                                <button type="button" class="btn btn-gray-200" data-cancel-collapse="#rename-{{ $department->id }}">Batal</button>
                             </form>
                         </td>
                     </tr>

@@ -109,7 +109,8 @@
                                         <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
                                         <form method="POST" action="{{ route('admin.categories.status', $category->id) }}">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                            <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                                    @if ($category->is_active) data-deactivate-message="Nonaktifkan pertanyaan {{ $category->name }}? Pertanyaan ini tidak akan muncul di formulir buku tamu sampai diaktifkan kembali." @endif>
                                                 {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                             </button>
                                         </form>

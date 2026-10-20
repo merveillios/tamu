@@ -57,7 +57,8 @@
                                     <a href="{{ route('admin.staff.edit', $member->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
                                     <form method="POST" action="{{ route('admin.staff.status', $member->id) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm {{ $member->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                        <button type="submit" class="btn btn-sm {{ $member->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                                @if ($member->is_active) data-deactivate-message="Nonaktifkan petugas {{ $member->name }}? Petugas ini tidak akan muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
                                             {{ $member->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                         </button>
                                     </form>

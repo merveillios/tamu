@@ -62,20 +62,19 @@
                     <th class="border-gray-200">Instansi</th>
                     <th class="border-gray-200">Kelompok rentan</th>
                     <th class="border-gray-200">Keperluan</th>
-                    <th class="border-gray-200">Saran departemen</th>
-                    <th class="border-gray-200">Departemen / orang yang ditemui</th>
+                    <th class="border-gray-200">Departemen</th>
+                    <th class="border-gray-200">Nama PIC</th>
                     @unless ($isReceptionist)
                         <th class="border-gray-200">Lokasi / QR</th>
                     @endunless
                     <th class="border-gray-200">Jam datang</th>
-                    <th class="border-gray-200">Menunggu</th>
                     <th class="border-gray-200">Status</th>
                     <th class="border-gray-200">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="12" class="text-center text-gray-600 py-4">Memuat data…</td>
+                    <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
                 </tr>
             </tbody>
         </table>
@@ -120,5 +119,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/active-visits.js') }}"></script>
+    <script src="{{ asset('assets/js/active-visits.js') }}?v={{ filemtime(public_path('assets/js/active-visits.js')) }}"></script>
 @endpush

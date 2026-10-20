@@ -48,10 +48,10 @@
                                 <a href="{{ route('admin.departments.index', $location->id) }}" class="btn btn-sm btn-gray-800">Departemen</a>
                                 <a href="{{ route('admin.qr.index', ['lokasi' => $location->id]) }}" class="btn btn-sm btn-gray-800">QR</a>
                                 <a href="{{ route('admin.locations.edit', $location->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                <form method="POST" action="{{ route('admin.locations.status', $location->id) }}"
-                                      @if ($location->is_active) data-confirm="{{ $deactivateMessage }}" @endif>
+                                <form method="POST" action="{{ route('admin.locations.status', $location->id) }}">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm {{ $location->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                    <button type="submit" class="btn btn-sm {{ $location->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                            @if ($location->is_active) data-deactivate-message="{{ $deactivateMessage }}" @endif>
                                         {{ $location->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                     </button>
                                 </form>

@@ -71,6 +71,54 @@ body {
     width: auto;
 }
 
+.sidebar-brand-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+/* Brand block teks di sidebar — tidak memakai .sidebar-text agar terhindar dari override Volt */
+.sidebar-brand-wrap {
+    min-width: 0;        /* wajib agar flex child bisa menyusut */
+    line-height: 1.2;
+}
+
+.sidebar-brand-name {
+    display: block;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.15rem;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.sidebar-brand-sub {
+    display: block;
+    font-size: 0.62rem;
+    color: #ffffff !important;
+    line-height: 1.25;
+    margin-top: 2px;
+    letter-spacing: -0.01em;
+}
+
+/* Izinkan nav-link brand sidebar tumbuh sesuai tinggi konten dan sejajar vertikal */
+.sitamu-sidebar .nav-item:first-child .nav-link {
+    height: auto !important;
+    white-space: normal !important;
+    align-items: center !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.25rem !important;
+}
+
+/* Override Bootstrap white-space:nowrap pada .navbar-brand */
+.navbar-brand.d-flex .sidebar-brand-wrap {
+    white-space: normal;
+}
+
 .avatar-initial {
     width: 2.25rem;
     height: 2.25rem;
@@ -201,6 +249,119 @@ body {
 .auth-card {
     max-width: 440px;
 }
+
+.auth-banner {
+    background-color: #0b3d7b;
+    padding: 1.25rem 1.5rem;
+}
+
+.auth-banner-logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.auth-banner-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    margin-bottom: 0.2rem;
+    color: #ffffff;
+}
+
+.auth-banner-subtitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0;
+    color: #ffffff;
+}
+
+/* Halaman verifikasi Google tamu (/tamu/{token}) */
+.guest-verify-wrapper {
+    min-height: 100vh;
+    background-color: #f2f4f6;
+}
+
+.guest-card {
+    max-width: 430px;
+    border-radius: 0.85rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+.guest-verify-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    line-height: 1.3;
+}
+
+.guest-verify-subtitle {
+    font-size: 0.925rem;
+    color: #4b5563;
+    line-height: 1.45;
+}
+
+.btn-google-auth {
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+}
+
+.btn-google-auth:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+    color: #111827;
+}
+
+.btn-google-auth:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
+}
+
+.btn-google-auth .google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.btn-google-auth .google-btn-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.guest-verify-divider {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    opacity: 1;
+    margin: 1.5rem 0 1rem;
+}
+
+.guest-help-link {
+    color: #2563eb;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    transition: color 0.15s ease;
+}
+
+.guest-help-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.guest-verify-footer {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
 
 /* Halaman cetak QR ukuran A4 (QR-5) */
 .qr-print-sheet {

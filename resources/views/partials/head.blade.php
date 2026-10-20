@@ -5,5 +5,5 @@
 <link rel="icon" type="image/png" href="{{ asset('assets/img/logo.png') }}">
 <link rel="stylesheet" href="{{ asset('assets/vendor/inter/inter.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/vendor/volt/css/volt.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/app.css') }}?v={{ filemtime(public_path('assets/css/app.css')) }}">
 @stack('styles')

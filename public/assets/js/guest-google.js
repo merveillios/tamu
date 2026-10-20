@@ -1,6 +1,6 @@
 /*
- * Langkah 1 halaman tamu: tombol "Pilih akun Google" dengan Google Identity Services (TAM-11).
- * Tanpa One Tap dan tanpa auto-select; ID token dikirim ke server untuk diverifikasi.
+ * Langkah 1 halaman tamu: tombol "Lanjutkan dengan Google" dengan Google Identity Services (TAM-11).
+ * Menggunakan tombol kustom SVG resmi dan memanggil One Tap/Prompt saat diklik.
  */
 (function () {
     var container = document.querySelector('[data-google-button]');
@@ -10,10 +10,12 @@
     }
 
     var errorBox = document.querySelector('[data-google-error]');
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    var csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    var csrfToken = csrfTokenMeta ? csrfTokenMeta.content : '';
     var nonce = container.dataset.nonce;
 
     function showError(message) {
+        if (!errorBox) return;
         errorBox.textContent = message;
         errorBox.classList.remove('d-none');
     }
@@ -44,7 +46,7 @@
                 // Nonce lama sudah dipakai server; inisialisasi ulang dengan nonce baru.
                 if (body.data && body.data.nonce) {
                     nonce = body.data.nonce;
-                    renderButton();
+                    initGoogle();
                 }
             })
             .catch(function () {
@@ -52,31 +54,41 @@
             });
     }
 
-    function renderButton() {
+    function initGoogle() {
+        if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+            return;
+        }
+
+        var clientId = container.dataset.clientId;
+        if (!clientId) {
+            return;
+        }
+
         google.accounts.id.initialize({
-            client_id: container.dataset.clientId,
+            client_id: clientId,
             nonce: nonce,
             callback: handleCredential,
             auto_select: false,
             cancel_on_tap_outside: true
         });
-
-        container.innerHTML = '';
-        google.accounts.id.renderButton(container, {
-            type: 'standard',
-            theme: 'outline',
-            size: 'large',
-            text: 'signin_with',
-            shape: 'pill',
-            locale: 'id',
-            width: Math.min(container.parentElement.clientWidth, 400)
-        });
     }
 
+    container.addEventListener('click', function () {
+        var clientId = container.dataset.clientId;
+
+        if (window.google && window.google.accounts && window.google.accounts.id && clientId) {
+            google.accounts.id.prompt();
+        } else if (!clientId) {
+            showError('Layanan Google Sign-In belum dikonfigurasi (GOOGLE_CLIENT_ID belum diatur).');
+        } else {
+            showError('Pustaka Google Sign-In sedang dimuat. Silakan coba beberapa saat lagi.');
+        }
+    });
+
     // Pustaka Google dimuat async; fungsi ini dipanggil otomatis setelah pustaka siap.
-    window.onGoogleLibraryLoad = renderButton;
+    window.onGoogleLibraryLoad = initGoogle;
 
     if (window.google && window.google.accounts && window.google.accounts.id) {
-        renderButton();
+        initGoogle();
     }
 })();

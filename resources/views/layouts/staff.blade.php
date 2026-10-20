@@ -7,8 +7,14 @@
     {{-- Navbar ponsel: tombol pembuka sidebar (offcanvas) --}}
     <nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
         <a class="navbar-brand d-flex align-items-center" href="{{ url('/admin') }}">
-            <img src="{{ asset('assets/img/logo.png') }}" class="brand-logo-sm me-2" alt="">
-            <span class="fw-bold">{{ config('app.name') }}</span>
+            <img src="{{ asset('assets/img/logo-jatim.png') }}" class="sidebar-brand-logo me-2" alt="Logo Provinsi Jawa Timur">
+            <span class="sidebar-brand-wrap">
+                <span class="sidebar-brand-name">{{ config('app.name') }}</span>
+                <span class="sidebar-brand-sub">
+                    <span class="d-block text-nowrap">Dinas Perindustrian dan Perdagangan</span>
+                    <span class="d-block text-nowrap">Provinsi Jawa Timur</span>
+                </span>
+            </span>
         </a>
         <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu"
                 aria-controls="sidebarMenu" aria-expanded="false" aria-label="Buka menu">
@@ -33,6 +39,7 @@
     </main>
 
     @include('partials.flash')
+    @include('partials.staff.confirm-modals')
     @include('partials.scripts')
 </body>
 </html>

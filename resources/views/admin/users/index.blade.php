@@ -49,7 +49,7 @@
                     <th class="border-gray-200">Nama</th>
                     <th class="border-gray-200">Email</th>
                     <th class="border-gray-200">Peran</th>
-                    <th class="border-gray-200">Terkait</th>
+                    <th class="border-gray-200">Lokasi</th>
                     <th class="border-gray-200">Status</th>
                     <th class="border-gray-200">Login terakhir</th>
                     <th class="border-gray-200">Aksi</th>

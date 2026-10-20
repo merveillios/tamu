@@ -99,15 +99,14 @@
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
         tr.appendChild(cell('Keperluan', row.category));
-        tr.appendChild(cell('Saran departemen', row.suggested_department));
-        tr.appendChild(cell('Departemen / ditemui', assigned));
+        tr.appendChild(cell('Departemen', row.suggested_department));
+        tr.appendChild(cell('Nama PIC', assigned));
 
         if (showLocation) {
             tr.appendChild(cell('Lokasi / QR', row.location + ' · ' + row.qr_label));
         }
 
         tr.appendChild(cell('Jam datang', row.check_in));
-        tr.appendChild(cell('Menunggu', waitingCell(row)));
         tr.appendChild(cell('Status', badge));
         tr.appendChild(cell('Aksi', actionButtons(row)));
 
@@ -120,7 +119,7 @@
         if (data.rows.length === 0) {
             var empty = el('tr');
             var td = el('td', 'text-center text-gray-600 py-4', 'Tidak ada tamu aktif.');
-            td.colSpan = 12;
+            td.colSpan = 11;
             empty.appendChild(td);
             tbody.appendChild(empty);
         }

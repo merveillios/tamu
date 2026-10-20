@@ -35,10 +35,14 @@
         <ul class="nav flex-column pt-3 pt-md-0">
             <li class="nav-item">
                 <a href="{{ url('/admin') }}" class="nav-link d-flex align-items-center">
-                    <span class="sidebar-icon">
-                        <img src="{{ asset('assets/img/logo.png') }}" class="brand-logo-sm" alt="">
+                    <img src="{{ asset('assets/img/logo-jatim.png') }}" class="sidebar-brand-logo me-2" alt="Logo Provinsi Jawa Timur">
+                    <span class="sidebar-brand-wrap">
+                        <span class="sidebar-brand-name">{{ config('app.name') }}</span>
+                        <span class="sidebar-brand-sub">
+                            <span class="d-block text-nowrap">Dinas Perindustrian dan Perdagangan</span>
+                            <span class="d-block text-nowrap">Provinsi Jawa Timur</span>
+                        </span>
                     </span>
-                    <span class="mt-1 ms-2 sidebar-text fw-bold">{{ config('app.name') }}</span>
                 </a>
             </li>
             <li role="separator" class="dropdown-divider mt-3 mb-3 border-gray-700"></li>

@@ -36,7 +36,10 @@
                                class="form-control">
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Simpan Password</button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-gray-200">Batal</a>
+                    </div>
                 </form>
             </div>
         </div>

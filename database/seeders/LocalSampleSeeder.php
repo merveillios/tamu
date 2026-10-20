@@ -71,6 +71,8 @@ class LocalSampleSeeder extends Seeder
             $this->seedAccount('PIC '.$department->name, $email, UserRole::Pic, $department->id);
         }
 
+        $this->seedAccount('PIC Contoh', 'pic@sitamu.test', UserRole::Pic, $departments['Sekretariat']->id);
+
         foreach (self::CATEGORIES as $name => $departmentName) {
             PurposeCategory::firstOrCreate(
                 ['location_id' => $headquarters->id, 'name' => $name],
@@ -109,20 +111,20 @@ class LocalSampleSeeder extends Seeder
      */
     private function seedAccount(string $name, string $email, UserRole $role, ?int $departmentId = null): User
     {
-        $existing = User::where('email', $email)->first();
+        $password = env('SAMPLE_PASSWORD', 'password');
 
-        if ($existing !== null) {
-            return $existing;
-        }
-
-        $password = Str::password(12, symbols: false);
-        $user = User::create([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password,
-            'role' => $role,
-            'department_id' => $departmentId,
-        ]);
+        $user = User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name,
+                'password' => $password,
+                'role' => $role,
+                'department_id' => $departmentId,
+                'is_active' => true,
+                'failed_logins' => 0,
+                'locked_until' => null,
+            ]
+        );
 
         $this->command?->line(sprintf('  %-50s %s', $email, $password));
 

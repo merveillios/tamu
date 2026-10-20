@@ -9,14 +9,18 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-12 d-flex align-items-center justify-content-center">
-                        <div class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 w-100 auth-card">
-                            <div class="text-center mb-4">
-                                <img src="{{ asset('assets/img/logo.png') }}" class="brand-logo mb-3" alt="">
-                                <h1 class="mb-1 h3">{{ config('app.name') }}</h1>
-                                <p class="small text-gray-600 mb-0">{{ config('sitamu.institution_name') }}</p>
+                        <div class="bg-white shadow border-0 rounded border-light overflow-hidden w-100 auth-card">
+                            <div class="auth-banner d-flex align-items-center">
+                                <img src="{{ asset('assets/img/logo-jatim.png') }}" alt="Logo Provinsi Jawa Timur" class="auth-banner-logo me-3">
+                                <div>
+                                    <div class="auth-banner-title">Dinas Perindustrian Dan Perdagangan</div>
+                                    <div class="auth-banner-subtitle">Provinsi Jawa Timur</div>
+                                </div>
                             </div>
 
-                            @yield('content')
+                            <div class="p-4 p-lg-5 pt-3 pt-lg-4">
+                                @yield('content')
+                            </div>
                         </div>
                     </div>
                 </div>

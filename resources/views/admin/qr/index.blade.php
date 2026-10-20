@@ -50,7 +50,7 @@
                     </select>
                 </div>
                 <div class="col-12 col-xl-2 d-grid">
-                    <button type="submit" class="btn btn-primary">Buat QR</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
             @if ($receptionists->isEmpty())
@@ -121,7 +121,8 @@
                                     </button>
                                     <form method="POST" action="{{ route('admin.qr.status', $qr->id) }}">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm {{ $qr->status === \App\Enums\QrStatus::Active ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                        <button type="submit" class="btn btn-sm {{ $qr->status === \App\Enums\QrStatus::Active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                                @if ($qr->status === \App\Enums\QrStatus::Active) data-deactivate-message="Nonaktifkan QR {{ $qr->label ?? '#'.$qr->id }}? QR ini tidak akan bisa digunakan oleh tamu sampai diaktifkan kembali." @endif>
                                             {{ $qr->status === \App\Enums\QrStatus::Active ? 'Nonaktifkan' : 'Aktifkan' }}
                                         </button>
                                     </form>
@@ -163,6 +164,9 @@
                                             <button type="submit" class="btn btn-primary">Simpan</button>
                                         </form>
                                     </div>
+                                </div>
+                                <div class="mt-2 text-end">
+                                    <button type="button" class="btn btn-sm btn-gray-200" data-cancel-collapse="#edit-{{ $qr->id }}">Batal</button>
                                 </div>
                             </td>
                         </tr>
