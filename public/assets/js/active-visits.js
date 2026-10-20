@@ -69,6 +69,7 @@
         if (row.actions.cancel) {
             var cancel = el('button', 'btn btn-sm btn-outline-danger', 'Batal');
             cancel.type = 'button';
+            cancel.setAttribute('data-no-confirm', 'true');
             cancel.addEventListener('click', function () { openCancel(row); });
             wrap.appendChild(cancel);
         }

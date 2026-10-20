@@ -56,6 +56,7 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/tamu', [ActiveVisitController::class, 'index'])->name('visits.active');
         Route::get('/tamu/data', [ActiveVisitController::class, 'data'])->name('visits.active.data');
         Route::post('/kunjungan/{id}/batal', [VisitController::class, 'cancel'])->whereNumber('id')->name('visits.cancel');
+        Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
     });
 
     Route::middleware('role:receptionist')->group(function () {
@@ -109,7 +110,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     });
 
     Route::middleware('role:admin,super_admin')->group(function () {
-        Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
         Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
         Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
 

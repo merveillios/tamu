@@ -53,7 +53,15 @@ class GuestFormTest extends TestCase
         $this->verifiedAs($qr, 'tamu@contoh.test');
         $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr)));
 
-        $this->get("/tamu/{$qr->token}/terima-kasih")->assertOk()->assertSee('No. 1')->assertSee('Siti Aminah');
+        $response = $this->get("/tamu/{$qr->token}/terima-kasih");
+        $response->assertOk()
+            ->assertSee('No. 1')
+            ->assertSee('Siti Aminah')
+            ->assertSee('guest-header-banner')
+            ->assertSee(config('sitamu.institution_name'))
+            ->assertSee($qr->location->name);
+        $this->assertSame(1, substr_count($response->getContent(), 'assets/img/logo-jatim.png'));
+
         $this->get("/tamu/{$qr->token}/terima-kasih")->assertRedirect(route('guest.show', $qr->token));
     }
 
@@ -248,6 +256,30 @@ class GuestFormTest extends TestCase
 
         $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr)))->assertStatus(303);
         $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, 'apa-saja'))->assertStatus(429);
+    }
+
+    public function test_form_renders_unified_banner_and_email_card_without_arrival_text(): void
+    {
+        [$qr] = $this->usableQr();
+        $this->verifiedAs($qr, 'tamu@contoh.test');
+
+        $response = $this->get("/tamu/{$qr->token}/formulir");
+        $response->assertOk();
+
+        // 1. Kalimat jam datang otomatis dihapus
+        $response->assertDontSee('Jam datang dicatat otomatis saat formulir dikirim.');
+
+        // 2. Kartu email terverifikasi tetap ada dan utuh
+        $response->assertSee('Email terverifikasi');
+        $response->assertSee('tamu@contoh.test');
+        $response->assertSee('Ganti akun');
+        $response->assertSee(route('guest.switch', $qr->token));
+
+        // 3 & 4. Banner biru dan logo instansi & badge lokasi menyatu
+        $response->assertSee('guest-header-banner');
+        $response->assertSee(config('sitamu.institution_name'));
+        $response->assertSee($qr->location->name);
+        $this->assertSame(1, substr_count($response->getContent(), 'assets/img/logo-jatim.png'));
     }
 
     /**

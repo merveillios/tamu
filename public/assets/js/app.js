@@ -143,6 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function isCancelButton(element) {
         if (!element) return false;
         if (element.closest('.modal')) return false; // Jangan intersep tombol di dalam modal lain
+        if (element.closest('table') || element.closest('[data-active-visits]')) return false; // Tombol aksi di tabel data bukan tombol batal form
+        if (element.hasAttribute('data-cancel-visit')) return false; // Tombol pembatalan kunjungan memiliki modal sendiri
         if (element.hasAttribute('data-bs-dismiss')) return false;
         if (element.hasAttribute('data-no-confirm')) return false;
         if (element.hasAttribute('data-confirm-cancel')) return true;

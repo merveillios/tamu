@@ -43,7 +43,7 @@ class VisitController extends Controller
             'statusLogs' => fn ($query) => $query->with(['changedBy:id,name', 'staffMember:id,name'])->orderBy('id'),
         ]);
 
-        $canSeeSignature = $user->hasRole(UserRole::Admin, UserRole::SuperAdmin);
+        $canSeeSignature = $user->hasRole(UserRole::Admin, UserRole::SuperAdmin, UserRole::Receptionist);
 
         return view('admin.visits.show', [
             'visit' => $visit,

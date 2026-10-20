@@ -143,6 +143,37 @@ body {
     white-space: normal;
 }
 
+/* Banner halaman formulir tamu (/tamu/{token}/formulir) */
+.guest-form-header-card {
+    border-radius: 0.5rem;
+}
+
+.guest-header-banner {
+    background-color: var(--sitamu-primary);
+    padding: 1.25rem 1.25rem 1rem;
+}
+
+.guest-banner-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
+.guest-banner-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ffffff;
+}
+
+.guest-banner-badge {
+    background-color: #ffffff;
+    color: var(--sitamu-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 /* Honeypot anti-bot: tersembunyi dari manusia tetapi tetap ada di DOM (TAM-8) */
 .guest-hp {
     position: absolute;

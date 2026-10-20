@@ -46,7 +46,7 @@
                         <td data-label="Aksi">
                             <div class="d-flex flex-wrap gap-1 justify-content-end justify-content-md-start">
                                 <button type="button" class="btn btn-sm btn-outline-danger" data-cancel-visit="{{ $visit->id }}"
-                                        data-guest="No. {{ $visit->daily_number }} · {{ $visit->name }}">Batal</button>
+                                        data-guest="No. {{ $visit->daily_number }} · {{ $visit->name }}" data-no-confirm>Batal</button>
                                 <a href="{{ route('admin.visits.show', $visit->id) }}" class="btn btn-sm btn-outline-gray-800">Detail</a>
                             </div>
                         </td>

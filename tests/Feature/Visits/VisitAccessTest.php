@@ -102,6 +102,7 @@ class VisitAccessTest extends TestCase
             'pic membuka detail' => ['picA', 'GET', 'detail'],
             'pic menerima' => ['picA', 'POST', 'terima'],
             'admin melihat tanda tangan' => ['adminA', 'GET', 'tanda-tangan'],
+            'resepsionis melihat tanda tangan' => ['receptionistA', 'GET', 'tanda-tangan'],
         ];
     }
 
@@ -119,16 +120,16 @@ class VisitAccessTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'access.denied', 'user_id' => $this->data[$actor]->id, 'detail->id' => $id]);
     }
 
-    public function test_detail_shows_signature_only_to_admin_roles(): void
+    public function test_detail_shows_signature_to_admin_and_receptionist(): void
     {
         $id = $this->data['visitA']->id;
 
         $this->as('adminA')->get("/admin/kunjungan/{$id}")->assertOk()->assertSee('tanda-tangan')->assertSee('081200000001');
-        $this->as('receptionistA')->get("/admin/kunjungan/{$id}")->assertOk()->assertDontSee('tanda-tangan');
+        $this->as('receptionistA')->get("/admin/kunjungan/{$id}")->assertOk()->assertSee('tanda-tangan');
         $this->as('picA')->get("/admin/kunjungan/{$id}")->assertOk()->assertDontSee('tanda-tangan');
     }
 
-    public function test_signature_route_is_limited_to_admin_roles(): void
+    public function test_signature_route_is_limited_to_admin_and_receptionist(): void
     {
         $id = $this->data['visitA']->id;
 
@@ -136,7 +137,10 @@ class VisitAccessTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'image/png')
             ->assertHeader('Cache-Control', 'no-store, private');
-        $this->as('receptionistA')->get("/admin/kunjungan/{$id}/tanda-tangan")->assertForbidden();
+        $this->as('receptionistA')->get("/admin/kunjungan/{$id}/tanda-tangan")
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png')
+            ->assertHeader('Cache-Control', 'no-store, private');
         $this->as('picA')->get("/admin/kunjungan/{$id}/tanda-tangan")->assertForbidden();
     }
 

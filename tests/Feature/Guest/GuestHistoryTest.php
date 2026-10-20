@@ -20,11 +20,19 @@ class GuestHistoryTest extends TestCase
         $this->createVisit($qr, $category, ['email' => 'saya@contoh.test', 'purpose' => 'Keperluan milik saya']);
         $this->createVisit($qr, $category, ['email' => 'orang-lain@contoh.test', 'purpose' => 'Keperluan orang lain']);
 
-        $this->verifiedAs($qr, 'saya@contoh.test')->get("/tamu/{$qr->token}/riwayat")
-            ->assertOk()
+        $response = $this->verifiedAs($qr, 'saya@contoh.test')->get("/tamu/{$qr->token}/riwayat");
+        $response->assertOk()
             ->assertSee('Keperluan milik saya')
             ->assertDontSee('Keperluan orang lain')
-            ->assertSee('Isi formulir lagi');
+            ->assertSee('Isi formulir lagi')
+            ->assertSee('guest-header-banner')
+            ->assertSee(config('sitamu.institution_name'))
+            ->assertSee($qr->location->name)
+            ->assertSee('Email terverifikasi')
+            ->assertSee('saya@contoh.test')
+            ->assertSee('Ganti akun')
+            ->assertSee(route('guest.switch', $qr->token));
+        $this->assertSame(1, substr_count($response->getContent(), 'assets/img/logo-jatim.png'));
     }
 
     public function test_history_includes_visits_from_other_locations_with_same_email(): void

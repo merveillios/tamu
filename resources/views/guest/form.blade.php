@@ -2,6 +2,8 @@
 
 @section('title', 'Formulir Buku Tamu')
 
+@section('hide_header', '1')
+
 @php
     $locked = $profile !== null;
     $value = fn (string $field) => $locked ? $profile[$field] : old($field);
@@ -9,8 +11,6 @@
 
 @section('content')
     @include('guest.partials.email-block')
-
-    <p class="small text-gray-600 mb-3">Jam datang dicatat otomatis saat formulir dikirim.</p>
 
     @if ($errors->any())
         <div class="alert alert-danger small" role="alert">Periksa kembali isian yang ditandai merah.</div>

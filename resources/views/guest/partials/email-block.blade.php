@@ -1,6 +1,9 @@
-{{-- Email terverifikasi (read-only) dengan tombol Ganti akun (TAM-11). --}}
-<div class="card border-0 shadow-sm mb-3">
-    <div class="card-body py-3 d-flex justify-content-between align-items-center gap-2">
+{{-- Banner instansi & kartu email terverifikasi yang menyatu --}}
+<div class="card border-0 shadow-sm mb-4 overflow-hidden guest-form-header-card">
+    @include('guest.partials.banner')
+
+    {{-- Kartu Email terverifikasi --}}
+    <div class="card-body py-3 d-flex justify-content-between align-items-center gap-2 bg-white">
         <div class="text-break">
             <div class="small text-gray-600">Email terverifikasi</div>
             <div class="fw-bold">{{ $email }}</div>

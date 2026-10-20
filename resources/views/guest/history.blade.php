@@ -2,6 +2,8 @@
 
 @section('title', 'Riwayat Kunjungan')
 
+@section('hide_header', '1')
+
 @section('content')
     @include('guest.partials.email-block')
 
