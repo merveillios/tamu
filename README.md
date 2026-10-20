@@ -245,3 +245,161 @@ Warna identitas instansi diatur di blok `:root` pada `public/assets/css/app.css`
 | M5 — History & Ekspor | Selesai |
 | M6 — Dashboard | Selesai |
 | M7 — Penyempurnaan | Selesai |
+
+## Alur Penggunaan dan Fitur per Peran
+
+SiTamu dipakai oleh lima peran: **Tamu, Resepsionis, PIC, Admin, dan Super Admin**.
+Satu kunjungan mengalir dari tamu memindai QR sampai hasil pelayanan tampil
+kembali di riwayat tamu.
+
+### Alur Utama Kunjungan
+
+1. **Super Admin menyiapkan data awal** — membuat lokasi, departemen di tiap
+   lokasi, akun petugas (Admin, Resepsionis, dan satu akun PIC per departemen),
+   kategori keperluan, petugas yang dapat ditemui, dan QR Code untuk tiap
+   titik masuk.
+2. **Tamu memindai QR Code** yang terpasang di titik masuk. Token QR menentukan
+   lokasi kunjungan, sehingga lokasi terisi otomatis dan tidak bisa diubah tamu.
+3. **Tamu verifikasi email dengan Google** ("Lanjutkan dengan Google"). Sistem
+   mengecek otomatis apakah email tersebut pernah melapor sebelumnya.
+4. **Tamu mengisi formulir** (lihat rincian di bagian Tamu), menandatangani
+   secara digital, menyetujui pemrosesan data pribadi (UU PDP), lalu mengirim.
+5. **Sistem memberi nomor urut** dan jam kedatangan dari server. Kunjungan
+   berstatus **Menunggu** dan langsung muncul di daftar Tamu Aktif resepsionis.
+6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan kategori
+   keperluan, sistem menampilkan bidang/departemen terkait, dan resepsionis
+   memilih PIC yang bertugas — setelah memastikan PIC tersebut sedang tersedia.
+7. **PIC menerima penugasan.** Status kunjungan berubah otomatis menjadi
+   **Diproses** (bukan diubah manual oleh resepsionis).
+8. **PIC melayani tamu lalu menulis hasil/solusi pelayanan.** Saat hasil
+   disimpan, status otomatis menjadi **Selesai** — tidak ada tombol "Selesai"
+   terpisah di peran mana pun.
+9. **Tamu melihat hasil/solusi PIC** di halaman riwayat kunjungannya.
+10. Kunjungan yang Selesai atau Dibatalkan keluar dari daftar Tamu Aktif dan
+    tersimpan di riwayat/history untuk dipantau Admin dan Super Admin.
+
+### Status Kunjungan
+
+| Status | Arti |
+| --- | --- |
+| Menunggu | Formulir terkirim, belum diterima PIC |
+| Diproses | PIC sudah menerima penugasan dan sedang melayani |
+| Selesai | PIC sudah menyimpan hasil/solusi pelayanan (otomatis) |
+| Dibatalkan | Kunjungan dibatalkan resepsionis/Admin dengan alasan wajib yang tercatat |
+| Draf | Kunjungan diturunkan kembali ke Draf oleh Admin dengan alasan tercatat |
+
+### 1. Tamu (tanpa akun petugas, lewat QR)
+
+Fitur:
+
+- Pindai QR per titik masuk/lokasi; badge lokasi tampil di halaman dan terkunci.
+- Verifikasi email memakai Google — hanya email yang dibaca, tanpa password.
+- Deteksi otomatis tamu baru vs tamu lama berdasarkan email.
+- Riwayat kunjungan: daftar kunjungan sebelumnya beserta hasil/solusi dari PIC,
+  plus tombol **Isi Form Baru** untuk melapor lagi.
+- Link **Tidak bisa login Google?** membuka halaman **Bantuan Login Google**:
+  halaman berjudul "Tidak bisa login Google?" dengan badge lokasi, berisi
+  saran "Coba buka halaman ini di Chrome atau Safari. Jika masih belum bisa,
+  silakan hubungi petugas." dan tombol **Coba lagi** untuk kembali mencoba
+  login Google.
+
+Alur tamu baru:
+
+1. Pindai QR → verifikasi Google → langsung masuk formulir kosong.
+2. Isi formulir: Keperluan (dropdown kategori), Rincian keperluan (teks, muncul
+   setelah kategori dipilih), Kelompok Rentan, Nama Lengkap,
+   Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat, dan Tanda Tangan digital.
+3. Centang persetujuan UU PDP → Kirim → menerima nomor urut dengan status Menunggu.
+
+Alur tamu lama (pernah melapor):
+
+1. Pindai QR → verifikasi Google → diarahkan dulu ke halaman riwayat.
+2. Klik **Isi Form Baru** untuk melapor lagi: lima field data diri (Kelompok
+   Rentan, Nama Lengkap, Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat)
+   terisi otomatis dan terkunci; Keperluan, Rincian keperluan, tanda tangan, dan
+   persetujuan UU PDP tetap wajib diisi ulang.
+
+### 2. Resepsionis
+
+Fitur:
+
+- Dashboard **Tamu Aktif**: daftar kunjungan berstatus Menunggu dan Diproses
+  di pos/lokasinya.
+- **Detail Kunjungan**: data tamu, keperluan dan rinciannya, bidang terkait
+  (hanya terlihat petugas, tidak terlihat tamu), dan tanda tangan tamu.
+- **Tugaskan PIC**: memilih PIC sesuai bidang/departemen dari kategori
+  keperluan tamu, setelah memastikan PIC sedang tersedia.
+- **Tugaskan Ulang**: bila PIC ternyata tidak tersedia, penugasan dipindah ke
+  PIC lain — PIC diganti, status kembali Menunggu, alasan pengalihan wajib
+  diisi, dan jejaknya tercatat di audit log serta riwayat kunjungan.
+- **Batalkan kunjungan** dengan alasan wajib yang tercatat.
+- **Petugas yang dihubungi tamu** bila tamu gagal login Google: tamu yang sudah
+  mengikuti saran di halaman Bantuan Login Google (membuka halaman di Chrome
+  atau Safari) dan masih belum bisa, diarahkan untuk menghubungi petugas.
+
+Alur: kunjungan baru masuk (Menunggu) → tinjau detail → cek PIC tersedia →
+Tugaskan PIC → kunjungan tampil sampai status Diproses → setelah PIC menyimpan
+hasil, kunjungan selesai dan keluar dari Tamu Aktif.
+
+### 3. PIC (penanggung jawab pelayanan per departemen)
+
+Fitur:
+
+- Dashboard penugasan: daftar kunjungan yang ditugaskan ke departemennya.
+  **Setiap departemen memiliki 1 akun PIC yang digunakan oleh banyak PIC**
+  (petugas di departemen tersebut secara bergantian).
+- **Terima penugasan** — status kunjungan otomatis menjadi Diproses. Tidak ada
+  opsi menolak penugasan; ketersediaan PIC dipastikan resepsionis sebelum
+  menugaskan.
+- **Detail Kunjungan**: data tamu, keperluan, rincian, dan tanda tangan tamu.
+- **Isi hasil/solusi pelayanan** (wajib) — menyimpan hasil otomatis
+  menyelesaikan kunjungan (status Selesai).
+- **Riwayat pelayanan**: arsip kunjungan yang sudah pernah dilayani
+  departemennya.
+
+Alur: menerima penugasan (Menunggu) → Terima (Diproses) → layani tamu →
+tulis hasil/solusi → Simpan (Selesai, otomatis).
+
+### 4. Admin
+
+Fitur:
+
+- **Dashboard pemantauan**: statistik dan daftar kunjungan sesuai cakupan
+  aksesnya, dengan badge status (Menunggu, Diproses, Selesai, Dibatalkan).
+- **Kelola kunjungan**: melihat detail dan tanda tangan tamu, membatalkan
+  kunjungan dengan alasan wajib, dan menurunkan kunjungan ke Draf. Admin
+  **tidak bisa** mengubah status Menunggu/Diproses (status berubah otomatis
+  lewat alur PIC) dan **tidak** menyelesaikan kunjungan secara manual — status
+  Selesai hanya terjadi saat PIC menyimpan hasil.
+- **Buka kembali (reopen) kunjungan** yang sudah Selesai/Dibatalkan bila ada
+  koreksi.
+- **Kelola Pertanyaan Keperluan**: mengelola pertanyaan/kategori keperluan
+  yang tampil di formulir tamu per lokasi. Admin tidak menambah/mengubah
+  departemen — departemen hanya dikelola Super Admin.
+- **Kelola Petugas**: orang yang dapat ditemui di tiap departemen.
+- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke Excel dan PDF.
+- Admin **tidak bisa** menambah/membuat QR Code — pembuatan QR hanya dilakukan
+  Super Admin.
+
+### 5. Super Admin
+
+Fitur:
+
+- **Kelola Lokasi**: membuat dan mengubah lokasi/gedung.
+- **Kelola Departemen**: membuat dan mengubah departemen di tiap lokasi —
+  hanya Super Admin yang bisa menambah/mengubah departemen.
+- **Kelola Pengguna**: membuat akun Admin, akun Resepsionis per pos jaga, dan
+  satu akun PIC per departemen (dipakai bersama oleh para petugas di
+  departemen itu); mengaktifkan/menonaktifkan akun, membuka kunci, dan
+  mereset password akun petugas.
+- **Kelola QR Code**: satu-satunya peran yang membuat QR — membuat QR untuk
+  tiap titik masuk, memilih akun resepsionis penanggung jawabnya, memperbarui
+  (regenerate) token QR, dan mencetak poster QR siap tempel.
+- **Kelola Kategori Keperluan dan Petugas** (dibagi dengan Admin).
+- **Buka kembali (reopen) kunjungan** yang sudah Selesai/Dibatalkan bila ada
+  koreksi (fitur ini juga bisa dilakukan Admin).
+- **Audit Log**: catatan seluruh aktivitas penting (pembuatan akun, penugasan
+  dan penugasan ulang, pembatalan, reopen, perubahan data master).
+- **Dashboard global**: pemantauan kunjungan dari seluruh lokasi.
+- Masuk menggunakan akun Super Admin yang sudah tersedia untuk mengelola
+  seluruh sistem.
