@@ -9,15 +9,17 @@
             <div class="col-md-6 hero-illustration-panel">
                 @include('partials.hero-deco')
 
-                <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
+                {{-- Logo + nama instansi di pojok kiri atas --}}
+                <div class="hero-brand d-flex align-items-center">
                     <img src="{{ asset('assets/img/logo-disperindag.png') }}"
                          alt="Logo Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur"
-                         class="mb-3 mx-auto mx-md-0 d-block" style="height: 64px; width: auto; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));">
-
-                    <div class="text-white fw-bold mb-3" style="line-height: 1.35;">
+                         class="hero-logo me-3">
+                    <div class="hero-brand-text text-start">
                         Dinas Perindustrian dan Perdagangan<br>Provinsi Jawa Timur
                     </div>
+                </div>
 
+                <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
                     <h1 class="hero-welcome-title mb-3">Selamat Datang!</h1>
                     <p class="hero-welcome-subtitle mb-4">
                         Buku tamu digital Dinas Perindustrian dan Perdagangan

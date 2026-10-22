@@ -493,6 +493,35 @@ body {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
+/* Logo instansi di panel hero — paksa ukuran kecil, menangkan override tema */
+.hero-logo {
+    height: 48px !important;
+    width: auto !important;
+    max-width: none !important;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+}
+
+/* Brand (logo + nama instansi) menempel di pojok kiri atas panel.
+   Diberi latar bersih semi-transparan agar teks terbaca jelas. */
+.hero-brand {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 0.9rem;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
+    box-shadow: 0 4px 14px rgba(6, 30, 64, 0.25);
+}
+
+.hero-brand .hero-brand-text {
+    color: #123c6e;
+    font-weight: 700;
+    line-height: 1.35;
+    font-size: 0.95rem;
+}
+
 /* Panel kanan: area konten/form */
 .hero-content-panel {
     display: flex;
