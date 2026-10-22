@@ -18,7 +18,7 @@
             <div class="input-group login-input-group">
                 <span class="input-group-text"><x-icon name="mail" class="icon icon-xs text-gray-600" /></span>
                 <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}"
-                       placeholder="nama@sitamu.test" autocomplete="username" autofocus required>
+                       placeholder="Masukkan email Anda" autocomplete="username" autofocus required>
             </div>
         </div>
 
@@ -27,7 +27,7 @@
             <div class="input-group login-input-group">
                 <span class="input-group-text"><x-icon name="lock" class="icon icon-xs text-gray-600" /></span>
                 <input type="password" name="password" id="password" class="form-control"
-                       placeholder="••••••••" autocomplete="current-password" required>
+                       placeholder="Masukkan password Anda" autocomplete="current-password" required>
             </div>
         </div>
 
