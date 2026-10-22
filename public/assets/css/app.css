@@ -309,6 +309,219 @@ body {
     color: #ffffff;
 }
 
+/* ============================================================
+   Beranda & Login — hero dengan ilustrasi animasi Disperindag
+   ============================================================ */
+
+/* Latar gradasi lembut untuk seluruh halaman beranda/login */
+.hero-page {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #eaf2fb 0%, #f6f9fd 45%, #fef6e4 100%);
+}
+
+/* Panel ilustrasi: gradasi biru dinas */
+.hero-illustration-panel {
+    background: linear-gradient(150deg, #0b3d7b 0%, #12569f 55%, #1a6fc4 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lingkaran dekoratif latar */
+.hero-illustration-panel::before,
+.hero-illustration-panel::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.hero-illustration-panel::before {
+    width: 260px;
+    height: 260px;
+    top: -80px;
+    right: -70px;
+}
+
+.hero-illustration-panel::after {
+    width: 180px;
+    height: 180px;
+    bottom: -60px;
+    left: -50px;
+}
+
+.disdag-illustration {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Animasi elemen SVG (murni CSS) --- */
+@keyframes disdag-gear-spin {
+    to { transform: rotate(360deg); }
+}
+
+.disdag-gear-spin {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: disdag-gear-spin 9s linear infinite;
+}
+
+.disdag-gear-reverse {
+    animation-direction: reverse;
+    animation-duration: 6s;
+}
+
+@keyframes disdag-bar-grow {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.72); }
+}
+
+.disdag-bar {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: disdag-bar-grow 3.2s ease-in-out infinite;
+}
+
+.disdag-bar-2 { animation-delay: 0.4s; }
+.disdag-bar-3 { animation-delay: 0.8s; }
+
+@keyframes disdag-trend-dash {
+    to { stroke-dashoffset: 0; }
+}
+
+.disdag-trend {
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+    animation: disdag-trend-dash 2.4s ease-out 0.4s forwards;
+}
+
+.disdag-arrow {
+    opacity: 0;
+    animation: disdag-fade-in 0.6s ease-out 2.4s forwards;
+}
+
+@keyframes disdag-fade-in {
+    to { opacity: 1; }
+}
+
+@keyframes disdag-cloud-drift {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(14px); }
+}
+
+.disdag-cloud-1 { animation: disdag-cloud-drift 7s ease-in-out infinite; }
+.disdag-cloud-2 { animation: disdag-cloud-drift 9s ease-in-out infinite reverse; }
+
+@keyframes disdag-sun-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.disdag-sun {
+    animation: disdag-sun-pulse 4s ease-in-out infinite;
+}
+
+@keyframes disdag-flag-wave {
+    0%, 100% { transform: skewY(0deg); }
+    50% { transform: skewY(4deg); }
+}
+
+.disdag-flag {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: disdag-flag-wave 2.6s ease-in-out infinite;
+}
+
+/* Teks pada panel ilustrasi */
+.hero-panel-caption {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.hero-panel-caption .hero-panel-heading {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.01em;
+}
+
+/* Badge fitur kecil di panel */
+.hero-feature-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    margin: 0.15rem;
+}
+
+/* Logo pada kartu login (logo asli Disperindag) */
+.auth-banner-logo-lg {
+    height: 76px;
+    width: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* Kartu beranda */
+.home-card {
+    max-width: 880px;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.home-welcome-title {
+    font-weight: 700;
+    color: #123c6e;
+}
+
+.home-qr-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #eef4fb;
+    border: 1px dashed #9dbede;
+    color: #31598c;
+    font-size: 0.85rem;
+    border-radius: 0.6rem;
+    padding: 0.55rem 0.9rem;
+}
+
+/* Responsif: panel ilustrasi disembunyikan di layar kecil agar ringkas */
+@media (max-width: 767.98px) {
+    .hero-illustration-panel {
+        display: none !important;
+    }
+}
+
+/* Hormati preferensi pengguna yang mengurangi animasi */
+@media (prefers-reduced-motion: reduce) {
+    .disdag-gear-spin,
+    .disdag-bar,
+    .disdag-cloud-1,
+    .disdag-cloud-2,
+    .disdag-sun,
+    .disdag-flag,
+    .disdag-trend,
+    .disdag-arrow {
+        animation: none;
+    }
+
+    .disdag-trend { stroke-dashoffset: 0; }
+    .disdag-arrow { opacity: 1; }
+}
+
 /* Halaman verifikasi Google tamu (/tamu/{token}) */
 .guest-verify-wrapper {
     min-height: 100vh;
