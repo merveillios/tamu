@@ -13,7 +13,11 @@
                 <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
                     <img src="{{ asset('assets/img/logo-disperindag.png') }}"
                          alt="Logo Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur"
-                         class="mb-4 mx-auto mx-md-0 d-block" style="height: 96px; width: auto; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));">
+                         class="mb-3 mx-auto mx-md-0 d-block" style="height: 64px; width: auto; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));">
+
+                    <div class="text-white fw-bold mb-3" style="line-height: 1.35;">
+                        Dinas Perindustrian dan Perdagangan<br>Provinsi Jawa Timur
+                    </div>
 
                     <h1 class="hero-welcome-title mb-3">Selamat Datang!</h1>
                     <p class="hero-welcome-subtitle mb-4">
