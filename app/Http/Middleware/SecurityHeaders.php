@@ -26,12 +26,21 @@ class SecurityHeaders
         ."base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     /**
-     * Tambahan sumber Google khusus halaman Langkah 1 (Bab 12.1).
+     * img-src khusus halaman tamu: tambahan foto profil Google.
      */
-    private const GOOGLE_SIGN_IN_SOURCES = "; script-src 'self' https://accounts.google.com/gsi/client"
-        ."; frame-src https://accounts.google.com/gsi/"
-        ."; connect-src 'self' https://accounts.google.com/gsi/"
-        ."; style-src 'self' https://accounts.google.com/gsi/style";
+    private const GOOGLE_IMG_SOURCES = "img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com";
+
+    /**
+     * Tambahan sumber Google khusus halaman Langkah 1 (Bab 12.1).
+     *
+     * Google Identity Services memuat script/iframe/koneksi dari beberapa origin
+     * (accounts.google.com, apis.google.com, oauth2.googleapis.com, gstatic.com),
+     * sehingga yang diizinkan adalah origin-nya, bukan satu path saja.
+     */
+    private const GOOGLE_SIGN_IN_SOURCES = "; script-src 'self' https://accounts.google.com https://apis.google.com"
+        ."; frame-src https://accounts.google.com"
+        ."; connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com"
+        ."; style-src 'self' 'unsafe-inline' https://accounts.google.com";
 
     /**
      * Menambahkan header keamanan ke respons.
@@ -43,6 +52,9 @@ class SecurityHeaders
         $policy = self::CONTENT_SECURITY_POLICY;
 
         if ($request->attributes->get(self::ALLOW_GOOGLE_SIGN_IN) === true) {
+            // Ganti img-src dasar dengan versi yang mengizinkan foto profil Google,
+            // karena directive CSP yang sama hanya dihitung yang pertama.
+            $policy = str_replace("img-src 'self' data:", self::GOOGLE_IMG_SOURCES, $policy);
             $policy .= self::GOOGLE_SIGN_IN_SOURCES;
         }
 

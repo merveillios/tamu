@@ -47,7 +47,7 @@ class GuestEntryTest extends TestCase
             ->assertHeader('Referrer-Policy', 'no-referrer');
 
         $this->assertNotEmpty(session("guest.{$qr->id}.nonce"));
-        $this->assertStringContainsString('https://accounts.google.com/gsi/client', $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('https://accounts.google.com', $response->headers->get('Content-Security-Policy'));
     }
 
     public function test_other_guest_pages_keep_strict_csp(): void

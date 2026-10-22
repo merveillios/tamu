@@ -16,7 +16,7 @@ class LayoutTest extends TestCase
 
     public function test_home_and_login_pages_render_with_local_assets(): void
     {
-        $this->get('/')->assertOk()->assertSee('assets/vendor/volt/css/volt.css')->assertSee('Selamat datang');
+        $this->get('/')->assertOk()->assertSee('assets/vendor/volt/css/volt.css')->assertSee('Selamat Datang');
         $this->get('/login')->assertOk()->assertSee('name="email"', false)->assertSee('name="password"', false);
     }
 

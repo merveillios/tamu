@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\UserRole;
 use App\Enums\VisitStatus;
+use App\Enums\VulnerableGroup;
 use App\Models\GuestVisit;
 use App\Models\User;
 use App\Rules\IndonesianPhone;
@@ -41,8 +42,7 @@ class VisitListService
         return $this->filteredActive($user, $filters)
             ->tap(fn (Builder $query) => $this->applyStatusFilter($query, $filters['status'] ?? null))
             ->with(self::RELATIONS)
-            ->orderBy('check_in_at')
-            ->orderBy('id')
+            ->tap(fn (Builder $query) => $this->applyPriorityOrdering($query))
             ->paginate(25);
     }
 
@@ -76,8 +76,7 @@ class VisitListService
             ->forUser($pic)
             ->whereIn('status', [VisitStatus::Waiting, VisitStatus::Processing])
             ->with(self::RELATIONS)
-            ->orderBy('check_in_at')
-            ->orderBy('id')
+            ->tap(fn (Builder $query) => $this->applyPriorityOrdering($query))
             ->get();
     }
 
@@ -163,6 +162,33 @@ class VisitListService
                 $inner->orWhere('phone', 'like', "%{$phone}%");
             }
         });
+    }
+
+    /**
+     * Mengurutkan tamu prioritas (kelompok rentan) ke posisi paling atas,
+     * lalu berdasarkan waktu datang paling awal.
+     *
+     * Prioritas: Lansia, Disabilitas, Ibu hamil. Kelompok "bukan rentan" dan
+     * "tidak ingin menyebutkan" tidak diprioritaskan.
+     */
+    private function applyPriorityOrdering(Builder $query): void
+    {
+        $priority = [
+            VulnerableGroup::Elderly->value,
+            VulnerableGroup::Disability->value,
+            VulnerableGroup::Pregnant->value,
+        ];
+
+        $cases = implode(' ', array_map(
+            fn (string $value, int $rank) => "WHEN '{$value}' THEN {$rank}",
+            $priority,
+            array_keys($priority)
+        ));
+
+        $query
+            ->orderByRaw("CASE vulnerable_group {$cases} ELSE 3 END")
+            ->orderBy('check_in_at')
+            ->orderBy('id');
     }
 
     /**
