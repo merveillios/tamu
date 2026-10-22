@@ -4,52 +4,38 @@
     @include('partials.head')
 </head>
 <body>
-    <main>
-        <section class="hero-page min-vh-100 d-flex align-items-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-12 col-lg-10">
-                        <div class="card home-card border-0 shadow-lg mx-auto">
-                            <div class="row g-0">
-                                {{-- Panel ilustrasi animasi Disperindag --}}
-                                <div class="col-md-6 hero-illustration-panel d-flex flex-column align-items-center justify-content-center p-4 p-lg-5">
-                                    @include('partials.disdag-illustration')
+    <main class="container-fluid p-0">
+        <div class="row g-0 hero-split-row">
+            {{-- Panel kiri: sambutan dengan dekorasi biru Disperindag --}}
+            <div class="col-md-6 hero-illustration-panel">
+                @include('partials.hero-deco')
 
-                                    <div class="hero-panel-caption text-center mt-4">
-                                        <div class="hero-panel-heading mb-1">Buku Tamu Digital</div>
-                                        <p class="mb-0">
-                                            Pencatatan kunjungan yang cepat, aman, dan terintegrasi
-                                            untuk pelayanan yang lebih baik.
-                                        </p>
-                                    </div>
-                                </div>
+                <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
+                    <img src="{{ asset('assets/img/logo-disperindag.png') }}"
+                         alt="Logo Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur"
+                         class="mb-4 mx-auto mx-md-0 d-block" style="height: 96px; width: auto; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));">
 
-                                {{-- Panel form login --}}
-                                <div class="col-md-6">
-                                    <div class="bg-white h-100">
-                                        <div class="auth-banner d-flex align-items-center">
-                                            <img src="{{ asset('assets/img/logo-disperindag.png') }}" alt="Logo Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur" class="auth-banner-logo-lg me-3">
-                                            <div>
-                                                <div class="auth-banner-title">Dinas Perindustrian dan Perdagangan</div>
-                                                <div class="auth-banner-subtitle">Provinsi Jawa Timur</div>
-                                            </div>
-                                        </div>
+                    <h1 class="hero-welcome-title mb-3">Selamat Datang!</h1>
+                    <p class="hero-welcome-subtitle mb-4">
+                        Masuk untuk mengelola buku tamu digital Dinas Perindustrian
+                        dan Perdagangan Provinsi Jawa Timur.
+                    </p>
 
-                                        <div class="p-4 p-lg-5 pt-3 pt-lg-4">
-                                            @yield('content')
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="text-center text-muted small mt-3 mb-0">
-                            &copy; {{ date('Y') }} {{ config('sitamu.institution_name') }}
-                        </p>
-                    </div>
+                    @include('partials.disdag-illustration')
                 </div>
             </div>
-        </section>
+
+            {{-- Panel kanan: form login --}}
+            <div class="col-md-6 hero-content-panel">
+                <div class="hero-content-inner">
+                    @yield('content')
+
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        &copy; {{ date('Y') }} {{ config('sitamu.institution_name') }}
+                    </p>
+                </div>
+            </div>
+        </div>
     </main>
 
     @include('partials.flash')
