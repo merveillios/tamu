@@ -4,28 +4,44 @@
     @include('partials.head')
 </head>
 <body>
-    <main>
-        <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-12 d-flex align-items-center justify-content-center">
-                        <div class="bg-white shadow border-0 rounded border-light overflow-hidden w-100 auth-card">
-                            <div class="auth-banner d-flex align-items-center">
-                                <img src="{{ asset('assets/img/logo-jatim.png') }}" alt="Logo Provinsi Jawa Timur" class="auth-banner-logo me-3">
-                                <div>
-                                    <div class="auth-banner-title">Dinas Perindustrian Dan Perdagangan</div>
-                                    <div class="auth-banner-subtitle">Provinsi Jawa Timur</div>
-                                </div>
-                            </div>
+    <main class="container-fluid p-0">
+        <div class="row g-0 hero-split-row">
+            {{-- Panel kiri: sambutan dengan dekorasi biru Disperindag --}}
+            <div class="col-md-6 hero-illustration-panel">
+                @include('partials.hero-deco')
 
-                            <div class="p-4 p-lg-5 pt-3 pt-lg-4">
-                                @yield('content')
-                            </div>
-                        </div>
+                {{-- Logo + nama instansi di pojok kiri atas --}}
+                <div class="hero-brand d-flex align-items-center">
+                    <img src="{{ asset('assets/img/logo-disperindag.png') }}"
+                         alt="Logo Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur"
+                         class="hero-logo me-3">
+                    <div class="hero-brand-text text-start">
+                        Dinas Perindustrian dan Perdagangan<br>Provinsi Jawa Timur
                     </div>
                 </div>
+
+                <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
+                    <h1 class="hero-welcome-title mb-3">Selamat Datang!</h1>
+                    <p class="hero-welcome-subtitle mb-4">
+                        Masuk untuk mengelola buku tamu digital Dinas Perindustrian
+                        dan Perdagangan Provinsi Jawa Timur.
+                    </p>
+
+                    @include('partials.disdag-illustration')
+                </div>
             </div>
-        </section>
+
+            {{-- Panel kanan: form login --}}
+            <div class="col-md-6 hero-content-panel">
+                <div class="hero-content-inner">
+                    @yield('content')
+
+                    <p class="text-center text-muted small mt-4 mb-0">
+                        &copy; {{ date('Y') }} {{ config('sitamu.institution_name') }}
+                    </p>
+                </div>
+            </div>
+        </div>
     </main>
 
     @include('partials.flash')
