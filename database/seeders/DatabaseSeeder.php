@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
 
         $this->command?->info('Akun contoh baru (catat password ini, tidak ditampilkan lagi):');
         $this->call(LocalSampleSeeder::class);
+        $this->call(SampleVisitsSeeder::class);
     }
 }
