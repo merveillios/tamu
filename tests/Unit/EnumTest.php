@@ -18,7 +18,7 @@ class EnumTest extends TestCase
         $this->assertSame(['Menunggu', 'warning'], [VisitStatus::Waiting->label(), VisitStatus::Waiting->badge()]);
         $this->assertSame(['Sedang direview', 'primary'], [VisitStatus::Processing->label(), VisitStatus::Processing->badge()]);
         $this->assertSame(['Selesai', 'success'], [VisitStatus::Completed->label(), VisitStatus::Completed->badge()]);
-        $this->assertSame(['Dibatalkan', 'secondary'], [VisitStatus::Cancelled->label(), VisitStatus::Cancelled->badge()]);
+        $this->assertSame(['Dibatalkan', 'danger'], [VisitStatus::Cancelled->label(), VisitStatus::Cancelled->badge()]);
     }
 
     public function test_only_waiting_and_processing_are_active(): void

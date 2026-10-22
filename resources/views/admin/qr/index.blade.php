@@ -95,13 +95,7 @@
                     @php($revoked = $qr->status === \App\Enums\QrStatus::Revoked)
                     <tr @class(['text-gray-500' => $revoked])>
                         <td>{{ $qr->location->name }}</td>
-                        <td>
-                            @if ($qr->department)
-                                {{ $qr->department->name }}@unless ($qr->department->is_active) <span class="badge bg-secondary">nonaktif</span>@endunless
-                            @else
-                                <span class="badge bg-warning text-dark">Belum diatur</span>
-                            @endif
-                        </td>
+                        <td>{{ $departmentCounts->get($qr->location_id, 0) }}</td>
                         <td class="fw-bold">{{ $qr->label ?? 'QR #'.$qr->id }}</td>
                         <td>{{ $qr->receptionist->name }}@unless ($qr->receptionist->is_active) <span class="badge bg-secondary">nonaktif</span>@endunless</td>
                         <td><span class="badge bg-{{ $qr->status->badge() }}">{{ $qr->status->label() }}</span></td>

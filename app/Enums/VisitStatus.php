@@ -37,7 +37,7 @@ enum VisitStatus: string
             self::Waiting => 'warning',
             self::Processing => 'primary',
             self::Completed => 'success',
-            self::Cancelled => 'secondary',
+            self::Cancelled => 'danger',
         };
     }
 
