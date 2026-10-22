@@ -50,15 +50,18 @@ class QrController extends Controller
             ->paginate(25)
             ->withQueryString();
 
+        $departments = Department::query()
+            ->forUser($user)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'location_id', 'name']);
+
         return view('admin.qr.index', [
             'locations' => Location::query()->forUser($user)->orderBy('name')->get(['id', 'name', 'is_active']),
             'selected' => $selected,
             'qrCodes' => $qrCodes,
-            'departments' => Department::query()
-                ->forUser($user)
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(['id', 'location_id', 'name']),
+            'departments' => $departments,
+            'departmentCounts' => $departments->groupBy('location_id')->map->count(),
             'receptionists' => User::query()
                 ->where('role', UserRole::Receptionist)
                 ->where('is_active', true)
