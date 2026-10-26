@@ -75,10 +75,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/kunjungan/{id}/buka-kembali', [VisitController::class, 'reopen'])->whereNumber('id')->name('visits.reopen');
     });
 
-    Route::middleware('role:super_admin')->group(function () {
-        Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
-    });
-
     Route::middleware('role:admin,super_admin')->group(function () {
         Route::get('/lokasi', [LocationController::class, 'index'])->name('locations.index');
         Route::get('/lokasi/tambah', [LocationController::class, 'create'])->name('locations.create');
@@ -109,6 +105,8 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/{id}/ubah', [UserController::class, 'update'])->whereNumber('id')->name('users.update');
         Route::post('/pengguna/{id}/status', [UserController::class, 'toggleStatus'])->whereNumber('id')->name('users.status');
         Route::post('/pengguna/{id}/buka-kunci', [UserController::class, 'unlock'])->whereNumber('id')->name('users.unlock');
+
+        Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
 
         Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
         Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');

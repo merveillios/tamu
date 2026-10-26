@@ -57,4 +57,14 @@ class AuditLogTest extends TestCase
 
         $this->assertSame(0, $response->viewData('logs')->total());
     }
+
+    public function test_admin_can_read_audit_log_including_super_admin_actions(): void
+    {
+        $superAdmin = User::factory()->role(UserRole::SuperAdmin)->create();
+        AuditLog::create(['action' => 'user.unlock', 'user_id' => $superAdmin->id]);
+
+        $this->actingAs(User::factory()->role(UserRole::Admin)->create())->get('/admin/audit-log')
+            ->assertOk()
+            ->assertSee('user.unlock');
+    }
 }

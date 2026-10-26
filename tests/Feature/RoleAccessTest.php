@@ -30,7 +30,7 @@ class RoleAccessTest extends TestCase
             'history' => ['/admin/history', [UserRole::SuperAdmin, UserRole::Admin]],
             'daftar pengguna' => ['/admin/pengguna', [UserRole::SuperAdmin, UserRole::Admin]],
             'tambah pengguna' => ['/admin/pengguna/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
-            'audit log' => ['/admin/audit-log', [UserRole::SuperAdmin]],
+            'audit log' => ['/admin/audit-log', [UserRole::SuperAdmin, UserRole::Admin]],
             'lokasi' => ['/admin/lokasi', [UserRole::SuperAdmin, UserRole::Admin]],
             'tambah lokasi' => ['/admin/lokasi/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
             'qr code' => ['/admin/qr', [UserRole::SuperAdmin, UserRole::Admin]],

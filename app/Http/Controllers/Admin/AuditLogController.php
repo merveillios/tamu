@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 /**
- * Daftar audit log untuk Super Admin (AUD-2).
+ * Daftar audit log untuk Admin dan Super Admin, hanya baca (AUD-1, AUD-2).
  */
 class AuditLogController extends Controller
 {

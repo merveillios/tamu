@@ -44,8 +44,8 @@ class LayoutTest extends TestCase
     {
         $this->assertMenu(
             UserRole::Admin,
-            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'QR Code', 'Pertanyaan', 'Petugas', 'Pengguna', 'Ganti Password'],
-            ['Penugasan', 'Audit Log'],
+            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'QR Code', 'Pertanyaan', 'Petugas', 'Pengguna', 'Audit Log', 'Ganti Password'],
+            ['Penugasan'],
         );
     }
 
