@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Department;
-use App\Models\Location;
 use App\Models\User;
 use App\Services\UserAccountService;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +30,7 @@ class UserController extends Controller
         ]);
 
         $users = User::query()
-            ->with(['locations:id,name', 'department.location:id,name'])
+            ->with('department.location:id,name')
             ->withCount('qrCodes')
             ->when($filters['q'] ?? null, function ($query, string $search) {
                 $query->where(fn ($inner) => $inner
@@ -78,7 +77,7 @@ class UserController extends Controller
      */
     public function edit(int $id): View
     {
-        return view('admin.users.form', $this->formOptions(User::with('locations')->findOrFail($id)));
+        return view('admin.users.form', $this->formOptions(User::findOrFail($id)));
     }
 
     /**
@@ -116,7 +115,7 @@ class UserController extends Controller
     }
 
     /**
-     * Data pilihan untuk form akun: peran, departemen aktif per lokasi, dan lokasi.
+     * Data pilihan untuk form akun: peran dan departemen aktif per lokasi.
      *
      * @return array<string, mixed>
      */
@@ -132,7 +131,6 @@ class UserController extends Controller
                 ->get()
                 ->groupBy(fn (Department $department) => $department->location->name)
                 ->sortKeys(),
-            'locations' => Location::query()->orderBy('name')->get(['id', 'name', 'is_active']),
         ];
     }
 }

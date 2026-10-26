@@ -52,8 +52,7 @@ class LocalSampleSeeder extends Seeder
         $headquarters = Location::where('name', array_key_first(self::LOCATIONS))->firstOrFail();
 
         $this->seedAccount('Super Admin Contoh', 'superadmin@sitamu.test', UserRole::SuperAdmin);
-        $admin = $this->seedAccount('Admin Kantor Dinas', 'admin@sitamu.test', UserRole::Admin);
-        $admin->locations()->syncWithoutDetaching([$headquarters->id => ['assigned_at' => now()]]);
+        $this->seedAccount('Admin Kantor Dinas', 'admin@sitamu.test', UserRole::Admin);
 
         $receptionist = $this->seedAccount('Resepsionis Pintu Timur', 'resepsionis@sitamu.test', UserRole::Receptionist);
         QrCode::firstOrCreate(

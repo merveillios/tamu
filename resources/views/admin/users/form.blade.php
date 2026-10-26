@@ -6,7 +6,6 @@
     use App\Enums\UserRole;
 
     $selectedRole = old('role', $user->role?->value);
-    $selectedLocations = array_map('intval', old('location_ids', $user->exists ? $user->locations->pluck('id')->all() : []));
 @endphp
 
 @section('content')
@@ -52,6 +51,9 @@
                         <div class="form-text" data-role-section="{{ UserRole::Receptionist->value }}">
                             Akun resepsionis dihubungkan ke lokasi lewat QR Code (menu Lokasi → QR).
                         </div>
+                        <div class="form-text" data-role-section="{{ UserRole::Admin->value }}">
+                            Admin mengelola semua lokasi.
+                        </div>
                     </div>
 
                     <div class="mb-3" data-role-section="{{ UserRole::Pic->value }}">
@@ -74,23 +76,6 @@
                         @enderror
                     </div>
 
-                    <fieldset class="mb-3" data-role-section="{{ UserRole::Admin->value }}">
-                        <legend class="form-label fs-6">Lokasi yang ditugaskan</legend>
-                        @forelse ($locations as $location)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="location_ids[]" value="{{ $location->id }}"
-                                       id="location_{{ $location->id }}" @checked(in_array($location->id, $selectedLocations, true))>
-                                <label class="form-check-label" for="location_{{ $location->id }}">
-                                    {{ $location->name }}@unless ($location->is_active) <span class="text-gray-500">(nonaktif)</span>@endunless
-                                </label>
-                            </div>
-                        @empty
-                            <p class="small text-gray-600 mb-0">Belum ada lokasi.</p>
-                        @endforelse
-                        @error('location_ids')
-                            <div class="text-danger small">{{ $message }}</div>
-                        @enderror
-                    </fieldset>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">

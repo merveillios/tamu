@@ -63,9 +63,6 @@
                         <td>{{ $user->role->label() }}</td>
                         <td class="small">
                             @switch($user->role)
-                                @case(\App\Enums\UserRole::Admin)
-                                    {{ $user->locations->pluck('name')->join(', ') ?: 'Belum ada lokasi' }}
-                                    @break
                                 @case(\App\Enums\UserRole::Pic)
                                     {{ $user->department?->name }} — {{ $user->department?->location?->name }}
                                     @break

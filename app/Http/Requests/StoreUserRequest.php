@@ -21,8 +21,7 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
-     * Merapikan input dan membuang field yang tidak berlaku untuk peran terpilih,
-     * sehingga departemen hanya tersimpan untuk PIC dan lokasi hanya untuk Admin.
+     * Merapikan input dan membuang departemen bila peran terpilih bukan PIC.
      */
     protected function prepareForValidation(): void
     {
@@ -32,7 +31,6 @@ class StoreUserRequest extends FormRequest
             'name' => preg_replace('/\s+/', ' ', trim((string) $this->input('name'))),
             'email' => Str::lower(trim((string) $this->input('email'))),
             'department_id' => $role === UserRole::Pic->value ? $this->input('department_id') : null,
-            'location_ids' => $role === UserRole::Admin->value ? (array) $this->input('location_ids', []) : [],
         ]);
     }
 
@@ -52,8 +50,6 @@ class StoreUserRequest extends FormRequest
                 'required_if:role,'.UserRole::Pic->value,
                 Rule::exists('departments', 'id')->where('is_active', true),
             ],
-            'location_ids' => ['array'],
-            'location_ids.*' => ['integer', Rule::exists('locations', 'id')->whereNull('deleted_at')],
             'password' => $this->passwordRules(),
         ];
     }
@@ -71,7 +67,6 @@ class StoreUserRequest extends FormRequest
             'email.*' => 'Email tidak valid.',
             'role.*' => 'Pilih peran akun.',
             'department_id.*' => 'Pilih departemen aktif untuk akun PIC.',
-            'location_ids.*' => 'Lokasi tidak valid.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'password.*' => 'Password minimal 8 karakter.',
         ];

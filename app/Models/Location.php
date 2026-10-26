@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Concerns\LimitedByAccess;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -56,14 +55,5 @@ class Location extends Model
     public function guestVisits(): HasMany
     {
         return $this->hasMany(GuestVisit::class);
-    }
-
-    /**
-     * Akun Admin yang ditugaskan ke lokasi ini.
-     */
-    public function admins(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_locations')
-            ->withPivot('assigned_by', 'assigned_at');
     }
 }

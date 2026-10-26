@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -50,15 +49,6 @@ class User extends Authenticatable
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
-    }
-
-    /**
-     * Lokasi yang ditugaskan ke akun Admin.
-     */
-    public function locations(): BelongsToMany
-    {
-        return $this->belongsToMany(Location::class, 'user_locations')
-            ->withPivot('assigned_by', 'assigned_at');
     }
 
     /**

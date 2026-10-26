@@ -43,7 +43,7 @@ class UserManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'user.create', 'entity_id' => $pic->id, 'user_id' => $this->superAdmin->id]);
     }
 
-    public function test_creates_admin_with_locations_and_records_assigner(): void
+    public function test_creates_admin_without_location_assignment(): void
     {
         $location = $this->createLocation();
 
@@ -52,24 +52,21 @@ class UserManagementTest extends TestCase
             ->assertRedirect(route('admin.users.index'));
 
         $admin = User::where('email', 'baru@contoh.test')->firstOrFail();
-        $this->assertDatabaseHas('user_locations', ['user_id' => $admin->id, 'location_id' => $location->id, 'assigned_by' => $this->superAdmin->id]);
-        $this->assertDatabaseHas('audit_logs', ['action' => 'user.assign_locations', 'entity_id' => $admin->id]);
+        $this->assertSame(UserRole::Admin, $admin->role);
+        $this->assertDatabaseCount('user_locations', 0);
     }
 
-    public function test_department_and_locations_are_ignored_for_receptionist(): void
+    public function test_department_is_ignored_for_receptionist(): void
     {
-        $location = $this->createLocation();
-        $department = $this->createDepartment($location);
+        $department = $this->createDepartment($this->createLocation());
 
         $this->actingAs($this->superAdmin)->post('/admin/pengguna/tambah', $this->payload([
             'role' => 'receptionist',
             'department_id' => $department->id,
-            'location_ids' => [$location->id],
         ]));
 
         $receptionist = User::where('email', 'baru@contoh.test')->firstOrFail();
         $this->assertNull($receptionist->department_id);
-        $this->assertSame(0, $receptionist->locations()->count());
     }
 
     public function test_pic_requires_department(): void

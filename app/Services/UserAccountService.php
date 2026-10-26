@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Aturan bisnis akun staf yang dikelola Super Admin (USR-1, USR-2, USR-4, USR-5, AUTH-4).
+ * Aturan bisnis akun staf (USR-1, USR-4, USR-5, AUTH-4).
  */
 class UserAccountService
 {
@@ -19,7 +19,7 @@ class UserAccountService
     }
 
     /**
-     * Membuat akun staf baru beserta lokasi Admin bila ada.
+     * Membuat akun staf baru.
      *
      * @param  array<string, mixed>  $data
      */
@@ -41,7 +41,6 @@ class UserAccountService
             ]);
 
             $this->audit->record('user.create', $user, ['role' => $role->value], $actor);
-            $this->syncLocations($user, $role === UserRole::Admin ? $data['location_ids'] : [], $actor);
 
             return $user;
         });
@@ -86,8 +85,6 @@ class UserAccountService
             if (! empty($data['password'])) {
                 $this->audit->record('user.password_reset', $user, [], $actor);
             }
-
-            $this->syncLocations($user, $role === UserRole::Admin ? $data['location_ids'] : [], $actor);
 
             return $user;
         });
@@ -204,29 +201,4 @@ class UserAccountService
         }
     }
 
-    /**
-     * Menyamakan lokasi Admin (USR-2); lokasi yang tetap dipertahankan tidak diubah catatan penugasannya.
-     *
-     * @param  array<int, int|string>  $locationIds
-     */
-    private function syncLocations(User $user, array $locationIds, User $actor): void
-    {
-        $current = $user->locations()->pluck('locations.id')->map(fn ($id) => (int) $id)->all();
-        $target = array_values(array_unique(array_map('intval', $locationIds)));
-
-        $added = array_diff($target, $current);
-        $removed = array_diff($current, $target);
-
-        if ($added === [] && $removed === []) {
-            return;
-        }
-
-        $user->locations()->detach($removed);
-        $user->locations()->attach(
-            array_fill_keys($added, ['assigned_by' => $actor->id, 'assigned_at' => now()]),
-        );
-
-        sort($target);
-        $this->audit->record('user.assign_locations', $user, ['location_ids' => $target], $actor);
-    }
 }
