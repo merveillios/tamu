@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Manajemen QR Code oleh Super Admin (QR-1 sampai QR-7).
+ * Manajemen QR Code oleh Admin dan Super Admin (QR-1 sampai QR-7).
  */
 class QrController extends Controller
 {

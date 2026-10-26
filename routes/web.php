@@ -85,15 +85,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/{id}/buka-kunci', [UserController::class, 'unlock'])->whereNumber('id')->name('users.unlock');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
-
-        Route::get('/qr', [QrController::class, 'index'])->name('qr.index');
-        Route::post('/qr', [QrController::class, 'store'])->name('qr.store');
-        Route::post('/qr/{id}/departemen', [QrController::class, 'changeDepartment'])->whereNumber('id')->name('qr.department');
-        Route::post('/qr/{id}/resepsionis', [QrController::class, 'changeReceptionist'])->whereNumber('id')->name('qr.receptionist');
-        Route::post('/qr/{id}/status', [QrController::class, 'toggleStatus'])->whereNumber('id')->name('qr.status');
-        Route::post('/qr/{id}/regenerate', [QrController::class, 'regenerate'])->whereNumber('id')->name('qr.regenerate');
-        Route::get('/qr/{id}/unduh', [QrController::class, 'download'])->whereNumber('id')->name('qr.download');
-        Route::get('/qr/{id}/cetak', [QrController::class, 'print'])->whereNumber('id')->name('qr.print');
     });
 
     Route::middleware('role:admin,super_admin')->group(function () {
@@ -109,6 +100,15 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/lokasi/{id}/departemen', [DepartmentController::class, 'store'])->whereNumber('id')->name('departments.store');
         Route::post('/departemen/{id}/ubah', [DepartmentController::class, 'update'])->whereNumber('id')->name('departments.update');
         Route::post('/departemen/{id}/status', [DepartmentController::class, 'toggleStatus'])->whereNumber('id')->name('departments.status');
+
+        Route::get('/qr', [QrController::class, 'index'])->name('qr.index');
+        Route::post('/qr', [QrController::class, 'store'])->name('qr.store');
+        Route::post('/qr/{id}/departemen', [QrController::class, 'changeDepartment'])->whereNumber('id')->name('qr.department');
+        Route::post('/qr/{id}/resepsionis', [QrController::class, 'changeReceptionist'])->whereNumber('id')->name('qr.receptionist');
+        Route::post('/qr/{id}/status', [QrController::class, 'toggleStatus'])->whereNumber('id')->name('qr.status');
+        Route::post('/qr/{id}/regenerate', [QrController::class, 'regenerate'])->whereNumber('id')->name('qr.regenerate');
+        Route::get('/qr/{id}/unduh', [QrController::class, 'download'])->whereNumber('id')->name('qr.download');
+        Route::get('/qr/{id}/cetak', [QrController::class, 'print'])->whereNumber('id')->name('qr.print');
 
         Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
         Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');

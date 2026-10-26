@@ -13,11 +13,11 @@ use Illuminate\Validation\Rule;
 class QrRequest extends FormRequest
 {
     /**
-     * Hanya Super Admin yang mengelola QR.
+     * Admin dan Super Admin mengelola QR (QR-2, PRD v0.11).
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasRole(UserRole::SuperAdmin) ?? false;
+        return $this->user()?->hasRole(UserRole::SuperAdmin, UserRole::Admin) ?? false;
     }
 
     /**

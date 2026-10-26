@@ -163,13 +163,32 @@ class QrManagementTest extends TestCase
             ->assertSee('data:image/svg+xml;base64,', false);
     }
 
-    public function test_admin_cannot_manage_qr(): void
+    public function test_admin_manages_qr(): void
     {
         $location = $this->createLocation();
+        $department = $this->createDepartment($location);
+        $receptionist = $this->createUser(UserRole::Receptionist);
         $admin = $this->createAdmin();
-        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
 
-        $this->actingAs($admin)->get("/admin/qr?lokasi={$location->id}")->assertForbidden();
-        $this->actingAs($admin)->get("/admin/qr/{$qr->id}/unduh")->assertForbidden();
+        $this->actingAs($admin)->get("/admin/qr?lokasi={$location->id}")->assertOk();
+        $this->actingAs($admin)
+            ->post('/admin/qr', ['location_id' => $location->id, 'department_id' => $department->id, 'receptionist_id' => $receptionist->id])
+            ->assertSessionHasNoErrors();
+
+        $qr = QrCode::firstOrFail();
+        $this->actingAs($admin)->get("/admin/qr/{$qr->id}/unduh?format=png")->assertOk();
+        $this->actingAs($admin)->post("/admin/qr/{$qr->id}/status");
+
+        $this->assertSame(QrStatus::Inactive, $qr->refresh()->status);
+        $this->assertSame($admin->id, $qr->created_by);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'qr.deactivate', 'user_id' => $admin->id, 'entity_id' => $qr->id]);
+    }
+
+    public function test_receptionist_cannot_manage_qr(): void
+    {
+        $qr = $this->createQr($this->createLocation(), $receptionist = $this->createUser(UserRole::Receptionist));
+
+        $this->actingAs($receptionist)->get('/admin/qr')->assertForbidden();
+        $this->actingAs($receptionist)->get("/admin/qr/{$qr->id}/unduh")->assertForbidden();
     }
 }
