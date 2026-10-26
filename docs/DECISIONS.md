@@ -2,6 +2,18 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-10-26 — Admin mengelola semua lokasi (PRD v0.11)
+
+- **Konteks:** Klien meminta Super Admin sebisa mungkin tidak dipakai kecuali darurat, sehingga pekerjaan harian Super Admin (lokasi, departemen, QR, dan akun) dipindah ke Admin. Admin juga tidak lagi dibatasi lokasi.
+- **Keputusan:**
+  - `AccessScope` memperlakukan Admin tanpa batas lokasi, sama seperti Super Admin (ADM-5). Membuka kembali kunjungan tetap hanya untuk Admin (ADM-3).
+  - Admin mengelola lokasi, departemen, dan QR Code di semua lokasi dengan aturan yang sama seperti Super Admin.
+  - Admin hanya mengelola akun Resepsionis dan PIC (USR-6). Akun Admin dan Super Admin tetap hanya dikelola Super Admin, dan Admin tidak dapat mengubah akunnya sendiri lewat menu Pengguna.
+  - Admin dapat melihat audit log (AUD-2) agar ada yang membaca catatan aksi walau Super Admin jarang login.
+  - Penugasan lokasi Admin (USR-2) dihapus dari aplikasi. Tabel `user_locations` dan isinya **tidak** dihapus agar bisa dipakai lagi bila klien kembali meminta pembatasan per lokasi; tidak ada migrasi yang menghapus data.
+- **Alasan:** Tanpa USR-6, Admin dapat membuat akun Super Admin, me-reset password Super Admin atau Admin lain lalu login atas nama mereka. Itu sama dengan mengambil alih sistem dan membuat audit log tidak dapat dipercaya. Membuat atau mengganti akun Admin jarang terjadi, sehingga tetap sesuai dengan keinginan klien.
+- **Risiko yang harus diketahui klien:** kesalahan satu Admin (misalnya menonaktifkan lokasi atau me-regenerate QR yang sudah dicetak) berdampak ke semua lokasi; pengamannya adalah dialog konfirmasi dan audit log. Password akun Super Admin harus kuat dan disimpan pejabat yang bertanggung jawab.
+
 ## 2026-10-18 — Versi PHP dan Laravel
 
 - **Konteks:** PRD Bab 17 No. 10 meminta Laravel mayor stabil terbaru yang kompatibel dengan PHP server. Mesin pengembangan (Laragon) hanya memiliki PHP 8.1.10, dan pemilik proyek memilih tetap memakai PHP 8.1.

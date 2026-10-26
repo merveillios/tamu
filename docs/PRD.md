@@ -1,16 +1,16 @@
-# PRD SiTamu v0.10 — Laravel (Model 5 Peran)
+# PRD SiTamu v0.11 — Laravel (Model 5 Peran)
 
 Oct 14, 2026 · @ahmad
 
 SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi formulir, resepsionis menugaskan ke departemen, PIC melayani dan menulis hasil, lalu hasil kembali ke riwayat tamu.
 
-**STATUS: DRAFT v0.10 — disiapkan untuk implementasi oleh AI coding agent (framework Laravel)**
+**STATUS: DRAFT v0.11 — disiapkan untuk implementasi oleh AI coding agent (framework Laravel)**
 
 |  |  |
 | --- | --- |
 | **Nama Produk** | SiTamu (Sistem Informasi Buku Tamu) |
 | **Klien** | Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur (Disperindag) |
-| **Versi Dokumen** | v0.10 |
+| **Versi Dokumen** | v0.11 |
 | **Disusun oleh** | TBD (Pengembang) |
 | **Tanggal** | 14 Oktober 2026 |
 | **Dokumen Terkait** | PRD v0.9 (6 Okt 2026), dokumen Use Case & User Flow SiTamu (revisi 13 Okt 2026), hasil pembahasan alur 14 Okt 2026, prototipe HTML antarmuka. Lihat aturan A-9. |
@@ -19,6 +19,7 @@ SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi fo
 
 | Versi | Tanggal | Perubahan |
 | --- | --- | --- |
+| v0.11 | 26 Okt 2026 | Atas permintaan klien, **Admin menjadi pengelola harian untuk semua lokasi** dan Super Admin dipakai hanya untuk keadaan darurat. Admin tidak lagi dibatasi lokasi (ADM-5): pemantauan, History, ekspor, dan dashboard mencakup semua lokasi. Admin kini mengelola lokasi (LOK-1–3), departemen (DEP-1–3), QR Code (QR-2–7), serta akun Resepsionis dan PIC (USR-1, USR-6, AUTH-4), dan dapat melihat audit log (AUD-2). Akun Admin dan Super Admin tetap hanya dikelola Super Admin (USR-6). **Dihapus**: penugasan lokasi Admin (USR-2); tabel `user_locations` dibiarkan tanpa dipakai. |
 | v0.10 | 14 Okt 2026 | **Model peran diubah menjadi 5 peran**: Super Admin, Admin, Resepsionis, PIC, dan Tamu (Bab 3). Ditambah: penugasan kunjungan ke departemen oleh resepsionis (RSP-1–8), penerimaan, penulisan hasil, dan penyelesaian oleh PIC (PIC-1–6), riwayat kunjungan untuk tamu (TAM-17), deteksi tamu lama dan pengisian otomatis data diri (TAM-15, TAM-16), kategori keperluan dengan saran departemen (KAT-1–3), kelompok rentan, master departemen (DEP-1–3), dan daftar petugas departemen (PTG-1–2). Satu QR terhubung ke tepat satu akun resepsionis (QR-6). Akun resepsionis dan PIC adalah akun bersama yang dipakai bergantian. QR hanya dikelola Super Admin. Buka kembali kunjungan dipindah dari Super Admin ke Admin (ADM-3). Instansi/perusahaan menjadi wajib. Orang yang ditemui tidak lagi diisi tamu; nilainya dipilih resepsionis saat menugaskan; PIC adalah satu akun bersama per departemen yang mereview tamu. Ganti password kini mengakhiri semua sesi akun (USR-3). Label Diproses diganti "Sedang direview" (PIC mereview keperluan tamu yang diarahkan resepsionis); History dan ekspor dapat memuat kunjungan Sedang direview. Admin mengelola kategori keperluan dan daftar petugas untuk semua lokasi. Desain antarmuka memakai template Volt Bootstrap 5 Dashboard (Bab 5.6). **Dihapus**: QR Darurat (VIS-11, TAM-13, tabel `emergency_passes`, kolom `email_source` dan `email_authorized_by`), status Draf, dan penolakan penugasan oleh PIC. `LocationScope` diganti `AccessScope` (Bab 12.2). Skema, route, validasi, ekspor, UI, milestone, dan keputusan tertunda disusun ulang. |
 | v0.9 | 6 Okt 2026 | Implementasi dipindah dari PHP native ke framework Laravel: migrasi, Eloquent, Form Request, `RateLimiter`, guard `web`, `Http` facade, perintah artisan, aturan A-14 dan A-15. Tidak ada perubahan kebutuhan fungsional. |
 | v0.8 | 5 Okt 2026 | Ekspor History tiga format (CSV, Excel, PDF); Excel dan PDF memuat gambar tanda tangan. |
@@ -133,7 +134,7 @@ Instansi menerima tamu di banyak titik masuk dan gedung. Pencatatan manual menyu
 Sistem terdiri dari dua bagian:
 
 1. **Halaman tamu** tanpa akun, dibuka lewat QR Code. Tamu memverifikasi email dengan akun Google, mengisi formulir (atau melihat riwayat bila pernah berkunjung), dan menerima nomor urut.
-2. **Panel staf** dengan empat peran: Resepsionis menugaskan kunjungan ke departemen, PIC melayani dan menulis hasil, Admin memantau lokasinya, Super Admin mengelola master data dan akun.
+2. **Panel staf** dengan empat peran: Resepsionis menugaskan kunjungan ke departemen, PIC melayani dan menulis hasil, Admin memantau semua lokasi serta mengelola master data dan akun Resepsionis/PIC, Super Admin menjadi akun cadangan darurat.
 
 Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga lokasi kunjungan dan resepsionis yang bertanggung jawab ditentukan otomatis. Siklus yang ditangani: pendaftaran → penugasan → pelayanan dan penulisan hasil → riwayat.
 
@@ -159,8 +160,8 @@ Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga loka
 
 Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; cakupan data setiap peran staf berbeda.
 
-- **Super Admin:** mengelola lokasi, departemen, QR Code (termasuk memilih akun resepsionis setiap QR), akun staf, dan penugasan lokasi Admin. Melihat data seluruh lokasi, membatalkan kunjungan, mengekspor data, membuka kunci akun, dan melihat audit log. Tidak membuka kembali kunjungan \[DEFAULT\].
-- **Admin:** dibatasi pada satu atau beberapa lokasi yang ditugaskan. Memantau tamu aktif dari semua QR di lokasinya, membatalkan dan membuka kembali kunjungan, melihat dan mengekspor History, serta mengelola kategori keperluan dan daftar petugas departemen di semua lokasi. Admin tidak menugaskan kunjungan dan tidak mengelola QR.
+- **Super Admin:** \[DIUBAH v0.11\] akun cadangan untuk keadaan darurat. Memiliki semua hak Admin kecuali membuka kembali kunjungan \[DEFAULT\], ditambah satu hak yang tidak dimiliki Admin: mengelola akun Admin dan Super Admin (USR-6). Dalam operasional harian tidak perlu dipakai.
+- **Admin:** \[DIUBAH v0.11\] pengelola harian untuk **semua lokasi**, tanpa penugasan lokasi (ADM-5). Memantau tamu aktif, membatalkan dan membuka kembali kunjungan, melihat dan mengekspor History, mengelola lokasi, departemen, QR Code, kategori keperluan, daftar petugas, serta akun Resepsionis dan PIC, dan melihat audit log. Admin tidak menugaskan kunjungan dan tidak mengelola akun Admin maupun Super Admin (USR-6).
 - **Resepsionis:** akun bersama per pos penerimaan tamu (misalnya "Resepsionis Pintu Timur"), dipakai bergantian oleh petugas yang sedang jaga. Cakupannya adalah QR yang terhubung ke akunnya. Melihat tamu aktif dari QR tersebut, menugaskan dan menugaskan ulang kunjungan ke departemen sekaligus memilih orang yang ditemui (petugas yang akan mereview tamu), serta membatalkan kunjungan.
 - **PIC:** akun bersama per departemen (misalnya "PIC Bidang Perdagangan Dalam Negeri"), satu akun per departemen yang dipakai beberapa orang secara bergantian. Cakupannya adalah kunjungan yang ditugaskan ke departemennya. Menerima penugasan, lalu orang yang ditemui yang dipilih resepsionis mereview keperluan tamu lewat akun ini, menulis hasil, dan menyelesaikan kunjungan.
 - **Tamu:** tidak memiliki akun. Memindai QR, memverifikasi email lewat akun Google, mengisi formulir dan membubuhkan tanda tangan, menerima nomor urut, dan melihat riwayat kunjungannya sendiri beserta hasil dari PIC.
@@ -171,23 +172,24 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | --- | --- | --- | --- | --- | --- |
 | Isi formulir buku tamu via QR | – | – | – | – | Ya |
 | Lihat riwayat kunjungan sendiri | – | – | – | – | Ya |
-| Dashboard | Semua lokasi | Lokasi ditugaskan | QR miliknya | Departemennya | – |
-| Tamu Aktif: lihat, cari, filter | Semua lokasi | Lokasi ditugaskan | QR miliknya | – | – |
+| Dashboard | Semua lokasi | Semua lokasi | QR miliknya | Departemennya | – |
+| Tamu Aktif: lihat, cari, filter | Semua lokasi | Semua lokasi | QR miliknya | – | – |
 | Tugaskan / tugaskan ulang (departemen dan orang yang ditemui) | Tidak | Tidak | QR miliknya | – | – |
 | Daftar penugasan: terima, tulis hasil, selesaikan | Tidak | Tidak | Tidak | Departemennya | – |
-| Batalkan kunjungan | Semua lokasi | Lokasi ditugaskan | QR miliknya | Tidak | – |
-| Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Lokasi ditugaskan | Tidak | Tidak | – |
-| Detail kunjungan dan riwayat status | Semua lokasi | Lokasi ditugaskan | QR miliknya | Departemennya | – |
-| Gambar tanda tangan | Semua lokasi | Lokasi ditugaskan | Tidak | Tidak | – |
-| History: lihat, cari, filter, ekspor CSV/Excel/PDF | Semua lokasi | Lokasi ditugaskan | Tidak | Tidak | – |
+| Batalkan kunjungan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
+| Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Semua lokasi | Tidak | Tidak | – |
+| Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Departemennya | – |
+| Gambar tanda tangan | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
+| History: lihat, cari, filter, ekspor CSV/Excel/PDF | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola kategori keperluan | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola daftar petugas departemen | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
-| Kelola lokasi | Ya | Tidak | Tidak | Tidak | – |
-| Kelola departemen | Ya | Tidak | Tidak | Tidak | – |
-| Kelola QR Code dan akun resepsionisnya | Ya | Tidak | Tidak | Tidak | – |
-| Kelola akun staf dan penugasan lokasi Admin | Ya | Tidak | Tidak | Tidak | – |
-| Buka kunci akun | Ya | Tidak | Tidak | Tidak | – |
-| Lihat audit log | Ya | Tidak | Tidak | Tidak | – |
+| Kelola lokasi | Ya | Ya | Tidak | Tidak | – |
+| Kelola departemen | Ya | Ya | Tidak | Tidak | – |
+| Kelola QR Code dan akun resepsionisnya | Ya | Ya | Tidak | Tidak | – |
+| Kelola akun Resepsionis dan PIC | Ya | Ya | Tidak | Tidak | – |
+| Kelola akun Admin dan Super Admin | Ya | Tidak | Tidak | Tidak | – |
+| Buka kunci akun | Ya | Resepsionis dan PIC | Tidak | Tidak | – |
+| Lihat audit log | Ya | Ya | Tidak | Tidak | – |
 | Ganti password sendiri | Ya | Ya | Ya | Ya | – |
 
 **Catatan:** "QR miliknya" berarti QR yang kolom `receptionist_id`-nya menunjuk akun resepsionis tersebut, apa pun status QR-nya, agar kunjungan aktif dari QR yang baru dinonaktifkan tetap bisa diselesaikan. "Departemennya" berarti kunjungan dengan `assigned_department_id` sama dengan `department_id` akun PIC.
@@ -201,7 +203,7 @@ MVP mencakup seluruh siklus kunjungan dari pemindaian QR sampai hasil tampil di 
 - Manajemen lokasi, departemen, dan QR Code per titik masuk (buat, aktif/nonaktif, regenerate, unduh PNG/SVG, cetak), dengan satu akun resepsionis per QR.
 - Halaman tamu mobile-first: verifikasi email Google, deteksi tamu lama, riwayat kunjungan tamu, formulir dengan kategori keperluan dan kelompok rentan, nomor urut otomatis, jam datang otomatis, dan tanda tangan digital.
 - Pengisian otomatis data diri tamu lama dari kunjungan terakhirnya.
-- Manajemen akun staf empat peran, penugasan lokasi Admin, dan pengaitan akun PIC ke departemen.
+- Manajemen akun staf empat peran dan pengaitan akun PIC ke departemen.
 - Kategori keperluan per lokasi dengan saran departemen, dan daftar petugas per departemen.
 - Tamu Aktif untuk Resepsionis (dengan penugasan), Admin, dan Super Admin; daftar Penugasan untuk PIC (terima, tulis hasil, selesaikan).
 - Pembatalan kunjungan dengan alasan dan buka kembali oleh Admin.
@@ -394,7 +396,9 @@ Panel staf memakai template [Volt Bootstrap 5 Dashboard](https://github.com/them
 
 Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan menjadi acuan pengujian. \[DIHAPUS v0.10\] ID `VIS-1` sampai `VIS-11` dan `TAM-13` tidak dipakai lagi; fungsinya digantikan RSP, PIC, dan ADM.
 
-## 6.1 Super Admin — Manajemen Lokasi
+## 6.1 Admin dan Super Admin — Manajemen Lokasi \[DIUBAH v0.11\]
+
+\[DIUBAH v0.11\] Setiap "Super Admin" pada tabel di bawah berarti **Admin dan Super Admin**, untuk semua lokasi.
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
@@ -402,7 +406,9 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | LOK-2 | Super Admin dapat menonaktifkan dan mengaktifkan kembali lokasi. | Wajib | Saat lokasi nonaktif, semua QR-nya menampilkan halaman TAM-6. Kunjungan aktif lokasi itu tetap dapat diselesaikan. Jika lokasi masih punya kunjungan aktif, sistem meminta konfirmasi. Tercatat di audit log. |
 | LOK-3 | Lokasi yang sudah memiliki data (kunjungan, departemen, atau QR) tidak dapat dihapus, hanya dinonaktifkan. | Wajib | Tombol Hapus hanya muncul jika lokasi belum punya data tersebut. Hapus = soft delete. Server tetap menolak walau request dikirim manual. |
 
-## 6.2 Super Admin — Manajemen Departemen \[BARU v0.10\]
+## 6.2 Admin dan Super Admin — Manajemen Departemen \[DIUBAH v0.11\]
+
+\[DIUBAH v0.11\] Setiap "Super Admin" pada tabel di bawah berarti **Admin dan Super Admin**, untuk semua lokasi.
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
@@ -410,7 +416,9 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | DEP-2 | Super Admin dapat menonaktifkan dan mengaktifkan kembali departemen. | Wajib | Departemen nonaktif tidak muncul di pilihan penugasan, saran departemen kategori, maupun pilihan departemen akun PIC. Penugasan yang sudah ada tetap berjalan. |
 | DEP-3 | Departemen tidak dapat dihapus. | Wajib | Tidak ada tombol Hapus; hanya aktif/nonaktif. |
 
-## 6.3 Super Admin — Manajemen QR Code
+## 6.3 Admin dan Super Admin — Manajemen QR Code \[DIUBAH v0.11\]
+
+\[DIUBAH v0.11\] Setiap "Super Admin" pada tabel di bawah berarti **Admin dan Super Admin**, untuk semua lokasi.
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
@@ -505,9 +513,10 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| ADM-1 | `/admin/tamu` untuk Admin dan Super Admin menampilkan kunjungan `waiting` dan `processing` di cakupannya. | Wajib | Admin: semua QR di lokasi yang ditugaskan. Super Admin: semua lokasi. Kolom sama dengan RSP-1 ditambah lokasi dan QR. Filter lokasi tampil bila cakupan lebih dari satu lokasi. Polling dan penanda menunggu lama seperti RSP-7 dan RSP-8. Tidak ada tombol Tugaskan. |
+| ADM-1 | `/admin/tamu` untuk Admin dan Super Admin menampilkan kunjungan `waiting` dan `processing` di cakupannya. | Wajib | \[DIUBAH v0.11\] Admin dan Super Admin: semua lokasi. Kolom sama dengan RSP-1 ditambah lokasi dan QR. Filter lokasi tampil bila ada lebih dari satu lokasi. Polling dan penanda menunggu lama seperti RSP-7 dan RSP-8. Tidak ada tombol Tugaskan. |
 | ADM-2 | Admin dan Super Admin dapat membatalkan kunjungan. | Wajib | Aturan sama dengan RSP-4. |
-| ADM-3 | \[DIUBAH v0.10\] Hanya Admin yang dapat membuka kembali kunjungan Selesai atau Dibatalkan di lokasinya. | Penting | Tombol "Buka Kembali" di detail kunjungan History. Alasan wajib (maks. 255 karakter). Aturan di Bab 7.3. Tercatat di `visit_status_logs` dan audit log (`visit.reopen`). Super Admin tidak memiliki tombol ini \[DEFAULT\]. |
+| ADM-3 | \[DIUBAH v0.11\] Hanya Admin yang dapat membuka kembali kunjungan Selesai atau Dibatalkan, di lokasi mana pun. | Penting | Tombol "Buka Kembali" di detail kunjungan History. Alasan wajib (maks. 255 karakter). Aturan di Bab 7.3. Tercatat di `visit_status_logs` dan audit log (`visit.reopen`). Super Admin tidak memiliki tombol ini \[DEFAULT\]. |
+| ADM-5 | \[BARU v0.11\] Admin tidak dibatasi lokasi. | Wajib | `AccessScope` memperlakukan Admin seperti Super Admin untuk data kunjungan dan master data (Bab 12.2). Tidak ada penugasan lokasi Admin (USR-2 dihapus). |
 | ADM-4 | Admin dan Super Admin melihat detail lengkap kunjungan. | Wajib | 12 data Bab 6.6.1 termasuk gambar tanda tangan, lokasi, QR, saran departemen, departemen tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status. |
 
 ## 6.10 Admin dan Super Admin — History Kunjungan
@@ -524,27 +533,28 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| DSH-1 | Dashboard Admin menampilkan 5 kartu angka untuk lokasinya. | Wajib | **Belum Ditugaskan** = `waiting` tanpa departemen; **Menunggu PIC** = `waiting` dengan departemen; **Sedang Direview** = `processing`; **Selesai Hari Ini** = `completed_at` hari ini; **Total Kunjungan Hari Ini** = `check_in_at` hari ini. Hitungan `waiting` mencakup semua tanggal. |
+| DSH-1 | \[DIUBAH v0.11\] Dashboard Admin menampilkan 5 kartu angka untuk semua lokasi. | Wajib | **Belum Ditugaskan** = `waiting` tanpa departemen; **Menunggu PIC** = `waiting` dengan departemen; **Sedang Direview** = `processing`; **Selesai Hari Ini** = `completed_at` hari ini; **Total Kunjungan Hari Ini** = `check_in_at` hari ini. Hitungan `waiting` mencakup semua tanggal. |
 | DSH-2 | Dashboard Admin menampilkan daftar Tamu Aktif ringkas. | Wajib | Maksimal 10 baris teratas dengan tombol Batal seperti ADM-2 dan tautan "Lihat semua". |
 | DSH-3 | Dashboard Super Admin menampilkan ringkasan seluruh lokasi. | Wajib | Kartu: Total Kunjungan (semua waktu), Lokasi Aktif, Kunjungan Hari Ini, Tamu Menunggu. Tabel per lokasi: belum ditugaskan, menunggu PIC, sedang direview, selesai hari ini, total hari ini. Grafik batang kunjungan per hari 14 hari terakhir. Daftar 10 kunjungan terbaru. |
 | DSH-4 | Seluruh angka bersumber dari database dan mengikuti cakupan peran. | Wajib | Semua query dashboard melewati `AccessScope` (A-6). |
 | DSH-5 | \[BARU v0.10\] Resepsionis dan PIC langsung diarahkan ke halaman kerjanya. | Wajib | `/admin` mengarahkan Resepsionis ke `/admin/tamu` dan PIC ke `/admin/penugasan`. |
 
-## 6.12 Super Admin — Pengguna, Autentikasi, dan Audit
+## 6.12 Pengguna, Autentikasi, dan Audit \[DIUBAH v0.11\]
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| USR-1 | \[DIUBAH v0.10\] Super Admin dapat membuat, mengubah, dan menonaktifkan akun staf empat peran, termasuk mengatur ulang password. | Wajib | Reset password oleh Super Admin mengakhiri semua sesi akun tersebut. Field umum: nama akun, email (unik, huruf kecil), peran, password (minimal 8 karakter). Field per peran: Admin → lokasi (multi, lihat USR-2); PIC → satu departemen (wajib); Resepsionis → tanpa lokasi (dihubungkan lewat QR-2/QR-6). Akun nonaktif langsung ditolak pada request berikutnya (`EnsureUserIsActive`). |
-| USR-2 | Super Admin dapat menugaskan Admin ke satu atau beberapa lokasi. | Wajib | Admin tanpa lokasi tetap bisa login dan melihat pesan "Anda belum ditugaskan ke lokasi mana pun." Perubahan tercatat di audit log. |
+| USR-1 | \[DIUBAH v0.11\] Super Admin dapat membuat, mengubah, dan menonaktifkan akun staf empat peran, termasuk mengatur ulang password. Admin dapat melakukan hal yang sama untuk akun Resepsionis dan PIC (USR-6). | Wajib | Reset password mengakhiri semua sesi akun tersebut. Field umum: nama akun, email (unik, huruf kecil), peran, password (minimal 8 karakter). Field per peran: Admin → tanpa lokasi (ADM-5); PIC → satu departemen (wajib); Resepsionis → tanpa lokasi (dihubungkan lewat QR-2/QR-6). Akun nonaktif langsung ditolak pada request berikutnya (`EnsureUserIsActive`). |
+| USR-2 | \[DIHAPUS v0.11\] Penugasan lokasi Admin. | – | Tidak diimplementasikan lagi; Admin mencakup semua lokasi (ADM-5). |
 | USR-3 | Setiap staf dapat mengganti password sendiri. | Penting | Wajib memasukkan password lama. \[DIUBAH v0.10\] Setelah berhasil, semua sesi akun tersebut diakhiri, termasuk sesi yang sedang dipakai; pengguna diarahkan ke halaman login dengan pesan "Password berhasil diganti. Silakan login kembali." Di perangkat lain, sesi akun itu ditolak pada request berikutnya dan diarahkan ke login. |
 | USR-4 | Sistem mencegah hilangnya akses Super Admin. | Wajib | Super Admin tidak dapat menonaktifkan atau menurunkan peran dirinya sendiri; sistem menolak perubahan yang membuat jumlah Super Admin aktif menjadi nol. |
 | USR-5 | \[BARU v0.10\] Sistem menjaga keterhubungan akun resepsionis dan PIC. | Wajib | Menonaktifkan atau mengubah peran akun resepsionis yang masih terhubung ke QR berstatus `active` atau `inactive` ditolak: "Pindahkan QR ke akun resepsionis lain terlebih dahulu." Satu departemen hanya boleh memiliki satu akun PIC aktif \[DEFAULT\]; akun PIC kedua yang aktif untuk departemen yang sama ditolak: "Departemen ini sudah memiliki akun PIC aktif." |
+| USR-6 | \[BARU v0.11\] Admin hanya mengelola akun Resepsionis dan PIC. | Wajib | Pilihan peran di form akun Admin hanya Resepsionis dan PIC; server menolak peran lain (422). Ubah, aktif/nonaktif, reset password, dan buka kunci pada akun Admin atau Super Admin oleh Admin ditolak HTTP 403; akun itu tetap tampil di daftar tanpa tombol aksi. Admin tidak dapat mengubah akunnya sendiri lewat menu Pengguna (ganti password sendiri tetap lewat USR-3). |
 | AUTH-1 | Login dengan email dan password; akun dikunci sementara setelah beberapa kali gagal. | Wajib | Setelah `LOGIN_MAX_ATTEMPTS` gagal berturut-turut, `locked_until` = sekarang + `LOGIN_LOCK_MINUTES`. Pesan gagal selalu "Email atau password salah." Login sukses mereset `failed_logins` dan meregenerasi ID sesi. |
 | AUTH-2 | \[DIUBAH v0.10\] Setiap request staf divalidasi di server berdasarkan cakupan perannya. | Wajib | Lihat Bab 12.2. Berlaku untuk halaman, AJAX, gambar tanda tangan, dan ekspor. |
 | AUTH-3 | Logout dan batas waktu sesi. | Wajib | Logout lewat POST dengan CSRF. Sesi berakhir setelah `SESSION_LIFETIME` menit tanpa aktivitas. |
-| AUTH-4 | Super Admin dapat membuka kunci akun yang terkunci. | Wajib | Tombol "Buka kunci" pada akun yang `locked_until`-nya masih berlaku; mereset `failed_logins` dan mengosongkan `locked_until`. Tercatat di audit log (`user.unlock`). |
+| AUTH-4 | \[DIUBAH v0.11\] Super Admin dapat membuka kunci akun yang terkunci; Admin hanya untuk akun Resepsionis dan PIC (USR-6). | Wajib | Tombol "Buka kunci" pada akun yang `locked_until`-nya masih berlaku; mereset `failed_logins` dan mengosongkan `locked_until`. Tercatat di audit log (`user.unlock`). |
 | AUD-1 | Sistem mencatat audit log untuk aksi penting. | Wajib | Daftar aksi di Bab 12.3. Audit log tidak dapat diubah atau dihapus lewat aplikasi. |
-| AUD-2 | Super Admin dapat melihat audit log. | Wajib | Filter tanggal, akun, dan jenis aksi; paginasi 50 baris; urut terbaru. |
+| AUD-2 | \[DIUBAH v0.11\] Admin dan Super Admin dapat melihat audit log. | Wajib | Filter tanggal, akun, dan jenis aksi; paginasi 50 baris; urut terbaru. |
 
 # 7. Aturan Status Kunjungan (State Machine) \[DIUBAH v0.10\]
 
@@ -560,7 +570,7 @@ Empat status database tetap sama dengan v0.9; penugasan ke departemen dicatat se
 | `processing` | `completed` | Selesai (hasil wajib) | PIC departemen yang ditugaskan | `result`, `completed_at`, `closed_by` |
 | `waiting` | `cancelled` | Batal | Resepsionis pemilik QR, Admin, Super Admin | `cancelled_at`, `cancel_reason`, `closed_by` |
 | `processing` | `cancelled` | Batal | Resepsionis pemilik QR, Admin, Super Admin | `cancelled_at`, `cancel_reason`, `closed_by` |
-| `completed` / `cancelled` | status sebelum ditutup | Buka Kembali | Hanya Admin lokasi tersebut | Lihat 7.3 |
+| `completed` / `cancelled` | status sebelum ditutup | Buka Kembali | Hanya Admin | Lihat 7.3 |
 
 Transisi lain **ditolak** server dengan HTTP 422, termasuk: `waiting` → `completed`, `waiting` tanpa penugasan → `processing`, penugasan pada kunjungan `processing`, `completed`, atau `cancelled`, serta perubahan ke status Draf (tidak ada).
 
@@ -597,10 +607,10 @@ Satu kunjungan berjalan melalui tujuh tahap: persiapan, pindai QR, verifikasi Go
 
 ## 8.1 Tahap 0 — Persiapan (Super Admin dan Admin)
 
-1. Super Admin membuat lokasi, misalnya "Kantor Dinas Jl. Ahmad Yani".
-2. Super Admin membuat departemen di lokasi itu.
-3. Super Admin membuat akun Admin (dengan lokasinya), akun resepsionis per pos, dan akun PIC per departemen.
-4. Super Admin membuat QR untuk tiap titik masuk dan memilih akun resepsionis pemiliknya, lalu mencetak QR dan menempelnya di titik masuk.
+1. Super Admin membuat akun Admin. \[DIUBAH v0.11\] Langkah berikutnya dikerjakan Admin; Super Admin hanya turun tangan saat darurat.
+2. Admin membuat lokasi, misalnya "Kantor Dinas Jl. Ahmad Yani", lalu departemen di lokasi itu.
+3. Admin membuat akun resepsionis per pos dan akun PIC per departemen.
+4. Admin membuat QR untuk tiap titik masuk dan memilih akun resepsionis pemiliknya, lalu mencetak QR dan menempelnya di titik masuk.
 5. Admin mengisi kategori keperluan (dengan saran departemen) dan daftar petugas setiap departemen di semua lokasi.
 
 ## 8.2 Tahap 1–4 — Tamu mendaftar
@@ -649,7 +659,7 @@ Skema v0.10 menambah empat tabel (`departments`, `purpose_categories`, `staff_me
 ## 9.1 Relasi
 
 - `locations` 1—N `departments`, `qr_codes`, `purpose_categories`, `guest_visits`, `visit_counters`.
-- `users` (peran `admin`) N—N `locations` melalui `user_locations`.
+- \[DIHAPUS v0.11\] `users` (peran `admin`) N—N `locations` melalui `user_locations`. Tabel tetap ada tetapi tidak dipakai aplikasi (lihat `docs/DECISIONS.md`).
 - `users` (peran `pic`) N—1 `departments` melalui `users.department_id`.
 - `users` (peran `receptionist`) 1—N `qr_codes` melalui `qr_codes.receptionist_id`.
 - `departments` 1—N `staff_members`; `departments` 0..1—N `purpose_categories` (saran departemen).
@@ -710,7 +720,7 @@ CREATE TABLE users (
   CONSTRAINT fk_users_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE user_locations (              -- hanya untuk peran admin
+CREATE TABLE user_locations (              -- tidak dipakai sejak v0.11 (ADM-5)
   user_id BIGINT UNSIGNED NOT NULL,
   location_id BIGINT UNSIGNED NOT NULL,
   assigned_by BIGINT UNSIGNED NULL,
@@ -1115,29 +1125,28 @@ Inti keamanan v0.10 adalah `AccessScope`: satu titik yang menentukan data apa ya
 - ID token Google, data URL tanda tangan, dan isi hasil **JANGAN** ditulis ke log aplikasi maupun `audit_logs.detail`. Data URL tanda tangan **JANGAN** dimasukkan kembali ke HTML saat formulir tampil ulang. Gambar tanda tangan tidak pernah disajikan dari `public/`; **JANGAN** menjalankan `php artisan storage:link`.
 - Di produksi `APP_DEBUG=false`; deployment menjalankan `php artisan config:cache`, `route:cache`, dan `view:cache`.
 
-## 12.2 Pembatasan akses berbasis peran (inti keamanan) \[DIUBAH v0.10\]
+## 12.2 Pembatasan akses berbasis peran (inti keamanan) \[DIUBAH v0.11\]
 
 Buat satu service `App\Services\AccessScope` sebagai satu-satunya sumber cakupan, dan satu trait `App\Models\Concerns\LimitedByAccess` yang menyediakan *local scope* `forUser($user)`. **JANGAN** memakai *global scope*, karena halaman tamu harus dapat membaca data tanpa filter staf.
 
 ```
 AccessScope::locationIds(user):
     super_admin   → NULL (tanpa batas)
-    admin         → location_id dari user_locations (termasuk lokasi nonaktif)
+    admin         → NULL (tanpa batas, ADM-5)
     receptionist  → location_id distinct dari qr_codes milik user
     pic           → [location_id departemen user]
     (hasil disimpan di memori selama satu request)
 
 AccessScope::applyToVisits(query, user):
     super_admin   → tanpa filter
-    admin         → whereIn(location_id, locationIds(user))
+    admin         → tanpa filter (ADM-5)
     receptionist  → whereIn(qr_code_id, id QR milik user)   // QR status apa pun
     pic           → where(assigned_department_id, user.department_id)
     daftar id kosong → query menghasilkan 0 baris
 
 AccessScope::applyToMaster(query, user, kolomLokasi):   // QR, departemen, kategori, petugas
     super_admin   → tanpa filter
-    admin         → kategori, petugas, dan daftar departemen: tanpa filter (semua lokasi)
-                    QR: whereIn(kolomLokasi, locationIds(user))
+    admin         → tanpa filter (ADM-5)
     peran lain    → 0 baris (tidak punya akses master data)
 
 AccessScope::findOrDeny(modelClass, id, user):
@@ -1152,7 +1161,7 @@ Aturan:
 - Setiap parameter `location_id`, `department_id`, `purpose_category_id`, `staff_member_id`, dan `receptionist_id` dari request **wajib** dicek terhadap cakupan. Di luar cakupan diperlakukan sebagai akses ditolak.
 - Pembatasan peran per route (`role:`) adalah lapis pertama; `AccessScope` adalah lapis kedua dan tetap wajib walau route sudah dibatasi peran.
 - Pengecualian tunggal: `ReturningGuestService` (Bab 9.4).
-- Tes otomatis (A-15) wajib membuktikan: Admin lokasi A, Resepsionis QR A, dan PIC departemen A mendapat 404 dan audit `access.denied` pada setiap route berparameter ID yang menyentuh data lokasi B, QR B, atau departemen B; serta ekspor tidak memuat data di luar cakupan.
+- Tes otomatis (A-15) wajib membuktikan: \[DIUBAH v0.11\] Resepsionis QR A, dan PIC departemen A mendapat 404 dan audit `access.denied` pada setiap route berparameter ID yang menyentuh data lokasi B, QR B, atau departemen B; serta ekspor tidak memuat data di luar cakupan.
 
 ## 12.3 Audit log \[DIUBAH v0.10\]
 
@@ -1164,7 +1173,7 @@ Aturan:
 | QR Code | `qr.create`, `qr.activate`, `qr.deactivate`, `qr.regenerate`, `qr.download`, `qr.change_receptionist` \[BARU v0.10\] |
 | Kategori keperluan \[BARU v0.10\] | `purpose_category.create`, `purpose_category.update`, `purpose_category.activate`, `purpose_category.deactivate` |
 | Petugas \[BARU v0.10\] | `staff.create`, `staff.update`, `staff.activate`, `staff.deactivate` |
-| Pengguna | `user.create`, `user.update`, `user.activate`, `user.deactivate`, `user.password_reset`, `user.assign_locations`, `user.unlock` |
+| Pengguna | `user.create`, `user.update`, `user.activate`, `user.deactivate`, `user.password_reset`, `user.unlock`. \[DIHAPUS v0.11\] `user.assign_locations` |
 | Kunjungan | `visit.export`, `visit.reopen` |
 | Keamanan | `access.denied` |
 
