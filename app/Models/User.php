@@ -66,4 +66,12 @@ class User extends Authenticatable
     {
         return in_array($this->role, $roles, true);
     }
+
+    /**
+     * Mengecek apakah akun ini boleh mengubah akun lain di menu Pengguna (USR-6).
+     */
+    public function canManageAccount(User $target): bool
+    {
+        return in_array($target->role, $this->role->manageableRoles(), true);
+    }
 }

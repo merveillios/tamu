@@ -8,7 +8,7 @@ namespace App\Http\Requests;
 class UpdateUserRequest extends StoreUserRequest
 {
     /**
-     * Password opsional; bila diisi berarti reset password oleh Super Admin.
+     * Password opsional; bila diisi berarti reset password oleh Admin atau Super Admin.
      *
      * @return array<int, string>
      */

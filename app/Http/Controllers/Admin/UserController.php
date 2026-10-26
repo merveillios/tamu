@@ -8,16 +8,22 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Department;
 use App\Models\User;
+use App\Services\AuditService;
 use App\Services\UserAccountService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Manajemen akun staf oleh Super Admin (USR-1 sampai USR-5, AUTH-4).
+ * Manajemen akun staf oleh Admin dan Super Admin (USR-1, USR-3 sampai USR-6, AUTH-4).
+ * Admin hanya mengelola akun Resepsionis dan PIC (USR-6).
  */
 class UserController extends Controller
 {
+    public function __construct(private readonly AuditService $audit)
+    {
+    }
+
     /**
      * Daftar akun dengan pencarian serta filter peran dan status.
      */
@@ -57,9 +63,9 @@ class UserController extends Controller
     /**
      * Form akun baru.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('admin.users.form', $this->formOptions(new User(['role' => UserRole::Receptionist])));
+        return view('admin.users.form', $this->formOptions(new User(['role' => UserRole::Receptionist]), $request->user()));
     }
 
     /**
@@ -75,9 +81,9 @@ class UserController extends Controller
     /**
      * Form ubah akun.
      */
-    public function edit(int $id): View
+    public function edit(Request $request, int $id): View
     {
-        return view('admin.users.form', $this->formOptions(User::findOrFail($id)));
+        return view('admin.users.form', $this->formOptions($this->findManageable($request, $id), $request->user()));
     }
 
     /**
@@ -85,7 +91,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, int $id, UserAccountService $accounts): RedirectResponse
     {
-        $user = $accounts->update(User::findOrFail($id), $request->validated(), $request->user());
+        $user = $accounts->update($this->findManageable($request, $id), $request->validated(), $request->user());
 
         return redirect()->route('admin.users.index')->with('success', "Akun {$user->name} berhasil diperbarui.");
     }
@@ -95,7 +101,7 @@ class UserController extends Controller
      */
     public function toggleStatus(Request $request, int $id, UserAccountService $accounts): RedirectResponse
     {
-        $user = User::findOrFail($id);
+        $user = $this->findManageable($request, $id);
         $accounts->setActive($user, ! $user->is_active, $request->user());
 
         $message = $user->is_active ? "Akun {$user->name} diaktifkan." : "Akun {$user->name} dinonaktifkan.";
@@ -108,22 +114,38 @@ class UserController extends Controller
      */
     public function unlock(Request $request, int $id, UserAccountService $accounts): RedirectResponse
     {
-        $user = User::findOrFail($id);
+        $user = $this->findManageable($request, $id);
         $accounts->unlock($user, $request->user());
 
         return back()->with('success', "Kunci akun {$user->name} telah dibuka.");
     }
 
     /**
-     * Data pilihan untuk form akun: peran dan departemen aktif per lokasi.
+     * Mencari akun yang boleh diubah pelaku. Akun di luar hak pelaku ditolak 403
+     * dan dicatat sebagai access.denied (USR-6).
+     */
+    private function findManageable(Request $request, int $id): User
+    {
+        $user = User::findOrFail($id);
+
+        if (! $request->user()->canManageAccount($user)) {
+            $this->audit->record('access.denied', null, ['model' => 'User', 'id' => $user->id], $request->user());
+            abort(403);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Data pilihan untuk form akun: peran yang boleh diberikan pelaku dan departemen aktif per lokasi.
      *
      * @return array<string, mixed>
      */
-    private function formOptions(User $user): array
+    private function formOptions(User $user, User $actor): array
     {
         return [
             'user' => $user,
-            'roles' => UserRole::cases(),
+            'roles' => $actor->role->manageableRoles(),
             'departments' => Department::query()
                 ->with('location:id,name')
                 ->where('is_active', true)

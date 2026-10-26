@@ -4,7 +4,13 @@
 
 @section('content')
     <div class="d-flex justify-content-between flex-wrap align-items-center mb-3 gap-2">
-        <p class="mb-0 text-gray-600">Kelola akun Super Admin, Admin, Resepsionis, dan PIC.</p>
+        <p class="mb-0 text-gray-600">
+            @if (auth()->user()->hasRole(\App\Enums\UserRole::SuperAdmin))
+                Kelola akun Super Admin, Admin, Resepsionis, dan PIC.
+            @else
+                Kelola akun Resepsionis dan PIC. Akun Admin dan Super Admin hanya dapat diubah Super Admin.
+            @endif
+        </p>
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">Tambah Akun</a>
     </div>
 
@@ -81,10 +87,14 @@
                         </td>
                         <td class="small">{{ $user->last_login_at?->format('d/m/Y H:i') ?? '–' }}</td>
                         <td>
-                            <div class="d-flex flex-wrap gap-1">
-                                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                @include('admin.users.partials.actions', ['user' => $user])
-                            </div>
+                            @if (auth()->user()->canManageAccount($user))
+                                <div class="d-flex flex-wrap gap-1">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                    @include('admin.users.partials.actions', ['user' => $user])
+                                </div>
+                            @else
+                                <span class="small text-gray-500">Dikelola Super Admin</span>
+                            @endif
                         </td>
                     </tr>
                 @empty

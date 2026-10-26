@@ -28,8 +28,8 @@ class RoleAccessTest extends TestCase
             'tamu aktif' => ['/admin/tamu', [UserRole::SuperAdmin, UserRole::Admin, UserRole::Receptionist]],
             'penugasan' => ['/admin/penugasan', [UserRole::Pic]],
             'history' => ['/admin/history', [UserRole::SuperAdmin, UserRole::Admin]],
-            'daftar pengguna' => ['/admin/pengguna', [UserRole::SuperAdmin]],
-            'tambah pengguna' => ['/admin/pengguna/tambah', [UserRole::SuperAdmin]],
+            'daftar pengguna' => ['/admin/pengguna', [UserRole::SuperAdmin, UserRole::Admin]],
+            'tambah pengguna' => ['/admin/pengguna/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
             'audit log' => ['/admin/audit-log', [UserRole::SuperAdmin]],
             'lokasi' => ['/admin/lokasi', [UserRole::SuperAdmin, UserRole::Admin]],
             'tambah lokasi' => ['/admin/lokasi/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
@@ -55,11 +55,11 @@ class RoleAccessTest extends TestCase
         }
     }
 
-    public function test_non_super_admin_cannot_change_accounts(): void
+    public function test_receptionist_and_pic_cannot_change_accounts(): void
     {
-        $target = User::factory()->create();
+        $target = User::factory()->role(UserRole::Receptionist)->create();
 
-        foreach ([UserRole::Admin, UserRole::Receptionist, UserRole::Pic] as $role) {
+        foreach ([UserRole::Receptionist, UserRole::Pic] as $role) {
             $this->flushSession();
             $actor = User::factory()->role($role)->create();
 

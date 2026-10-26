@@ -8,16 +8,16 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
- * Validasi pembuatan akun staf oleh Super Admin (USR-1, PRD Bab 11.3).
+ * Validasi pembuatan akun staf oleh Admin dan Super Admin (USR-1, USR-6, PRD Bab 11.3).
  */
 class StoreUserRequest extends FormRequest
 {
     /**
-     * Route sudah dibatasi role:super_admin.
+     * Admin dan Super Admin mengelola akun; batas peran per pelaku dicek di rules().
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasRole(UserRole::SuperAdmin) ?? false;
+        return $this->user()?->hasRole(UserRole::SuperAdmin, UserRole::Admin) ?? false;
     }
 
     /**
@@ -44,7 +44,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'string', 'max:150', 'email:rfc', Rule::unique('users', 'email')->ignore($this->route('id'))],
-            'role' => ['required', Rule::enum(UserRole::class)],
+            'role' => ['required', Rule::enum(UserRole::class)->only($this->user()->role->manageableRoles())],
             'department_id' => [
                 'nullable',
                 'required_if:role,'.UserRole::Pic->value,
