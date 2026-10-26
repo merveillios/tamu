@@ -95,12 +95,13 @@ Setiap kali kode diperbarui, ulangi `composer install --no-dev --optimize-autolo
 
 Setelah instalasi, isi data sesuai urutan PRD Bab 8.1:
 
-1. **Super Admin → Lokasi:** buat setiap lokasi atau gedung.
-2. **Super Admin → Lokasi → Departemen:** buat departemen di tiap lokasi.
-3. **Super Admin → Pengguna:** buat akun Admin (pilih lokasinya), akun Resepsionis per pos jaga, dan satu akun PIC per departemen.
-4. **Super Admin → Lokasi → QR:** buat QR untuk tiap titik masuk dan pilih akun resepsionisnya, lalu cetak dan tempel.
-5. **Admin atau Super Admin → Kategori Keperluan:** isi kategori tiap lokasi beserta saran departemennya. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu kategori aktif.
-6. **Admin atau Super Admin → Petugas:** isi orang yang dapat ditemui di tiap departemen. Departemen baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
+1. **Super Admin → Pengguna:** buat akun Admin. Langkah berikutnya dikerjakan Admin; Super Admin hanya dipakai saat darurat.
+2. **Admin → Lokasi:** buat setiap lokasi atau gedung.
+3. **Admin → Lokasi → Departemen:** buat departemen di tiap lokasi.
+4. **Admin → Pengguna:** buat akun Resepsionis per pos jaga dan satu akun PIC per departemen.
+5. **Admin → QR Code:** buat QR untuk tiap titik masuk dan pilih akun resepsionisnya, lalu cetak dan tempel.
+6. **Admin → Kategori Keperluan:** isi kategori tiap lokasi beserta saran departemennya. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu kategori aktif.
+7. **Admin → Petugas:** isi orang yang dapat ditemui di tiap departemen. Departemen baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
 
 ## Backup dan pemulihan
 
@@ -254,10 +255,10 @@ kembali di riwayat tamu.
 
 ### Alur Utama Kunjungan
 
-1. **Super Admin menyiapkan data awal** — membuat lokasi, departemen di tiap
-   lokasi, akun petugas (Admin, Resepsionis, dan satu akun PIC per departemen),
-   kategori keperluan, petugas yang dapat ditemui, dan QR Code untuk tiap
-   titik masuk.
+1. **Admin menyiapkan data awal** — membuat lokasi, departemen di tiap
+   lokasi, akun Resepsionis dan satu akun PIC per departemen, kategori
+   keperluan, petugas yang dapat ditemui, dan QR Code untuk tiap titik masuk.
+   Akun Admin sendiri dibuat oleh Super Admin.
 2. **Tamu memindai QR Code** yang terpasang di titik masuk. Token QR menentukan
    lokasi kunjungan, sehingga lokasi terisi otomatis dan tidak bisa diubah tamu.
 3. **Tamu verifikasi email dengan Google** ("Lanjutkan dengan Google"). Sistem
@@ -362,44 +363,35 @@ tulis hasil/solusi → Simpan (Selesai, otomatis).
 
 ### 4. Admin
 
+Admin adalah pengelola harian untuk **semua lokasi** (PRD v0.11).
+
 Fitur:
 
-- **Dashboard pemantauan**: statistik dan daftar kunjungan sesuai cakupan
-  aksesnya, dengan badge status (Menunggu, Diproses, Selesai, Dibatalkan).
-- **Kelola kunjungan**: melihat detail dan tanda tangan tamu, membatalkan
-  kunjungan dengan alasan wajib, dan menurunkan kunjungan ke Draf. Admin
-  **tidak bisa** mengubah status Menunggu/Diproses (status berubah otomatis
-  lewat alur PIC) dan **tidak** menyelesaikan kunjungan secara manual — status
-  Selesai hanya terjadi saat PIC menyimpan hasil.
+- **Dashboard pemantauan**: statistik dan daftar tamu aktif semua lokasi.
+- **Kelola kunjungan**: melihat detail dan tanda tangan tamu, serta membatalkan
+  kunjungan dengan alasan wajib. Admin tidak menugaskan kunjungan dan tidak
+  menyelesaikannya; status Selesai hanya terjadi saat PIC menyimpan hasil.
 - **Buka kembali (reopen) kunjungan** yang sudah Selesai/Dibatalkan bila ada
-  koreksi.
-- **Kelola Pertanyaan Keperluan**: mengelola pertanyaan/kategori keperluan
-  yang tampil di formulir tamu per lokasi. Admin tidak menambah/mengubah
-  departemen — departemen hanya dikelola Super Admin.
-- **Kelola Petugas**: orang yang dapat ditemui di tiap departemen.
-- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke Excel dan PDF.
-- Admin **tidak bisa** menambah/membuat QR Code — pembuatan QR hanya dilakukan
-  Super Admin.
+  koreksi. Hanya Admin yang memiliki fitur ini.
+- **Kelola Lokasi dan Departemen** di semua lokasi.
+- **Kelola QR Code**: membuat QR untuk tiap titik masuk, memilih akun
+  resepsionisnya, mengaktifkan/menonaktifkan, regenerate, mengunduh, dan
+  mencetak poster QR.
+- **Kelola Pengguna**: membuat, mengubah, menonaktifkan, mereset password, dan
+  membuka kunci akun **Resepsionis dan PIC**. Akun Admin dan Super Admin tampil
+  di daftar tetapi hanya dapat diubah Super Admin.
+- **Kelola Pertanyaan Keperluan dan Petugas** di semua lokasi.
+- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke CSV, Excel,
+  dan PDF.
+- **Audit Log** (hanya baca).
 
 ### 5. Super Admin
 
+Super Admin adalah akun cadangan untuk keadaan darurat. Simpan password-nya
+dengan aman dan jangan dipakai untuk pekerjaan harian.
+
 Fitur:
 
-- **Kelola Lokasi**: membuat dan mengubah lokasi/gedung.
-- **Kelola Departemen**: membuat dan mengubah departemen di tiap lokasi —
-  hanya Super Admin yang bisa menambah/mengubah departemen.
-- **Kelola Pengguna**: membuat akun Admin, akun Resepsionis per pos jaga, dan
-  satu akun PIC per departemen (dipakai bersama oleh para petugas di
-  departemen itu); mengaktifkan/menonaktifkan akun, membuka kunci, dan
-  mereset password akun petugas.
-- **Kelola QR Code**: satu-satunya peran yang membuat QR — membuat QR untuk
-  tiap titik masuk, memilih akun resepsionis penanggung jawabnya, memperbarui
-  (regenerate) token QR, dan mencetak poster QR siap tempel.
-- **Kelola Kategori Keperluan dan Petugas** (dibagi dengan Admin).
-- **Buka kembali (reopen) kunjungan** yang sudah Selesai/Dibatalkan bila ada
-  koreksi (fitur ini juga bisa dilakukan Admin).
-- **Audit Log**: catatan seluruh aktivitas penting (pembuatan akun, penugasan
-  dan penugasan ulang, pembatalan, reopen, perubahan data master).
-- **Dashboard global**: pemantauan kunjungan dari seluruh lokasi.
-- Masuk menggunakan akun Super Admin yang sudah tersedia untuk mengelola
-  seluruh sistem.
+- Semua fitur Admin kecuali buka kembali kunjungan.
+- **Kelola akun Admin dan Super Admin** — satu-satunya hal yang tidak dapat
+  dilakukan Admin.
