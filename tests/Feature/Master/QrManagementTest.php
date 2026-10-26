@@ -32,13 +32,20 @@ class QrManagementTest extends TestCase
     public function test_creates_qr_with_random_token_and_receptionist(): void
     {
         $location = $this->createLocation();
+        $department = $this->createDepartment($location);
         $receptionist = $this->createUser(UserRole::Receptionist);
 
         $this->actingAs($this->superAdmin)
-            ->post("/admin/lokasi/{$location->id}/qr", ['label' => 'Pintu Timur', 'receptionist_id' => $receptionist->id])
+            ->post('/admin/qr', [
+                'location_id' => $location->id,
+                'department_id' => $department->id,
+                'label' => 'Pintu Timur',
+                'receptionist_id' => $receptionist->id,
+            ])
             ->assertSessionHasNoErrors();
 
         $qr = QrCode::firstOrFail();
+        $this->assertSame($department->id, $qr->department_id);
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $qr->token);
         $this->assertSame(QrStatus::Active, $qr->status);
         $this->assertSame($receptionist->id, $qr->receptionist_id);
@@ -49,12 +56,13 @@ class QrManagementTest extends TestCase
     public function test_receptionist_must_be_active_receptionist(): void
     {
         $location = $this->createLocation();
+        $department = $this->createDepartment($location);
         $inactive = $this->createUser(UserRole::Receptionist, ['is_active' => false]);
         $admin = $this->createUser(UserRole::Admin);
 
         foreach ([$inactive, $admin] as $candidate) {
             $this->actingAs($this->superAdmin)
-                ->post("/admin/lokasi/{$location->id}/qr", ['receptionist_id' => $candidate->id])
+                ->post('/admin/qr', ['location_id' => $location->id, 'department_id' => $department->id, 'receptionist_id' => $candidate->id])
                 ->assertSessionHasErrors('receptionist_id');
         }
 
@@ -161,7 +169,7 @@ class QrManagementTest extends TestCase
         $admin = $this->createAdmin($location);
         $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
 
-        $this->actingAs($admin)->get("/admin/lokasi/{$location->id}/qr")->assertForbidden();
+        $this->actingAs($admin)->get("/admin/qr?lokasi={$location->id}")->assertForbidden();
         $this->actingAs($admin)->get("/admin/qr/{$qr->id}/unduh")->assertForbidden();
     }
 }
