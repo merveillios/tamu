@@ -11,8 +11,6 @@ use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\StaffMember;
 use App\Models\User;
-use App\Models\VisitAssignment;
-use App\Models\VisitStatusLog;
 use Illuminate\Database\Seeder;
 
 /**
