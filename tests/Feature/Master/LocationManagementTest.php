@@ -116,7 +116,7 @@ class LocationManagementTest extends TestCase
     public function test_admin_cannot_manage_locations(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
 
         $this->actingAs($admin)->get('/admin/lokasi')->assertForbidden();
         $this->actingAs($admin)->post("/admin/lokasi/{$location->id}/status")->assertForbidden();

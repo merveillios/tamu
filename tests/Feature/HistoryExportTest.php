@@ -44,32 +44,32 @@ class HistoryExportTest extends TestCase
         VisitSignature::create(['visit_id' => $completed->id, 'image' => $png, 'size_bytes' => strlen($png), 'sha256' => hash('sha256', $png)]);
 
         $this->data = compact('locationA', 'locationB', 'categoryB', 'departmentA') + [
-            'adminA' => $this->createAdmin($locationA),
+            'admin' => $this->createAdmin(),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
         ];
     }
 
-    public function test_history_shows_completed_and_cancelled_in_scope_by_default(): void
+    public function test_history_shows_completed_and_cancelled_of_all_locations_by_default(): void
     {
-        $this->actingAs($this->data['adminA'])->get('/admin/history')
+        $this->actingAs($this->data['admin'])->get('/admin/history')
             ->assertOk()
             ->assertSee('Tamu Selesai')
             ->assertSee('HYPERLINK')
             ->assertDontSee('Tamu Menunggu')
             ->assertDontSee('Tamu Direview')
-            ->assertDontSee('Tamu Lokasi B');
+            ->assertSee('Tamu Lokasi B');
     }
 
     public function test_status_filter_can_show_processing_visits(): void
     {
-        $this->actingAs($this->data['adminA'])->get('/admin/history?status=direview')
+        $this->actingAs($this->data['admin'])->get('/admin/history?status=direview')
             ->assertSee('Tamu Direview')
             ->assertDontSee('Tamu Selesai');
     }
 
     public function test_search_and_filters(): void
     {
-        $admin = $this->data['adminA'];
+        $admin = $this->data['admin'];
 
         $this->actingAs($admin)->get('/admin/history?q=ekspor+kopi')->assertSee('Tamu Selesai')->assertDontSee('HYPERLINK');
         $this->actingAs($admin)->get('/admin/history?vulnerable_group=lansia')->assertSee('Tamu Selesai')->assertDontSee('HYPERLINK');
@@ -78,17 +78,22 @@ class HistoryExportTest extends TestCase
         $this->actingAs($admin)->get('/admin/history?from='.now()->addDay()->toDateString())->assertDontSee('Tamu Selesai');
     }
 
-    public function test_filters_outside_scope_are_rejected(): void
+    public function test_admin_can_filter_any_location_but_unknown_ids_are_rejected(): void
     {
-        $admin = $this->data['adminA'];
+        $admin = $this->data['admin'];
 
-        $this->actingAs($admin)->get('/admin/history?location_id='.$this->data['locationB']->id)->assertNotFound();
-        $this->actingAs($admin)->get('/admin/history?purpose_category_id='.$this->data['categoryB']->id)->assertNotFound();
+        $this->actingAs($admin)->get('/admin/history?location_id='.$this->data['locationB']->id)
+            ->assertOk()
+            ->assertSee('Tamu Lokasi B')
+            ->assertDontSee('Tamu Selesai');
+        $this->actingAs($admin)->get('/admin/history?purpose_category_id='.$this->data['categoryB']->id)->assertOk();
+        $this->actingAs($admin)->get('/admin/history?location_id=999999')->assertNotFound();
+        $this->actingAs($admin)->get('/admin/history?purpose_category_id=999999')->assertNotFound();
     }
 
-    public function test_csv_export_is_scoped_guarded_and_audited(): void
+    public function test_csv_export_is_guarded_and_audited(): void
     {
-        $response = $this->actingAs($this->data['adminA'])->get('/admin/history/export?format=csv')
+        $response = $this->actingAs($this->data['admin'])->get('/admin/history/export?format=csv')
             ->assertOk()
             ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
             ->assertHeader('Cache-Control', 'no-store, private');
@@ -98,15 +103,15 @@ class HistoryExportTest extends TestCase
         $this->assertStringContainsString('"No. Urut";"Waktu Datang";Lokasi', $csv);
         $this->assertStringContainsString('Tamu Selesai', $csv);
         $this->assertStringContainsString("'=HYPERLINK", $csv);
-        $this->assertStringNotContainsString('Tamu Lokasi B', $csv);
+        $this->assertStringContainsString('Tamu Lokasi B', $csv);
         $this->assertStringNotContainsString('Tamu Menunggu', $csv);
         $this->assertMatchesRegularExpression('/sitamu_semua_\d{8}-\d{4}\.csv/', $response->headers->get('Content-Disposition'));
-        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['adminA']->id, 'detail->format' => 'csv', 'detail->rows' => 2]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['admin']->id, 'detail->format' => 'csv', 'detail->rows' => 3]);
     }
 
     public function test_xlsx_export_writes_strings_and_signature_images(): void
     {
-        $response = $this->actingAs($this->data['adminA'])->get('/admin/history/export?format=xlsx')
+        $response = $this->actingAs($this->data['admin'])->get('/admin/history/export?format=xlsx')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
@@ -116,7 +121,7 @@ class HistoryExportTest extends TestCase
         unlink($path);
 
         $this->assertSame('Tanda Tangan', $sheet->getCell('P1')->getValue());
-        $names = [$sheet->getCell('D2')->getValue(), $sheet->getCell('D3')->getValue()];
+        $names = [$sheet->getCell('D2')->getValue(), $sheet->getCell('D3')->getValue(), $sheet->getCell('D4')->getValue()];
         $this->assertContains('=HYPERLINK("http://jahat.test")', $names);
         $this->assertSame('s', $sheet->getCell('D'.(array_search('=HYPERLINK("http://jahat.test")', $names) + 2))->getDataType());
         $this->assertCount(1, $sheet->getDrawingCollection());
@@ -136,18 +141,18 @@ class HistoryExportTest extends TestCase
     public function test_rich_exports_over_limit_are_rejected_but_csv_is_not(): void
     {
         config(['sitamu.export.rich_max_rows' => 1]);
-        $admin = $this->data['adminA'];
+        $admin = $this->data['admin'];
 
         $this->actingAs($admin)->from('/admin/history')->get('/admin/history/export?format=xlsx')
             ->assertRedirect('/admin/history')
-            ->assertSessionHasErrors(['format' => 'Hasil filter 2 baris, melebihi batas 1 baris. Persempit filter atau gunakan ekspor CSV.']);
+            ->assertSessionHasErrors(['format' => 'Hasil filter 3 baris, melebihi batas 1 baris. Persempit filter atau gunakan ekspor CSV.']);
         $this->actingAs($admin)->get('/admin/history/export?format=pdf')->assertSessionHasErrors('format');
         $this->actingAs($admin)->get('/admin/history/export?format=csv')->assertOk();
     }
 
     public function test_invalid_format_is_rejected(): void
     {
-        $this->actingAs($this->data['adminA'])->get('/admin/history/export?format=docx')->assertSessionHasErrors('format');
+        $this->actingAs($this->data['admin'])->get('/admin/history/export?format=docx')->assertSessionHasErrors('format');
     }
 
     public function test_receptionist_and_pic_cannot_open_history(): void

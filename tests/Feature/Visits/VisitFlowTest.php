@@ -42,7 +42,7 @@ class VisitFlowTest extends TestCase
             'picA' => $this->createPic($departmentA),
             'picB' => $this->createPic($departmentB),
             'receptionist' => $receptionist,
-            'admin' => $this->createAdmin($location),
+            'admin' => $this->createAdmin(),
             'visit' => $this->createVisit($qr, $category),
         ];
     }

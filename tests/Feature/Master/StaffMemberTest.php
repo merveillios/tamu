@@ -34,7 +34,7 @@ class StaffMemberTest extends TestCase
         $location = $this->createLocation();
         $department = $this->createDepartment($location);
         $other = $this->createDepartment($location);
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         StaffMember::create(['department_id' => $department->id, 'name' => 'Budi Santoso']);
 
         $this->actingAs($admin)->post("/admin/petugas/tambah?department_id={$department->id}", ['name' => 'budi santoso'])
@@ -47,7 +47,7 @@ class StaffMemberTest extends TestCase
     {
         $location = $this->createLocation();
         $member = $this->createStaffMember($this->createDepartment($location));
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
 
         $this->actingAs($admin)->post("/admin/petugas/{$member->id}/ubah", ['name' => 'Nama Baru'])->assertSessionHasNoErrors();
         $this->actingAs($admin)->post("/admin/petugas/{$member->id}/status");

@@ -29,7 +29,7 @@ class PurposeCategoryController extends Controller
      */
     public function index(Request $request): View
     {
-        $locations = $this->scope->manageableLocations($request->user())->orderBy('name')->get(['id', 'name']);
+        $locations = Location::query()->forUser($request->user())->orderBy('name')->get(['id', 'name']);
         $location = $this->selectedLocation($request, $locations->first()?->id);
         $sections = $location === null ? collect() : $this->sections($request, $location);
 
@@ -46,7 +46,7 @@ class PurposeCategoryController extends Controller
      */
     public function create(Request $request): View
     {
-        $location = $this->scope->findManageableLocationOrDeny((int) $request->query('location_id'), $request->user());
+        $location = $this->scope->findOrDeny(Location::class, (int) $request->query('location_id'), $request->user());
         $category = new PurposeCategory(['suggested_department_id' => (int) $request->query('departemen') ?: null]);
 
         return view('admin.categories.form', $this->formData($category, $location));
@@ -57,7 +57,7 @@ class PurposeCategoryController extends Controller
      */
     public function store(PurposeCategoryRequest $request, PurposeCategoryService $categories): RedirectResponse
     {
-        $location = $this->scope->findManageableLocationOrDeny((int) $request->query('location_id'), $request->user());
+        $location = $this->scope->findOrDeny(Location::class, (int) $request->query('location_id'), $request->user());
         $category = $categories->create($location, $request->validated(), $request->user());
 
         return redirect($this->sectionUrl($category))
@@ -106,7 +106,7 @@ class PurposeCategoryController extends Controller
     {
         $id = $request->query('location_id', $defaultId);
 
-        return $id === null ? null : $this->scope->findManageableLocationOrDeny($id, $request->user());
+        return $id === null ? null : $this->scope->findOrDeny(Location::class, $id, $request->user());
     }
 
     /**

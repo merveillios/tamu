@@ -3,10 +3,6 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    @if ($adminWithoutLocation)
-        <div class="alert alert-warning" role="alert">Anda belum ditugaskan ke lokasi mana pun.</div>
-    @endif
-
     <div class="row">
         @include('admin.dashboard.partials.stat-card', ['label' => 'Belum Ditugaskan', 'value' => $counts['unassigned'], 'color' => 'warning'])
         @include('admin.dashboard.partials.stat-card', ['label' => 'Menunggu PIC', 'value' => $counts['waiting_pic'], 'color' => 'info'])

@@ -50,7 +50,7 @@ class AccessScopeTest extends TestCase
             'qrA' => $qrA,
             'qrAInactive' => $qrAInactive,
             'receptionistA' => $receptionistA,
-            'adminA' => $this->createAdmin($locationA),
+            'admin' => $this->createAdmin(),
             'picA' => $this->createPic($departmentA),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
             'visitA' => $this->createVisit($qrA, $categoryA, ['assigned_department_id' => $departmentA->id]),
@@ -59,32 +59,19 @@ class AccessScopeTest extends TestCase
         ];
     }
 
-    public function test_super_admin_sees_everything(): void
+    public function test_super_admin_and_admin_see_everything(): void
     {
-        $user = $this->data['superAdmin'];
+        foreach (['superAdmin', 'admin'] as $actor) {
+            $user = $this->data[$actor];
 
-        $this->assertSame(3, GuestVisit::forUser($user)->count());
-        $this->assertSame(3, QrCode::forUser($user)->count());
-        $this->assertSame(2, Location::forUser($user)->count());
-        $this->assertNull(app(AccessScope::class)->locationIds($user));
-    }
-
-    public function test_admin_is_limited_to_assigned_locations_for_visits_and_qr(): void
-    {
-        $user = $this->data['adminA'];
-
-        $this->assertVisitIds(['visitA', 'visitAInactiveQr'], $user);
-        $this->assertEqualsCanonicalizing([$this->data['qrA']->id, $this->data['qrAInactive']->id], QrCode::forUser($user)->pluck('id')->all());
-        $this->assertSame([$this->data['locationA']->id], Location::forUser($user)->pluck('id')->all());
-    }
-
-    public function test_admin_manages_departments_categories_and_staff_in_all_locations(): void
-    {
-        $user = $this->data['adminA'];
-
-        $this->assertSame(2, Department::forUser($user)->count());
-        $this->assertSame(2, PurposeCategory::forUser($user)->count());
-        $this->assertSame(2, StaffMember::forUser($user)->count());
+            $this->assertSame(3, GuestVisit::forUser($user)->count());
+            $this->assertSame(3, QrCode::forUser($user)->count());
+            $this->assertSame(2, Location::forUser($user)->count());
+            $this->assertSame(2, Department::forUser($user)->count());
+            $this->assertSame(2, PurposeCategory::forUser($user)->count());
+            $this->assertSame(2, StaffMember::forUser($user)->count());
+            $this->assertNull(app(AccessScope::class)->locationIds($user));
+        }
     }
 
     public function test_receptionist_sees_visits_from_own_qr_of_any_status(): void
@@ -107,21 +94,20 @@ class AccessScopeTest extends TestCase
 
     public function test_accounts_without_scope_see_nothing(): void
     {
-        $this->assertSame(0, GuestVisit::forUser($this->createAdmin())->count());
         $this->assertSame(0, GuestVisit::forUser($this->createUser(UserRole::Receptionist))->count());
         $this->assertSame(0, GuestVisit::forUser($this->createUser(UserRole::Pic))->count());
     }
 
     public function test_find_or_deny_returns_data_in_scope(): void
     {
-        $visit = app(AccessScope::class)->findOrDeny(GuestVisit::class, $this->data['visitA']->id, $this->data['adminA']);
+        $visit = app(AccessScope::class)->findOrDeny(GuestVisit::class, $this->data['visitA']->id, $this->data['receptionistA']);
 
         $this->assertTrue($visit->is($this->data['visitA']));
     }
 
     public function test_find_or_deny_out_of_scope_gives_404_and_audits(): void
     {
-        foreach (['adminA', 'receptionistA', 'picA'] as $actor) {
+        foreach (['receptionistA', 'picA'] as $actor) {
             try {
                 app(AccessScope::class)->findOrDeny(GuestVisit::class, $this->data['visitB']->id, $this->data[$actor]);
                 $this->fail("{$actor} seharusnya ditolak.");
@@ -136,7 +122,7 @@ class AccessScopeTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
 
         try {
-            app(AccessScope::class)->findOrDeny(GuestVisit::class, 999999, $this->data['adminA']);
+            app(AccessScope::class)->findOrDeny(GuestVisit::class, 999999, $this->data['admin']);
         } finally {
             $this->assertDatabaseMissing('audit_logs', ['action' => 'access.denied']);
         }

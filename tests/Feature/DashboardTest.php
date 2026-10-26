@@ -39,34 +39,34 @@ class DashboardTest extends TestCase
         $this->createVisit($qrB, $categoryB, ['name' => 'Tamu Lokasi B']);
 
         $this->data = [
-            'adminA' => $this->createAdmin($locationA),
+            'admin' => $this->createAdmin(),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
             'receptionist' => $this->createUser(UserRole::Receptionist),
             'pic' => $this->createPic($department),
         ];
     }
 
-    public function test_admin_counts_follow_definitions_and_scope(): void
+    public function test_admin_counts_follow_definitions_across_all_locations(): void
     {
-        $counts = app(DashboardService::class)->counts($this->data['adminA']);
+        $counts = app(DashboardService::class)->counts($this->data['admin']);
 
         $this->assertSame([
-            'unassigned' => 2,
+            'unassigned' => 3,
             'waiting_pic' => 1,
             'processing' => 1,
             'completed_today' => 1,
-            'today' => 4,
+            'today' => 5,
         ], $counts);
     }
 
     public function test_admin_dashboard_shows_cards_and_short_active_list(): void
     {
-        $this->actingAs($this->data['adminA'])->get('/admin')
+        $this->actingAs($this->data['admin'])->get('/admin')
             ->assertOk()
             ->assertSee('Belum Ditugaskan')
             ->assertSee('Total Kunjungan Hari Ini')
             ->assertSee('Tamu Menunggu Awal')
-            ->assertDontSee('Tamu Lokasi B')
+            ->assertSee('Tamu Lokasi B')
             ->assertSee('Lihat semua');
     }
 
@@ -92,12 +92,5 @@ class DashboardTest extends TestCase
         $this->actingAs($this->data['receptionist'])->get('/admin')->assertRedirect(route('admin.visits.active'));
         $this->flushSession();
         $this->actingAs($this->data['pic'])->get('/admin')->assertRedirect(route('admin.assignments.index'));
-    }
-
-    public function test_admin_without_location_sees_notice(): void
-    {
-        $this->actingAs($this->createAdmin())->get('/admin')
-            ->assertOk()
-            ->assertSee('Anda belum ditugaskan ke lokasi mana pun.');
     }
 }

@@ -92,7 +92,7 @@ class DepartmentManagementTest extends TestCase
     public function test_admin_cannot_manage_departments(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
 
         $this->actingAs($admin)->get("/admin/lokasi/{$location->id}/departemen")->assertForbidden();
         $this->actingAs($admin)->post("/admin/lokasi/{$location->id}/departemen", ['name' => 'Bidang X'])->assertForbidden();

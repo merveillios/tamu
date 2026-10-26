@@ -38,7 +38,7 @@ class VisitAccessTest extends TestCase
         VisitSignature::create(['visit_id' => $visitA->id, 'image' => 'png', 'size_bytes' => 3, 'sha256' => str_repeat('a', 64)]);
 
         $this->data = compact('locationA', 'locationB', 'receptionistA', 'visitA', 'visitB') + [
-            'adminA' => $this->createAdmin($locationA),
+            'admin' => $this->createAdmin(),
             'picA' => $this->createPic($departmentA),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
         ];
@@ -56,20 +56,20 @@ class VisitAccessTest extends TestCase
         $this->assertSame(1, $response->json('data.counts.menunggu_pic'));
     }
 
-    public function test_super_admin_sees_all_locations_and_admin_only_assigned(): void
+    public function test_super_admin_and_admin_see_all_locations(): void
     {
         $this->assertCount(2, $this->as('superAdmin')->getJson('/admin/tamu/data')->json('data.rows'));
 
-        $adminRows = $this->as('adminA')->getJson('/admin/tamu/data')->json('data.rows');
-        $this->assertSame(['Tamu Lokasi A'], array_column($adminRows, 'name'));
+        $adminRows = $this->as('admin')->getJson('/admin/tamu/data')->json('data.rows');
+        $this->assertEqualsCanonicalizing(['Tamu Lokasi A', 'Tamu Lokasi B'], array_column($adminRows, 'name'));
         $this->assertFalse($adminRows[0]['actions']['assign']);
     }
 
-    public function test_location_filter_outside_scope_is_denied(): void
+    public function test_admin_can_filter_any_location(): void
     {
-        $this->as('adminA')->getJson('/admin/tamu/data?location_id='.$this->data['locationB']->id)->assertNotFound();
+        $rows = $this->as('admin')->getJson('/admin/tamu/data?location_id='.$this->data['locationB']->id)->json('data.rows');
 
-        $this->assertDatabaseHas('audit_logs', ['action' => 'access.denied', 'user_id' => $this->data['adminA']->id]);
+        $this->assertSame(['Tamu Lokasi B'], array_column($rows, 'name'));
     }
 
     public function test_search_matches_phone_typed_with_leading_zero(): void
@@ -94,14 +94,11 @@ class VisitAccessTest extends TestCase
     public static function outOfScopeRequests(): array
     {
         return [
-            'admin membuka detail' => ['adminA', 'GET', 'detail'],
-            'admin membatalkan' => ['adminA', 'POST', 'batal'],
             'resepsionis membuka detail' => ['receptionistA', 'GET', 'detail'],
             'resepsionis menugaskan' => ['receptionistA', 'POST', 'tugaskan'],
             'resepsionis memuat departemen' => ['receptionistA', 'GET', 'departemen'],
             'pic membuka detail' => ['picA', 'GET', 'detail'],
             'pic menerima' => ['picA', 'POST', 'terima'],
-            'admin melihat tanda tangan' => ['adminA', 'GET', 'tanda-tangan'],
             'resepsionis melihat tanda tangan' => ['receptionistA', 'GET', 'tanda-tangan'],
         ];
     }
@@ -124,7 +121,7 @@ class VisitAccessTest extends TestCase
     {
         $id = $this->data['visitA']->id;
 
-        $this->as('adminA')->get("/admin/kunjungan/{$id}")->assertOk()->assertSee('tanda-tangan')->assertSee('081200000001');
+        $this->as('admin')->get("/admin/kunjungan/{$id}")->assertOk()->assertSee('tanda-tangan')->assertSee('081200000001');
         $this->as('receptionistA')->get("/admin/kunjungan/{$id}")->assertOk()->assertSee('tanda-tangan');
         $this->as('picA')->get("/admin/kunjungan/{$id}")->assertOk()->assertDontSee('tanda-tangan');
     }
@@ -133,7 +130,7 @@ class VisitAccessTest extends TestCase
     {
         $id = $this->data['visitA']->id;
 
-        $this->as('adminA')->get("/admin/kunjungan/{$id}/tanda-tangan")
+        $this->as('admin')->get("/admin/kunjungan/{$id}/tanda-tangan")
             ->assertOk()
             ->assertHeader('Content-Type', 'image/png')
             ->assertHeader('Cache-Control', 'no-store, private');

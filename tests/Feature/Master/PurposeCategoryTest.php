@@ -21,7 +21,7 @@ class PurposeCategoryTest extends TestCase
         $assigned = $this->createLocation();
         $other = $this->createLocation();
         $department = $this->createDepartment($other);
-        $admin = $this->createAdmin($assigned);
+        $admin = $this->createAdmin();
 
         $this->actingAs($admin)
             ->post("/admin/kategori-keperluan/tambah?location_id={$other->id}", [
@@ -42,7 +42,7 @@ class PurposeCategoryTest extends TestCase
         $otherLocationDepartment = $this->createDepartment($this->createLocation());
         $inactiveDepartment = $this->createDepartment($location);
         $inactiveDepartment->update(['is_active' => false]);
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
 
         foreach ([$otherLocationDepartment, $inactiveDepartment] as $department) {
             $this->actingAs($admin)
@@ -61,7 +61,7 @@ class PurposeCategoryTest extends TestCase
     {
         $location = $this->createLocation();
         $other = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Konsultasi']);
 
         $this->actingAs($admin)->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'konsultasi'])
@@ -74,7 +74,7 @@ class PurposeCategoryTest extends TestCase
     public function test_department_page_orders_by_sort_order_then_name(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Zebra', 'sort_order' => 1]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Beta', 'sort_order' => 2]);
         PurposeCategory::create(['location_id' => $location->id, 'name' => 'Alfa', 'sort_order' => 2]);
@@ -87,7 +87,7 @@ class PurposeCategoryTest extends TestCase
     public function test_index_lists_departments_without_their_questions(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $secretariat = $this->createDepartment($location, 'Sekretariat');
         $industry = $this->createDepartment($location, 'Bidang Industri Agro');
         $this->createDepartment($location, 'Bidang Kosong');
@@ -109,7 +109,7 @@ class PurposeCategoryTest extends TestCase
     public function test_department_page_shows_only_its_questions(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $industry = $this->createDepartment($location, 'Bidang Industri Agro');
         $empty = $this->createDepartment($location, 'Bidang Kosong');
         $inactive = $this->createDepartment($location, 'Bidang Lama');
@@ -137,7 +137,7 @@ class PurposeCategoryTest extends TestCase
     public function test_general_row_is_hidden_when_every_question_has_a_department(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $this->createCategory($location, $this->createDepartment($location));
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
@@ -148,7 +148,7 @@ class PurposeCategoryTest extends TestCase
     public function test_create_locks_department_and_saving_returns_to_its_page(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $department = $this->createDepartment($location);
         $other = $this->createDepartment($location);
 
@@ -175,7 +175,7 @@ class PurposeCategoryTest extends TestCase
     public function test_question_accepts_up_to_150_characters(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $url = "/admin/kategori-keperluan/tambah?location_id={$location->id}";
         $departmentId = $this->createDepartment($location)->id;
 
@@ -188,7 +188,7 @@ class PurposeCategoryTest extends TestCase
     public function test_updates_and_toggles_category(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $department = $this->createDepartment($location);
         $category = PurposeCategory::create(['location_id' => $location->id, 'name' => 'Lama']);
 

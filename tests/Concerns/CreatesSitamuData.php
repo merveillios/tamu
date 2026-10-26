@@ -32,12 +32,9 @@ trait CreatesSitamuData
         return User::factory()->role($role)->create($attributes);
     }
 
-    protected function createAdmin(Location ...$locations): User
+    protected function createAdmin(): User
     {
-        $admin = $this->createUser(UserRole::Admin);
-        $admin->locations()->attach(collect($locations)->pluck('id')->all(), ['assigned_at' => now()]);
-
-        return $admin;
+        return $this->createUser(UserRole::Admin);
     }
 
     protected function createPic(Department $department): User

@@ -18,8 +18,8 @@ use LogicException;
 /**
  * Satu-satunya sumber cakupan data per peran staf (PRD Bab 12.2, A-6).
  *
- * Super Admin tanpa batas, Admin dibatasi lokasi yang ditugaskan, Resepsionis
- * dibatasi QR miliknya, dan PIC dibatasi departemennya.
+ * Super Admin dan Admin tanpa batas (ADM-5), Resepsionis dibatasi QR miliknya,
+ * dan PIC dibatasi departemennya.
  */
 class AccessScope
 {
@@ -36,12 +36,11 @@ class AccessScope
      */
     public function locationIds(User $user): ?array
     {
-        if ($user->role === UserRole::SuperAdmin) {
+        if ($user->hasRole(UserRole::SuperAdmin, UserRole::Admin)) {
             return null;
         }
 
         return $this->remember("location_ids.{$user->id}", fn () => match ($user->role) {
-            UserRole::Admin => $user->locations()->pluck('locations.id')->all(),
             UserRole::Receptionist => QrCode::query()->where('receptionist_id', $user->id)
                 ->distinct()->pluck('location_id')->all(),
             UserRole::Pic => Department::query()->whereKey($user->department_id)->pluck('location_id')->all(),
@@ -55,23 +54,20 @@ class AccessScope
     {
         return match ($query->getModel()::class) {
             GuestVisit::class => $this->applyToVisits($query, $user),
-            QrCode::class => $this->applyToMaster($query, $user, 'location_id'),
-            Location::class => $this->applyToMaster($query, $user, 'id'),
-            Department::class, PurposeCategory::class, StaffMember::class => $this->applyToMaster($query, $user, null),
+            QrCode::class, Location::class, Department::class, PurposeCategory::class, StaffMember::class => $this->applyToMaster($query, $user),
             default => throw new LogicException('Model tidak dibatasi AccessScope: '.$query->getModel()::class),
         };
     }
 
     /**
-     * Cakupan kunjungan: lokasi (Admin), QR (Resepsionis), atau departemen (PIC).
+     * Cakupan kunjungan: semua (Super Admin dan Admin), QR (Resepsionis), atau departemen (PIC).
      */
     public function applyToVisits(Builder $query, User $user): Builder
     {
         $table = $query->getModel()->getTable();
 
         return match ($user->role) {
-            UserRole::SuperAdmin => $query,
-            UserRole::Admin => $query->whereIn("{$table}.location_id", $this->locationIds($user)),
+            UserRole::SuperAdmin, UserRole::Admin => $query,
             // QR dengan status apa pun agar kunjungan aktif dari QR nonaktif tetap bisa diselesaikan.
             UserRole::Receptionist => $query->whereIn("{$table}.qr_code_id", $this->qrIds($user)),
             UserRole::Pic => $user->department_id === null
@@ -81,49 +77,16 @@ class AccessScope
     }
 
     /**
-     * Cakupan master data. Admin mengelola departemen, kategori, dan petugas di
-     * semua lokasi, tetapi QR dan lokasi hanya di lokasi yang ditugaskan.
+     * Cakupan master data: Super Admin dan Admin mengelola semua lokasi (ADM-5),
+     * peran lain tidak memiliki akses master data.
      */
-    public function applyToMaster(Builder $query, User $user, ?string $locationColumn): Builder
+    public function applyToMaster(Builder $query, User $user): Builder
     {
-        $table = $query->getModel()->getTable();
-
-        return match (true) {
-            $user->role === UserRole::SuperAdmin => $query,
-            $user->role === UserRole::Admin && $locationColumn === null => $query,
-            $user->role === UserRole::Admin => $query->whereIn("{$table}.{$locationColumn}", $this->locationIds($user)),
-            default => $query->whereIn("{$table}.{$query->getModel()->getKeyName()}", []),
-        };
-    }
-
-    /**
-     * Lokasi yang boleh dipilih saat mengelola kategori keperluan dan petugas.
-     * Admin mengelola keduanya di semua lokasi (Bab 3, Bab 17 No. 27), berbeda
-     * dengan pemantauan kunjungan yang dibatasi lokasi yang ditugaskan.
-     */
-    public function manageableLocations(User $user): Builder
-    {
-        $query = Location::query();
-
-        return $user->hasRole(UserRole::SuperAdmin, UserRole::Admin) ? $query : $query->whereIn('id', []);
-    }
-
-    /**
-     * Mencari lokasi master data berdasarkan ID; di luar cakupan berakhir 404 seragam.
-     */
-    public function findManageableLocationOrDeny(int|string $id, User $user): Location
-    {
-        $location = $this->manageableLocations($user)->whereKey($id)->first();
-
-        if ($location !== null) {
-            return $location;
+        if ($user->hasRole(UserRole::SuperAdmin, UserRole::Admin)) {
+            return $query;
         }
 
-        if (Location::query()->whereKey($id)->exists()) {
-            $this->audit->record('access.denied', null, ['model' => 'Location', 'id' => (int) $id], $user);
-        }
-
-        abort(404);
+        return $query->whereIn("{$query->getModel()->getTable()}.{$query->getModel()->getKeyName()}", []);
     }
 
     /**

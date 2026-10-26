@@ -166,7 +166,7 @@ class QrManagementTest extends TestCase
     public function test_admin_cannot_manage_qr(): void
     {
         $location = $this->createLocation();
-        $admin = $this->createAdmin($location);
+        $admin = $this->createAdmin();
         $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
 
         $this->actingAs($admin)->get("/admin/qr?lokasi={$location->id}")->assertForbidden();

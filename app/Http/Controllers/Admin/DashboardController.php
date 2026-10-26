@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Services\AccessScope;
 use App\Services\DashboardService;
 use App\Services\VisitService;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +18,7 @@ class DashboardController extends Controller
     /**
      * Admin dan Super Admin melihat dashboard; Resepsionis dan PIC langsung ke halaman kerjanya (DSH-5).
      */
-    public function index(Request $request, AccessScope $scope, DashboardService $dashboard): View|RedirectResponse
+    public function index(Request $request, DashboardService $dashboard): View|RedirectResponse
     {
         $user = $request->user();
 
@@ -27,8 +26,6 @@ class DashboardController extends Controller
             UserRole::Receptionist => redirect()->route('admin.visits.active'),
             UserRole::Pic => redirect()->route('admin.assignments.index'),
             UserRole::Admin => view('admin.dashboard.admin', [
-                // USR-2: Admin tanpa lokasi tetap bisa login tetapi diberi tahu.
-                'adminWithoutLocation' => $scope->locationIds($user) === [],
                 'counts' => $dashboard->counts($user),
                 'activeVisits' => $dashboard->activePreview($user),
                 'cancelReasons' => VisitService::CANCEL_REASONS,
