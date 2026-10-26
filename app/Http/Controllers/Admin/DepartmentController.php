@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Manajemen departemen per lokasi oleh Super Admin (DEP-1 sampai DEP-3).
+ * Manajemen departemen per lokasi oleh Admin dan Super Admin (DEP-1 sampai DEP-3).
  */
 class DepartmentController extends Controller
 {

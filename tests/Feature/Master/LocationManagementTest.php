@@ -113,12 +113,31 @@ class LocationManagementTest extends TestCase
         $this->assertStringNotContainsString("/admin/lokasi/{$used->id}/hapus", $html);
     }
 
-    public function test_admin_cannot_manage_locations(): void
+    public function test_admin_manages_locations_of_any_location(): void
     {
-        $location = $this->createLocation();
+        $other = $this->createLocation('Lokasi Lain');
         $admin = $this->createAdmin();
 
-        $this->actingAs($admin)->get('/admin/lokasi')->assertForbidden();
-        $this->actingAs($admin)->post("/admin/lokasi/{$location->id}/status")->assertForbidden();
+        $this->actingAs($admin)->get('/admin/lokasi')->assertOk()->assertSee('Lokasi Lain');
+        $this->actingAs($admin)->post('/admin/lokasi/tambah', ['name' => 'Kantor UPT'])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post("/admin/lokasi/{$other->id}/ubah", ['name' => 'Lokasi Lain Baru'])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post("/admin/lokasi/{$other->id}/status");
+
+        $this->assertFalse($other->refresh()->is_active);
+        $this->assertSame('Lokasi Lain Baru', $other->name);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'location.create', 'user_id' => $admin->id]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'location.deactivate', 'user_id' => $admin->id, 'entity_id' => $other->id]);
+    }
+
+    public function test_receptionist_and_pic_cannot_manage_locations(): void
+    {
+        $location = $this->createLocation();
+
+        foreach ([$this->createUser(UserRole::Receptionist), $this->createPic($this->createDepartment($location))] as $user) {
+            // Sesi terpisah per akun agar auth.session tidak memakai hash password akun sebelumnya.
+            $this->flushSession();
+            $this->actingAs($user)->get('/admin/lokasi')->assertForbidden();
+            $this->actingAs($user)->post("/admin/lokasi/{$location->id}/status")->assertForbidden();
+        }
     }
 }

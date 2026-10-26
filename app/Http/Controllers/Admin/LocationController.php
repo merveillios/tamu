@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Manajemen lokasi oleh Super Admin (LOK-1 sampai LOK-3).
+ * Manajemen lokasi oleh Admin dan Super Admin (LOK-1 sampai LOK-3).
  */
 class LocationController extends Controller
 {

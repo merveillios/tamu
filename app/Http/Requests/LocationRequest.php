@@ -12,11 +12,11 @@ use Illuminate\Validation\Rule;
 class LocationRequest extends FormRequest
 {
     /**
-     * Hanya Super Admin yang mengelola lokasi.
+     * Admin dan Super Admin mengelola lokasi (LOK-1, PRD v0.11).
      */
     public function authorize(): bool
     {
-        return $this->user()?->hasRole(UserRole::SuperAdmin) ?? false;
+        return $this->user()?->hasRole(UserRole::SuperAdmin, UserRole::Admin) ?? false;
     }
 
     /**

@@ -89,13 +89,26 @@ class DepartmentManagementTest extends TestCase
             ->assertSee('PIC Perdagangan');
     }
 
-    public function test_admin_cannot_manage_departments(): void
+    public function test_admin_manages_departments(): void
     {
         $location = $this->createLocation();
         $admin = $this->createAdmin();
 
-        $this->actingAs($admin)->get("/admin/lokasi/{$location->id}/departemen")->assertForbidden();
-        $this->actingAs($admin)->post("/admin/lokasi/{$location->id}/departemen", ['name' => 'Bidang X'])->assertForbidden();
+        $this->actingAs($admin)->get("/admin/lokasi/{$location->id}/departemen")->assertOk();
+        $this->actingAs($admin)->post("/admin/lokasi/{$location->id}/departemen", ['name' => 'Bidang X'])->assertSessionHasNoErrors();
+
+        $department = Department::where('name', 'Bidang X')->firstOrFail();
+        $this->actingAs($admin)->post("/admin/departemen/{$department->id}/status");
+
+        $this->assertFalse($department->refresh()->is_active);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'department.create', 'user_id' => $admin->id]);
+    }
+
+    public function test_receptionist_cannot_manage_departments(): void
+    {
+        $location = $this->createLocation();
+
+        $this->actingAs($this->createUser(UserRole::Receptionist))->get("/admin/lokasi/{$location->id}/departemen")->assertForbidden();
     }
 
     public function test_unknown_location_gives_404(): void

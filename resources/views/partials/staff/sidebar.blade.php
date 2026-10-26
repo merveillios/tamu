@@ -9,7 +9,7 @@
         ['label' => 'Tamu Aktif', 'path' => 'admin/tamu', 'icon' => 'user-group', 'roles' => [UserRole::SuperAdmin, UserRole::Admin, UserRole::Receptionist]],
         ['label' => 'Penugasan', 'path' => 'admin/penugasan', 'icon' => 'clipboard-check', 'roles' => [UserRole::Pic]],
         ['label' => 'History', 'path' => 'admin/history', 'icon' => 'clock', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
-        ['label' => 'Lokasi', 'path' => 'admin/lokasi', 'icon' => 'location', 'roles' => [UserRole::SuperAdmin]],
+        ['label' => 'Lokasi', 'path' => 'admin/lokasi', 'icon' => 'location', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'QR Code', 'path' => 'admin/qr', 'icon' => 'qrcode', 'roles' => [UserRole::SuperAdmin]],
         ['label' => 'Pertanyaan', 'path' => 'admin/kategori-keperluan', 'icon' => 'tag', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Petugas', 'path' => 'admin/petugas', 'icon' => 'identification', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
