@@ -3,7 +3,7 @@
 @section('title', 'Login Staf')
 
 @section('content')
-    <h1 class="h3 fw-bold mb-1" style="color: #123c6e;">Masuk</h1>
+    <h1 class="h3 fw-bold mb-1 auth-title">Masuk</h1>
     <p class="text-gray-600 small mb-4">Gunakan akun staf Anda untuk melanjutkan.</p>
 
     @if ($errors->any())

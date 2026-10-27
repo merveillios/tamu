@@ -416,6 +416,30 @@ body {
     animation: disdag-float 6s ease-in-out infinite;
 }
 
+/* Posisi tiap hiasan ditaruh di sini, bukan atribut style, karena CSP memblokir style inline. */
+.hero-deco-float-1 {
+    top: 18%;
+    right: 22%;
+}
+
+.hero-deco-float-2 {
+    top: 12%;
+    left: 38%;
+    animation-delay: 1.2s;
+}
+
+.hero-deco-float-3 {
+    bottom: 14%;
+    left: 18%;
+    animation-delay: 2.1s;
+}
+
+.hero-deco-float-4 {
+    bottom: 22%;
+    right: 12%;
+    animation-delay: 0.7s;
+}
+
 @keyframes disdag-float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-12px); }
@@ -590,6 +614,15 @@ body {
 }
 
 /* Judul besar panel kiri */
+.hero-welcome {
+    z-index: 1;
+    max-width: 420px;
+}
+
+.auth-title {
+    color: #123c6e;
+}
+
 .hero-welcome-title {
     color: #ffffff;
     font-size: 2rem;
