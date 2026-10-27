@@ -759,7 +759,6 @@ body {
     line-height: 1.4;
 }
 
-
 /* Halaman cetak QR ukuran A4 (QR-5) */
 .qr-print-sheet {
     max-width: 180mm;
@@ -862,6 +861,8 @@ body.auth-page-body {
     position: relative;
     z-index: 1;
     display: block;
+    /* Volt memberi main overflow hidden sehingga bayangan kartu terpotong kotak di sudut bawah. */
+    overflow: visible;
 }
 
 /* Kartu Login Utama */
@@ -902,6 +903,17 @@ body.auth-page-body {
     top: 28px;
     left: 28px;
     z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.auth-card-brand-text {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
 .auth-card-logo {
@@ -927,6 +939,13 @@ body.auth-page-body {
 .auth-card-dots-bl {
     bottom: 28px;
     left: 28px;
+}
+
+/* Di layar sempit hiasan kanan atas bertabrakan dengan nama instansi di samping logo. */
+@media (max-width: 1199.98px) {
+    .auth-card-dots-tr {
+        display: none;
+    }
 }
 
 /* Konten tengah panel kiri */

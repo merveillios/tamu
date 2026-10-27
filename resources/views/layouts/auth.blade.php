@@ -13,11 +13,14 @@
         <div class="auth-card">
             {{-- Panel Kiri: Gradasi Biru SiTamu (±45%) --}}
             <div class="auth-card-left">
-                {{-- Logo lambang Jawa Timur di pojok kiri atas --}}
+                {{-- Logo lambang Jawa Timur dan nama instansi di pojok kiri atas --}}
                 <div class="auth-card-logo-wrap">
                     <img src="{{ asset('assets/img/logo-jatim.png') }}"
                          alt="Logo Provinsi Jawa Timur"
                          class="auth-card-logo">
+                    <div class="auth-card-brand-text">
+                        Dinas Perindustrian dan Perdagangan<br>Provinsi Jawa Timur
+                    </div>
                 </div>
 
                 {{-- Hiasan titik-titik (dot grid) di kanan atas panel --}}
