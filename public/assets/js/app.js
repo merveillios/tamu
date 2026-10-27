@@ -104,14 +104,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Form dengan atribut data-confirm meminta konfirmasi sebelum dikirim.
+    /*
+     * Form dengan atribut data-confirm meminta konfirmasi lewat modal, bukan window.confirm,
+     * agar tampil seragam dengan modal lain. Atribut opsional: data-confirm-title,
+     * data-confirm-button (label tombol), dan data-confirm-variant (warna Bootstrap, default danger).
+     */
+    var actionModalEl = document.getElementById('confirmActionModal');
+    var actionModal = actionModalEl ? bootstrap.Modal.getOrCreateInstance(actionModalEl) : null;
+    var actionSubmitBtn = document.getElementById('confirmActionSubmitBtn');
+    var pendingActionForm = null;
+
     document.querySelectorAll('form[data-confirm]').forEach(function (form) {
         form.addEventListener('submit', function (event) {
-            if (!window.confirm(form.dataset.confirm)) {
-                event.preventDefault();
+            event.preventDefault();
+
+            if (!actionModal) {
+                if (window.confirm(form.dataset.confirm)) {
+                    form.submit();
+                }
+                return;
             }
+
+            pendingActionForm = form;
+            document.getElementById('confirmActionModalTitle').textContent = form.dataset.confirmTitle || 'Konfirmasi';
+            document.getElementById('confirmActionModalMessage').textContent = form.dataset.confirm;
+            actionSubmitBtn.textContent = form.dataset.confirmButton || 'Ya, Lanjutkan';
+            actionSubmitBtn.className = 'btn btn-' + (form.dataset.confirmVariant || 'danger');
+            actionModal.show();
         });
     });
+
+    if (actionSubmitBtn) {
+        actionSubmitBtn.addEventListener('click', function () {
+            var form = pendingActionForm;
+            pendingActionForm = null;
+            actionModal.hide();
+
+            if (form) {
+                // submit() tidak memicu event submit, sehingga modal tidak muncul lagi.
+                actionSubmitBtn.disabled = true;
+                form.submit();
+            }
+        });
+
+        actionModalEl.addEventListener('hidden.bs.modal', function () {
+            pendingActionForm = null;
+            actionSubmitBtn.disabled = false;
+        });
+    }
 
     /*
      * Modal Konfirmasi Simpan, Batal, & Nonaktifkan Global untuk Semua Form Staf

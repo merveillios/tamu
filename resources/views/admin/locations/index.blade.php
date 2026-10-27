@@ -56,7 +56,9 @@
                                     </button>
                                 </form>
                                 @if ($canDelete)
-                                    <form method="POST" action="{{ route('admin.locations.destroy', $location->id) }}" data-confirm="Hapus lokasi {{ $location->name }}?">
+                                    <form method="POST" action="{{ route('admin.locations.destroy', $location->id) }}"
+                                          data-confirm="Hapus lokasi {{ $location->name }}? Tindakan ini tidak dapat dibatalkan."
+                                          data-confirm-title="Hapus Lokasi" data-confirm-button="Ya, Hapus">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                                     </form>
