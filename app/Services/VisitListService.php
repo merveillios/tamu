@@ -11,6 +11,7 @@ use App\Rules\IndonesianPhone;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Query dan bentuk data daftar Tamu Aktif (RSP-1, ADM-1) dan Penugasan PIC (PIC-1).
@@ -78,6 +79,44 @@ class VisitListService
             ->with(self::RELATIONS)
             ->tap(fn (Builder $query) => $this->applyPriorityOrdering($query))
             ->get();
+    }
+
+    /**
+     * Kunjungan departemen PIC yang diselesaikan hari ini, urut terbaru selesai (PIC-7).
+     * Sengaja dibatasi hari ini agar data tamu tidak terbuka lama di akun PIC yang dipakai bersama.
+     *
+     * @return Collection<int, GuestVisit>
+     */
+    public function picCompletedToday(User $pic): Collection
+    {
+        return GuestVisit::query()
+            ->forUser($pic)
+            ->where('status', VisitStatus::Completed)
+            ->where('completed_at', '>=', today())
+            ->with('servedBy:id,name')
+            ->latest('completed_at')
+            ->get();
+    }
+
+    /**
+     * Baris ringkas kunjungan selesai untuk PIC: tanpa telepon, alamat, dan email (PIC-7).
+     *
+     * @return array<string, mixed>
+     */
+    public function completedRow(GuestVisit $visit): array
+    {
+        return [
+            'id' => $visit->id,
+            'number' => $visit->daily_number,
+            'name' => $visit->name,
+            'organization' => $visit->organization,
+            'category' => $visit->purpose_category_name,
+            'purpose' => $visit->purpose,
+            'served_by' => $visit->servedBy?->name,
+            'completed_at' => $visit->completed_at->format('H:i'),
+            'result_excerpt' => Str::limit((string) $visit->result, 120),
+            'detail_url' => route('admin.visits.show', $visit->id),
+        ];
     }
 
     /**

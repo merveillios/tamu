@@ -85,7 +85,33 @@ class VisitAccessTest extends TestCase
 
         $this->assertSame(['Tamu Lokasi A'], array_column($response->json('data.new'), 'name'));
         $this->assertSame([], $response->json('data.reviewing'));
+        $this->assertSame([], $response->json('data.completed'));
         $this->assertSame(1, $response->json('data.new_count'));
+    }
+
+    public function test_pic_sees_only_today_completed_visits_of_own_department(): void
+    {
+        $departmentId = $this->data['picA']->department_id;
+        $qr = $this->createQr($this->data['locationA'], $this->data['receptionistA']);
+        $category = $this->createCategory($this->data['locationA']);
+        $completed = ['status' => 'completed', 'assigned_department_id' => $departmentId];
+
+        $this->createVisit($qr, $category, $completed + ['name' => 'Selesai Pagi', 'completed_at' => today(), 'result' => str_repeat('a', 300)]);
+        $this->createVisit($qr, $category, $completed + ['name' => 'Selesai Siang', 'completed_at' => now(), 'result' => 'Sudah dijelaskan.']);
+        $this->createVisit($qr, $category, $completed + ['name' => 'Selesai Kemarin', 'completed_at' => now()->subDay(), 'result' => 'Lama.']);
+        $this->createVisit($qr, $category, ['status' => 'completed', 'completed_at' => now(), 'result' => 'Lain.', 'name' => 'Departemen Lain',
+            'assigned_department_id' => $this->data['visitB']->assigned_department_id]);
+
+        $rows = $this->as('picA')->getJson('/admin/penugasan/data')->assertOk()->json('data.completed');
+
+        $this->assertSame(['Selesai Siang', 'Selesai Pagi'], array_column($rows, 'name'));
+        $this->assertSame('Sudah dijelaskan.', $rows[0]['result_excerpt']);
+        $this->assertSame(123, mb_strlen($rows[1]['result_excerpt']));
+        $this->assertSame('00:00', $rows[1]['completed_at']);
+
+        foreach (['phone', 'address', 'email', 'actions'] as $privateKey) {
+            $this->assertArrayNotHasKey($privateKey, $rows[0]);
+        }
     }
 
     /**

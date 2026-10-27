@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Daftar penugasan departemen untuk akun PIC (PIC-1 sampai PIC-4).
+ * Daftar penugasan departemen untuk akun PIC (PIC-1 sampai PIC-4, PIC-7).
  */
 class AssignmentController extends Controller
 {
@@ -33,7 +33,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Data JSON untuk polling: penugasan baru, sedang direview, jumlah baru, dan waktu server.
+     * Data JSON untuk polling: penugasan baru, sedang direview, selesai hari ini, jumlah baru, dan waktu server.
      */
     public function data(Request $request): JsonResponse
     {
@@ -45,6 +45,7 @@ class AssignmentController extends Controller
             'data' => [
                 'new' => $rows->where('status', VisitStatus::Waiting->value)->values(),
                 'reviewing' => $rows->where('status', VisitStatus::Processing->value)->values(),
+                'completed' => $this->lists->picCompletedToday($user)->map(fn ($visit) => $this->lists->completedRow($visit))->values(),
                 'new_count' => $rows->where('status', VisitStatus::Waiting->value)->count(),
                 'server_time' => now()->format('H:i:s'),
             ],

@@ -1,5 +1,6 @@
 /*
- * Penugasan PIC: polling daftar (PIC-4), tombol Terima (PIC-2), dan modal Hasil (PIC-3).
+ * Penugasan PIC: polling daftar (PIC-4), tombol Terima (PIC-2), modal Hasil (PIC-3),
+ * dan daftar Selesai hari ini yang hanya bisa dilihat (PIC-7).
  * Jumlah penugasan baru tampil di judul tab dan badge menu; bunyi singkat diputar bila
  * PIC sudah mengaktifkannya lewat tombol di halaman.
  */
@@ -137,20 +138,41 @@
         return tr;
     }
 
-    function renderGroup(name, rows) {
+    function renderCompletedRow(row) {
+        var tr = el('tr');
+        var purpose = el('div');
+        purpose.appendChild(el('div', 'fw-bold', row.category));
+        purpose.appendChild(el('div', 'small text-gray-600 text-break', row.purpose));
+
+        var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
+        detail.href = row.detail_url;
+
+        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
+        tr.appendChild(cell('Nama', row.name, 'fw-bold'));
+        tr.appendChild(cell('Instansi', row.organization));
+        tr.appendChild(cell('Keperluan', purpose));
+        tr.appendChild(cell('Ditemui', row.served_by));
+        tr.appendChild(cell('Jam selesai', row.completed_at));
+        tr.appendChild(cell('Hasil', row.result_excerpt, 'small text-break'));
+        tr.appendChild(cell('Aksi', detail));
+
+        return tr;
+    }
+
+    function renderGroup(name, rows, rowRenderer, columns) {
         var tbody = root.querySelector('[data-group="' + name + '"]');
         tbody.textContent = '';
 
         if (rows.length === 0) {
             var empty = el('tr');
             var td = el('td', 'text-center text-gray-600 py-4', 'Tidak ada data.');
-            td.colSpan = 10;
+            td.colSpan = columns;
             empty.appendChild(td);
             tbody.appendChild(empty);
         }
 
         rows.forEach(function (row) {
-            tbody.appendChild(renderRow(row));
+            tbody.appendChild(rowRenderer(row));
         });
 
         root.querySelector('[data-group-count="' + name + '"]').textContent = rows.length;
@@ -160,8 +182,9 @@
         // Pemuatan pertama tidak dianggap penugasan baru agar bunyi tidak berbunyi saat halaman dibuka.
         var hasFreshAssignment = knownIds !== null && data.new.some(function (row) { return !knownIds.has(row.id); });
 
-        renderGroup('new', data.new);
-        renderGroup('reviewing', data.reviewing);
+        renderGroup('new', data.new, renderRow, 10);
+        renderGroup('reviewing', data.reviewing, renderRow, 10);
+        renderGroup('completed', data.completed, renderCompletedRow, 8);
 
         knownIds = knownIds || new Set();
         data.new.concat(data.reviewing).forEach(function (row) { knownIds.add(row.id); });
@@ -197,6 +220,12 @@
             timer = null;
         }
     }
+
+    var completedToggle = root.querySelector('[data-completed-toggle]');
+    var completedPanel = document.getElementById('completedToday');
+
+    completedPanel.addEventListener('shown.bs.collapse', function () { completedToggle.textContent = 'Sembunyikan'; });
+    completedPanel.addEventListener('hidden.bs.collapse', function () { completedToggle.textContent = 'Tampilkan'; });
 
     document.addEventListener('visibilitychange', function () {
         if (document.hidden) {
