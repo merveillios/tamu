@@ -60,6 +60,59 @@ body {
     border-color: var(--sitamu-primary);
 }
 
+/* Dropdown yang bisa dicari (RSP-9, searchable-select.js) */
+.searchable-select {
+    position: relative;
+}
+
+.searchable-select-native {
+    /* Tetap dirender (bukan display:none) agar validasi bawaan browser berjalan. */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.searchable-select-list {
+    position: absolute;
+    z-index: 1060;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12);
+}
+
+.searchable-select-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+}
+
+.searchable-select-option[aria-selected="true"] {
+    font-weight: 600;
+}
+
+.searchable-select-option.active,
+.searchable-select-option:hover {
+    background-color: rgba(var(--sitamu-primary-rgb), 0.1);
+    color: var(--sitamu-primary-hover);
+}
+
+.searchable-select-empty {
+    padding: 0.5rem 0.75rem;
+    color: #6b7280;
+}
+
 /* Logo dan identitas */
 .brand-logo {
     height: 40px;
