@@ -615,10 +615,6 @@ body {
     max-width: 420px;
 }
 
-.auth-title {
-    color: #123c6e;
-}
-
 .hero-welcome-title {
     color: #ffffff;
     font-size: 2rem;
@@ -769,11 +765,6 @@ body {
     border-radius: 0.5rem;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.qr-print-logo {
-    height: 64px;
-    width: auto;
 }
 
 .qr-print-code {
