@@ -119,5 +119,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/js/searchable-select.js') }}?v={{ filemtime(public_path('assets/js/searchable-select.js')) }}"></script>
     <script src="{{ asset('assets/js/active-visits.js') }}?v={{ filemtime(public_path('assets/js/active-visits.js')) }}"></script>
 @endpush

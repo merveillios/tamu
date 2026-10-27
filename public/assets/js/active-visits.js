@@ -221,6 +221,9 @@
     var departmentSelect = document.getElementById('assign_department');
     var staffSelect = document.getElementById('assign_staff');
     var departments = [];
+    // RSP-9: kedua pilihan dapat dicari; select asli tetap menjadi sumber nilai.
+    var departmentSearch = assignForm ? SearchableSelect.enhance(departmentSelect) : null;
+    var staffSearch = assignForm ? SearchableSelect.enhance(staffSelect) : null;
 
     function fillStaff(selectedStaffId) {
         staffSelect.textContent = '';
@@ -231,6 +234,10 @@
         (department ? department.staff : []).forEach(function (staff) {
             staffSelect.appendChild(new Option(staff.name, staff.id, false, staff.id === selectedStaffId));
         });
+
+        // Orang yang ditemui baru bisa dipilih setelah departemen dipilih.
+        staffSelect.disabled = !department;
+        staffSearch.refresh();
     }
 
     function openAssign(row) {
@@ -252,6 +259,7 @@
             departments.forEach(function (department) {
                 departmentSelect.appendChild(new Option(department.name, department.id, false, department.id === data.selected_department_id));
             });
+            departmentSearch.refresh();
 
             var suggestion = departments.find(function (item) { return item.id === data.suggested_department_id; });
             assignForm.querySelector('[data-assign-suggestion]').textContent = suggestion
