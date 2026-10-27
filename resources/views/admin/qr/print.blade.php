@@ -9,14 +9,19 @@
     </div>
 
     <article class="qr-print-sheet text-center">
-        <img src="{{ asset('assets/img/logo.png') }}" class="qr-print-logo mb-3" alt="Logo {{ config('sitamu.institution_name') }}">
-        <h1 class="h4 fw-bold mb-1">{{ config('sitamu.institution_name') }}</h1>
-        <p class="h5 mb-1">{{ $qr->location->name }}</p>
-        @if ($qr->department)
-            <p class="h6 mb-1">{{ $qr->department->name }}</p>
-        @endif
-        @if ($qr->label)
-            <p class="mb-4 text-gray-700">{{ $qr->label }}</p>
+        <div class="qr-print-banner rounded-3 overflow-hidden mb-4">
+            @include('guest.partials.banner', ['location' => $qr->location])
+        </div>
+
+        @if ($qr->department || $qr->label)
+            <div class="qr-print-meta mb-2">
+                @if ($qr->department)
+                    <p class="h5 fw-bold mb-1">{{ $qr->department->name }}</p>
+                @endif
+                @if ($qr->label)
+                    <p class="text-gray-700 mb-0">{{ $qr->label }}</p>
+                @endif
+            </div>
         @endif
 
         <img src="{{ $imageUri }}" class="qr-print-code my-4" alt="QR Code buku tamu {{ $qr->location->name }}">
