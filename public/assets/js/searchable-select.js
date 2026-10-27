@@ -2,6 +2,8 @@
  * Dropdown yang bisa dicari (RSP-9): membungkus <select> asli tanpa library tambahan (A-3).
  * <select> tetap menjadi sumber nilai dan pemicu event change, sehingga kode pemanggil
  * cukup membaca select.value seperti biasa. Pola ARIA: combobox dengan listbox.
+ * <optgroup> tampil sebagai judul grup; ketikan yang cocok dengan judul grup menampilkan
+ * semua pilihan di grup itu. Daftar dirender sendiri sehingga tidak ikut tema gelap HP.
  */
 window.SearchableSelect = (function () {
     var counter = 0;
@@ -44,6 +46,10 @@ window.SearchableSelect = (function () {
         select.tabIndex = -1;
         select.setAttribute('aria-hidden', 'true');
 
+        if (select.hasAttribute('aria-describedby')) {
+            input.setAttribute('aria-describedby', select.getAttribute('aria-describedby'));
+        }
+
         // Label lama menunjuk ke select; arahkan ke input agar klik label memfokuskan kolom ketik.
         var label = document.querySelector('label[for="' + select.id + '"]');
         if (label) {
@@ -79,14 +85,30 @@ window.SearchableSelect = (function () {
             list.textContent = '';
             items = [];
 
+            var lastGroup = null;
+
             Array.prototype.forEach.call(select.options, function (option) {
-                if (option.value === '' || normalize(option.text).indexOf(needle) === -1) {
+                var group = option.parentNode.tagName === 'OPTGROUP' ? option.parentNode : null;
+                var groupMatches = group !== null && normalize(group.label).indexOf(needle) !== -1;
+
+                if (option.value === '' || (normalize(option.text).indexOf(needle) === -1 && !groupMatches)) {
                     return;
                 }
 
+                // Judul grup hanya muncul sekali, di atas pilihan pertama grup yang lolos penyaringan.
+                if (group !== null && group !== lastGroup) {
+                    var heading = document.createElement('li');
+                    heading.className = 'searchable-select-group';
+                    heading.setAttribute('role', 'presentation');
+                    heading.textContent = group.label;
+                    list.appendChild(heading);
+                }
+
+                lastGroup = group;
+
                 var item = document.createElement('li');
                 item.id = listId + '-' + items.length;
-                item.className = 'searchable-select-option';
+                item.className = 'searchable-select-option' + (group !== null ? ' searchable-select-option-grouped' : '');
                 item.setAttribute('role', 'option');
                 item.setAttribute('aria-selected', option.selected ? 'true' : 'false');
                 item.dataset.value = option.value;
@@ -131,6 +153,7 @@ window.SearchableSelect = (function () {
             }
 
             input.classList.remove('is-invalid');
+            wrapper.classList.remove('is-invalid');
             close();
         }
 
@@ -204,7 +227,12 @@ window.SearchableSelect = (function () {
         // Validasi bawaan browser tetap berjalan pada select yang tersembunyi; tandai kolom ketiknya.
         select.addEventListener('invalid', function () {
             input.classList.add('is-invalid');
-            input.focus();
+
+            // Fokus diatur setelah browser selesai menangani validasi, dan hanya untuk kolom
+            // tidak valid pertama agar kursor tidak lompat ke kolom paling bawah.
+            if (!select.form || select.form.querySelector(':invalid') === select) {
+                window.setTimeout(function () { input.focus(); }, 0);
+            }
         });
 
         /**
@@ -226,6 +254,13 @@ window.SearchableSelect = (function () {
         }
 
         refresh();
+
+        // Error validasi dari server: Bootstrap menampilkan .invalid-feedback bila elemen
+        // sebelumnya bertanda is-invalid, dan kini elemen itu adalah pembungkus.
+        if (select.classList.contains('is-invalid')) {
+            wrapper.classList.add('is-invalid');
+            input.classList.add('is-invalid');
+        }
 
         return { refresh: refresh };
     }

@@ -3,6 +3,8 @@
  * Warna identitas instansi cukup diubah di blok :root ini.
  */
 :root {
+    /* Kontrol bawaan browser (dropdown, isian, scrollbar) tetap terang walau HP memakai tema gelap. */
+    color-scheme: light;
     --sitamu-primary: #1e40af;
     --sitamu-primary-hover: #1e3a8a;
     --sitamu-primary-rgb: 30, 64, 175;
@@ -111,6 +113,20 @@ body {
 .searchable-select-empty {
     padding: 0.5rem 0.75rem;
     color: #6b7280;
+}
+
+.searchable-select-group {
+    padding: 0.5rem 0.75rem 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #4b5563;
+    cursor: default;
+}
+
+.searchable-select-option-grouped {
+    padding-left: 1.5rem;
 }
 
 /*
