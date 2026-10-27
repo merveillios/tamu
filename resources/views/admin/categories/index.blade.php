@@ -37,29 +37,31 @@
                 </div>
             @endif
 
-            <div class="card card-body border-0 shadow table-wrapper table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th class="border-gray-200">Departemen</th>
-                            <th class="border-gray-200">Jumlah pertanyaan</th>
-                            <th class="border-gray-200">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($sections as $item)
+            <div class="card card-body border-0 shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
                             <tr>
-                                <td class="fw-bold">{{ $item['department']?->name ?? 'Umum (tanpa departemen)' }}</td>
-                                <td>{{ $item['categories']->count() }}</td>
-                                <td>
-                                    <a href="{{ route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $item['key']]) }}" class="btn btn-sm btn-outline-primary">
-                                        Lihat pertanyaan
-                                    </a>
-                                </td>
+                                <th class="border-gray-200">Departemen</th>
+                                <th class="border-gray-200">Jumlah pertanyaan</th>
+                                <th class="border-gray-200">Aksi</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($sections as $item)
+                                <tr>
+                                    <td class="fw-bold">{{ $item['department']?->name ?? 'Umum (tanpa departemen)' }}</td>
+                                    <td>{{ $item['categories']->count() }}</td>
+                                    <td>
+                                        <a href="{{ route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $item['key']]) }}" class="btn btn-sm btn-outline-primary">
+                                            Lihat pertanyaan
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         @else
             <div class="card card-body border-0 shadow mb-3">
@@ -80,50 +82,52 @@
                 </div>
             </div>
 
-            <div class="card card-body border-0 shadow table-wrapper table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th class="border-gray-200">Urutan</th>
-                            <th class="border-gray-200">Pertanyaan</th>
-                            <th class="border-gray-200">Status</th>
-                            <th class="border-gray-200">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($section['categories'] as $category)
+            <div class="card card-body border-0 shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
                             <tr>
-                                <td>{{ $category->sort_order }}</td>
-                                <td class="text-wrap">
-                                    <span class="fw-bold">{{ $category->name }}</span>
-                                    {{-- Di bagian Umum, departemen yang masih tercatat berarti sudah nonaktif. --}}
-                                    @if ($section['department'] === null && $category->suggestedDepartment !== null)
-                                        <div class="small text-gray-500">Departemen {{ $category->suggestedDepartment->name }} nonaktif</div>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-wrap gap-1">
-                                        <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                        <form method="POST" action="{{ route('admin.categories.status', $category->id) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                                    @if ($category->is_active) data-deactivate-message="Nonaktifkan pertanyaan {{ $category->name }}? Pertanyaan ini tidak akan muncul di formulir buku tamu sampai diaktifkan kembali." @endif>
-                                                {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th class="border-gray-200">Urutan</th>
+                                <th class="border-gray-200">Pertanyaan</th>
+                                <th class="border-gray-200">Status</th>
+                                <th class="border-gray-200">Aksi</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-gray-600 py-4">Belum ada pertanyaan di departemen ini.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($section['categories'] as $category)
+                                <tr>
+                                    <td>{{ $category->sort_order }}</td>
+                                    <td class="text-wrap">
+                                        <span class="fw-bold">{{ $category->name }}</span>
+                                        {{-- Di bagian Umum, departemen yang masih tercatat berarti sudah nonaktif. --}}
+                                        @if ($section['department'] === null && $category->suggestedDepartment !== null)
+                                            <div class="small text-gray-500">Departemen {{ $category->suggestedDepartment->name }} nonaktif</div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ $category->is_active ? 'success' : 'secondary' }}">{{ $category->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <a href="{{ route('admin.categories.edit', $category->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                            <form method="POST" action="{{ route('admin.categories.status', $category->id) }}">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm {{ $category->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                                        @if ($category->is_active) data-deactivate-message="Nonaktifkan pertanyaan {{ $category->name }}? Pertanyaan ini tidak akan muncul di formulir buku tamu sampai diaktifkan kembali." @endif>
+                                                    {{ $category->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-600 py-4">Belum ada pertanyaan di departemen ini.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         @endif
     @endif

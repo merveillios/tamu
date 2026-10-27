@@ -46,38 +46,40 @@
         <span class="text-gray-500 ms-auto">Diperbarui <span data-server-time>–</span></span>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-        <table class="table table-hover align-middle mb-0 table-cards"
-               data-active-visits
-               data-url="{{ route('admin.visits.active.data') }}"
-               data-poll="{{ config('sitamu.poll_interval_seconds') }}"
-               data-show-location="{{ $isReceptionist ? '0' : '1' }}"
-               data-departments-url="{{ url('/admin/kunjungan/__ID__/departemen') }}"
-               data-assign-url="{{ url('/admin/kunjungan/__ID__/tugaskan') }}"
-               data-cancel-url="{{ url('/admin/kunjungan/__ID__/batal') }}">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">No.</th>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Instansi</th>
-                    <th class="border-gray-200">Kelompok rentan</th>
-                    <th class="border-gray-200">Keperluan</th>
-                    <th class="border-gray-200">Departemen</th>
-                    <th class="border-gray-200">Nama PIC</th>
-                    @unless ($isReceptionist)
-                        <th class="border-gray-200">Lokasi / QR</th>
-                    @endunless
-                    <th class="border-gray-200">Jam datang</th>
-                    <th class="border-gray-200">Status</th>
-                    <th class="border-gray-200">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card card-body border-0 shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 table-cards"
+                   data-active-visits
+                   data-url="{{ route('admin.visits.active.data') }}"
+                   data-poll="{{ config('sitamu.poll_interval_seconds') }}"
+                   data-show-location="{{ $isReceptionist ? '0' : '1' }}"
+                   data-departments-url="{{ url('/admin/kunjungan/__ID__/departemen') }}"
+                   data-assign-url="{{ url('/admin/kunjungan/__ID__/tugaskan') }}"
+                   data-cancel-url="{{ url('/admin/kunjungan/__ID__/batal') }}">
+                <thead>
+                    <tr>
+                        <th class="border-gray-200">No.</th>
+                        <th class="border-gray-200">Nama</th>
+                        <th class="border-gray-200">Instansi</th>
+                        <th class="border-gray-200">Kelompok rentan</th>
+                        <th class="border-gray-200">Keperluan</th>
+                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Nama PIC</th>
+                        @unless ($isReceptionist)
+                            <th class="border-gray-200">Lokasi / QR</th>
+                        @endunless
+                        <th class="border-gray-200">Jam datang</th>
+                        <th class="border-gray-200">Status</th>
+                        <th class="border-gray-200">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <nav class="d-flex justify-content-between align-items-center mt-3 small" data-pagination hidden>
             <button type="button" class="btn btn-sm btn-outline-gray-800" data-page="prev">Sebelumnya</button>
             <span data-page-info></span>

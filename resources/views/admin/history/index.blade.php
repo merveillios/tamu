@@ -100,45 +100,47 @@
         </div>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-        <table class="table table-hover align-middle mb-0 table-cards">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">Tanggal</th>
-                    <th class="border-gray-200">No.</th>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Instansi</th>
-                    <th class="border-gray-200">Kelompok rentan</th>
-                    <th class="border-gray-200">Kategori</th>
-                    <th class="border-gray-200">Departemen tujuan</th>
-                    <th class="border-gray-200">Lokasi</th>
-                    <th class="border-gray-200">Jam datang</th>
-                    <th class="border-gray-200">Status</th>
-                    <th class="border-gray-200">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($visits as $visit)
+    <div class="card card-body border-0 shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 table-cards">
+                <thead>
                     <tr>
-                        <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
-                        <td data-label="No.">No. {{ $visit->daily_number }}</td>
-                        <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
-                        <td data-label="Instansi">{{ $visit->organization }}</td>
-                        <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
-                        <td data-label="Kategori">{{ $visit->purpose_category_name }}</td>
-                        <td data-label="Departemen">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
-                        <td data-label="Lokasi">{{ $visit->location->name }}</td>
-                        <td data-label="Jam datang">{{ $visit->check_in_at->format('H:i') }}</td>
-                        <td data-label="Status"><span class="badge bg-{{ $visit->display_status['badge'] }}">{{ $visit->display_status['label'] }}</span></td>
-                        <td data-label="Aksi"><a href="{{ route('admin.visits.show', $visit->id) }}" class="btn btn-sm btn-outline-gray-800">Detail</a></td>
+                        <th class="border-gray-200">Tanggal</th>
+                        <th class="border-gray-200">No.</th>
+                        <th class="border-gray-200">Nama</th>
+                        <th class="border-gray-200">Instansi</th>
+                        <th class="border-gray-200">Kelompok rentan</th>
+                        <th class="border-gray-200">Kategori</th>
+                        <th class="border-gray-200">Departemen tujuan</th>
+                        <th class="border-gray-200">Lokasi</th>
+                        <th class="border-gray-200">Jam datang</th>
+                        <th class="border-gray-200">Status</th>
+                        <th class="border-gray-200">Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="11" class="text-center text-gray-600 py-4">Tidak ada kunjungan yang cocok dengan filter.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($visits as $visit)
+                        <tr>
+                            <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
+                            <td data-label="No.">No. {{ $visit->daily_number }}</td>
+                            <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
+                            <td data-label="Instansi">{{ $visit->organization }}</td>
+                            <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
+                            <td data-label="Kategori">{{ $visit->purpose_category_name }}</td>
+                            <td data-label="Departemen">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
+                            <td data-label="Lokasi">{{ $visit->location->name }}</td>
+                            <td data-label="Jam datang">{{ $visit->check_in_at->format('H:i') }}</td>
+                            <td data-label="Status"><span class="badge bg-{{ $visit->display_status['badge'] }}">{{ $visit->display_status['label'] }}</span></td>
+                            <td data-label="Aksi"><a href="{{ route('admin.visits.show', $visit->id) }}" class="btn btn-sm btn-outline-gray-800">Detail</a></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="11" class="text-center text-gray-600 py-4">Tidak ada kunjungan yang cocok dengan filter.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <div class="mt-3">{{ $visits->links() }}</div>
     </div>
