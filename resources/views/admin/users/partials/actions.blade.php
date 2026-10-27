@@ -2,7 +2,7 @@
 @if ($user->locked_until?->isFuture())
     <form method="POST" action="{{ route('admin.users.unlock', $user->id) }}">
         @csrf
-        <button type="submit" class="btn btn-sm btn-outline-warning">Buka kunci</button>
+        <button type="submit" class="btn btn-sm btn-warning">Buka kunci</button>
     </form>
 @endif
 

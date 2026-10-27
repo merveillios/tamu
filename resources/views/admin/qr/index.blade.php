@@ -125,7 +125,7 @@
                                               data-confirm="Regenerate QR {{ $qr->label ?? '#'.$qr->id }}? QR lama yang sudah dicetak tidak akan berfungsi lagi."
                                               data-confirm-title="Regenerate QR" data-confirm-button="Ya, Regenerate" data-confirm-variant="warning">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-warning">Regenerate</button>
+                                            <button type="submit" class="btn btn-sm btn-warning">Regenerate</button>
                                         </form>
                                     @endunless
                                 </div>

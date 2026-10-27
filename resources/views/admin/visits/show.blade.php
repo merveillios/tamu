@@ -20,7 +20,7 @@
         <div class="d-flex align-items-center gap-2">
             <span class="badge bg-{{ $visit->display_status['badge'] }} fs-6">{{ $visit->display_status['label'] }}</span>
             @if ($canReopen)
-                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#reopenModal">Buka Kembali</button>
+                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#reopenModal">Buka Kembali</button>
             @endif
         </div>
     </div>

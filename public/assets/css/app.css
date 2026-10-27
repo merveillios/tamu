@@ -113,6 +113,49 @@ body {
     color: #6b7280;
 }
 
+/*
+ * Kontras teks minimal 4.5:1 (WCAG AA). Hijau, kuning, dan merah bawaan Volt terlalu terang
+ * untuk teks putih atau latar putih, sehingga digelapkan atau teksnya dibuat gelap.
+ */
+.badge.bg-warning,
+.badge.bg-success {
+    color: #1f2937;
+}
+
+.text-warning {
+    color: #b45309 !important;
+}
+
+.text-success {
+    color: #047857 !important;
+}
+
+.btn-outline-success {
+    color: #047857;
+    border-color: #047857;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active {
+    color: #ffffff;
+    background-color: #047857;
+    border-color: #047857;
+}
+
+.btn-outline-danger {
+    color: #be123c;
+    border-color: #be123c;
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus,
+.btn-outline-danger:active {
+    color: #ffffff;
+    background-color: #be123c;
+    border-color: #be123c;
+}
+
 /* Logo dan identitas */
 .brand-logo {
     height: 40px;
