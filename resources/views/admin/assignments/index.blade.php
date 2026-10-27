@@ -22,31 +22,65 @@
          data-accept-url="{{ url('/admin/kunjungan/__ID__/terima') }}"
          data-complete-url="{{ url('/admin/kunjungan/__ID__/selesai') }}">
         @foreach (['new' => 'Penugasan baru', 'reviewing' => 'Sedang direview'] as $group => $heading)
-            <section class="card card-body border-0 shadow table-wrapper table-responsive mb-4">
+            <section class="card card-body border-0 shadow mb-4">
                 <h2 class="h6 mb-3">{{ $heading }} <span class="badge bg-gray-200 text-gray-800" data-group-count="{{ $group }}">0</span></h2>
-                <table class="table table-hover align-middle mb-0 table-cards">
-                    <thead>
-                        <tr>
-                            <th class="border-gray-200">No.</th>
-                            <th class="border-gray-200">Nama</th>
-                            <th class="border-gray-200">Instansi</th>
-                            <th class="border-gray-200">Kelompok rentan</th>
-                            <th class="border-gray-200">Keperluan</th>
-                            <th class="border-gray-200">Orang yang ditemui</th>
-                            <th class="border-gray-200">Lokasi</th>
-                            <th class="border-gray-200">Jam datang</th>
-                            <th class="border-gray-200">Menunggu</th>
-                            <th class="border-gray-200">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody data-group="{{ $group }}">
-                        <tr>
-                            <td colspan="10" class="text-center text-gray-600 py-4">Memuat data…</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 table-cards">
+                        <thead>
+                            <tr>
+                                <th class="border-gray-200">No.</th>
+                                <th class="border-gray-200">Nama</th>
+                                <th class="border-gray-200">Instansi</th>
+                                <th class="border-gray-200">Kelompok rentan</th>
+                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Orang yang ditemui</th>
+                                <th class="border-gray-200">Lokasi</th>
+                                <th class="border-gray-200">Jam datang</th>
+                                <th class="border-gray-200">Menunggu</th>
+                                <th class="border-gray-200">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody data-group="{{ $group }}">
+                            <tr>
+                                <td colspan="10" class="text-center text-gray-600 py-4">Memuat data…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
         @endforeach
+
+        {{-- PIC-7: hanya kunjungan selesai hari ini; tertutup secara default agar halaman tetap ringkas. --}}
+        <section class="card card-body border-0 shadow mb-4">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <h2 class="h6 mb-0">Selesai hari ini <span class="badge bg-gray-200 text-gray-800" data-group-count="completed">0</span></h2>
+                <button type="button" class="btn btn-sm btn-outline-gray-800" data-bs-toggle="collapse" data-bs-target="#completedToday"
+                        aria-expanded="false" aria-controls="completedToday" data-completed-toggle>Tampilkan</button>
+            </div>
+            <div class="collapse" id="completedToday">
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover align-middle mb-0 table-cards">
+                        <thead>
+                            <tr>
+                                <th class="border-gray-200">No.</th>
+                                <th class="border-gray-200">Nama</th>
+                                <th class="border-gray-200">Instansi</th>
+                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Orang yang ditemui</th>
+                                <th class="border-gray-200">Jam selesai</th>
+                                <th class="border-gray-200">Hasil</th>
+                                <th class="border-gray-200">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody data-group="completed">
+                            <tr>
+                                <td colspan="8" class="text-center text-gray-600 py-4">Memuat data…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
     </div>
 
     <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalTitle" aria-hidden="true">
@@ -74,5 +108,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/assignments.js') }}"></script>
+    <script src="{{ asset('assets/js/assignments.js') }}?v={{ filemtime(public_path('assets/js/assignments.js')) }}"></script>
 @endpush

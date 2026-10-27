@@ -46,44 +46,81 @@
         <span class="text-gray-500 ms-auto">Diperbarui <span data-server-time>–</span></span>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-        <table class="table table-hover align-middle mb-0 table-cards"
-               data-active-visits
-               data-url="{{ route('admin.visits.active.data') }}"
-               data-poll="{{ config('sitamu.poll_interval_seconds') }}"
-               data-show-location="{{ $isReceptionist ? '0' : '1' }}"
-               data-departments-url="{{ url('/admin/kunjungan/__ID__/departemen') }}"
-               data-assign-url="{{ url('/admin/kunjungan/__ID__/tugaskan') }}"
-               data-cancel-url="{{ url('/admin/kunjungan/__ID__/batal') }}">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">No.</th>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Instansi</th>
-                    <th class="border-gray-200">Kelompok rentan</th>
-                    <th class="border-gray-200">Keperluan</th>
-                    <th class="border-gray-200">Departemen</th>
-                    <th class="border-gray-200">Nama PIC</th>
-                    @unless ($isReceptionist)
-                        <th class="border-gray-200">Lokasi / QR</th>
-                    @endunless
-                    <th class="border-gray-200">Jam datang</th>
-                    <th class="border-gray-200">Status</th>
-                    <th class="border-gray-200">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card card-body border-0 shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 table-cards"
+                   data-active-visits
+                   data-url="{{ route('admin.visits.active.data') }}"
+                   data-poll="{{ config('sitamu.poll_interval_seconds') }}"
+                   data-show-location="{{ $isReceptionist ? '0' : '1' }}"
+                   data-departments-url="{{ url('/admin/kunjungan/__ID__/departemen') }}"
+                   data-assign-url="{{ url('/admin/kunjungan/__ID__/tugaskan') }}"
+                   data-cancel-url="{{ url('/admin/kunjungan/__ID__/batal') }}">
+                <thead>
+                    <tr>
+                        <th class="border-gray-200">No.</th>
+                        <th class="border-gray-200">Nama</th>
+                        <th class="border-gray-200">Instansi</th>
+                        <th class="border-gray-200">Kelompok rentan</th>
+                        <th class="border-gray-200">Keperluan</th>
+                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Nama PIC</th>
+                        @unless ($isReceptionist)
+                            <th class="border-gray-200">Lokasi / QR</th>
+                        @endunless
+                        <th class="border-gray-200">Jam datang</th>
+                        <th class="border-gray-200">Status</th>
+                        <th class="border-gray-200">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <nav class="d-flex justify-content-between align-items-center mt-3 small" data-pagination hidden>
             <button type="button" class="btn btn-sm btn-outline-gray-800" data-page="prev">Sebelumnya</button>
             <span data-page-info></span>
             <button type="button" class="btn btn-sm btn-outline-gray-800" data-page="next">Berikutnya</button>
         </nav>
     </div>
+
+    @if ($isReceptionist)
+        {{-- RSP-10: kunjungan dari QR ini yang selesai atau dibatalkan hari ini; tertutup secara default. --}}
+        <section class="card card-body border-0 shadow mt-4" data-closed-today>
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <h2 class="h6 mb-0">Ditutup hari ini <span class="badge bg-gray-200 text-gray-800" data-closed-count>0</span></h2>
+                <button type="button" class="btn btn-sm btn-outline-gray-800" data-bs-toggle="collapse" data-bs-target="#closedToday"
+                        aria-expanded="false" aria-controls="closedToday" data-closed-toggle>Tampilkan</button>
+            </div>
+            <div class="collapse" id="closedToday">
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover align-middle mb-0 table-cards">
+                        <thead>
+                            <tr>
+                                <th class="border-gray-200">No.</th>
+                                <th class="border-gray-200">Nama</th>
+                                <th class="border-gray-200">Instansi</th>
+                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Departemen / ditemui</th>
+                                <th class="border-gray-200">Status</th>
+                                <th class="border-gray-200">Jam ditutup</th>
+                                <th class="border-gray-200">Alasan batal</th>
+                                <th class="border-gray-200">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody data-closed-rows>
+                            <tr>
+                                <td colspan="9" class="text-center text-gray-600 py-4">Memuat data…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    @endif
 
     @if ($isReceptionist)
         <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalTitle" aria-hidden="true">
@@ -119,5 +156,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/js/searchable-select.js') }}?v={{ filemtime(public_path('assets/js/searchable-select.js')) }}"></script>
     <script src="{{ asset('assets/js/active-visits.js') }}?v={{ filemtime(public_path('assets/js/active-visits.js')) }}"></script>
 @endpush

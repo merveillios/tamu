@@ -31,15 +31,15 @@
 </svg>
 
 {{-- Lingkaran & plus melayang --}}
-<span class="hero-deco-float" style="top: 18%; right: 22%;">
+<span class="hero-deco-float hero-deco-float-1">
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.6"/></svg>
 </span>
-<span class="hero-deco-float" style="top: 12%; left: 38%; animation-delay: 1.2s;">
+<span class="hero-deco-float hero-deco-float-2">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
 </span>
-<span class="hero-deco-float" style="bottom: 14%; left: 18%; animation-delay: 2.1s;">
+<span class="hero-deco-float hero-deco-float-3">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/></svg>
 </span>
-<span class="hero-deco-float" style="bottom: 22%; right: 12%; animation-delay: 0.7s;">
+<span class="hero-deco-float hero-deco-float-4">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
 </span>

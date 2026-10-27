@@ -19,7 +19,7 @@
                     </div>
                 </div>
 
-                <div class="position-relative text-center text-md-start" style="z-index: 1; max-width: 420px;">
+                <div class="position-relative text-center text-md-start hero-welcome">
                     <h1 class="hero-welcome-title mb-3">Selamat Datang!</h1>
                     <p class="hero-welcome-subtitle mb-4">
                         Buku tamu digital Dinas Perindustrian dan Perdagangan

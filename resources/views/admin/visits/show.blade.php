@@ -75,54 +75,58 @@
         </div>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive mb-4">
+    <div class="card card-body border-0 shadow mb-4">
         <h3 class="h6 mb-3">Riwayat penugasan</h3>
-        <table class="table align-middle mb-0 table-cards small">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">Waktu</th>
-                    <th class="border-gray-200">Departemen</th>
-                    <th class="border-gray-200">Orang yang ditemui</th>
-                    <th class="border-gray-200">Oleh akun</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($visit->assignments as $assignment)
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-cards small">
+                <thead>
                     <tr>
-                        <td data-label="Waktu">{{ $datetime($assignment->assigned_at) }}</td>
-                        <td data-label="Departemen">{{ $assignment->department->name }}</td>
-                        <td data-label="Ditemui">{{ $assignment->staffMember->name }}</td>
-                        <td data-label="Oleh">{{ $assignment->assignedBy?->name ?? '–' }}</td>
+                        <th class="border-gray-200">Waktu</th>
+                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Orang yang ditemui</th>
+                        <th class="border-gray-200">Oleh akun</th>
                     </tr>
-                @empty
-                    <tr><td colspan="4" class="text-center text-gray-600">Belum pernah ditugaskan.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($visit->assignments as $assignment)
+                        <tr>
+                            <td data-label="Waktu">{{ $datetime($assignment->assigned_at) }}</td>
+                            <td data-label="Departemen">{{ $assignment->department->name }}</td>
+                            <td data-label="Ditemui">{{ $assignment->staffMember->name }}</td>
+                            <td data-label="Oleh">{{ $assignment->assignedBy?->name ?? '–' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="text-center text-gray-600">Belum pernah ditugaskan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive mb-4">
+    <div class="card card-body border-0 shadow mb-4">
         <h3 class="h6 mb-3">Timeline status</h3>
-        <table class="table align-middle mb-0 table-cards small">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">Waktu</th>
-                    <th class="border-gray-200">Perubahan</th>
-                    <th class="border-gray-200">Oleh akun</th>
-                    <th class="border-gray-200">Catatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($visit->statusLogs as $log)
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-cards small">
+                <thead>
                     <tr>
-                        <td data-label="Waktu">{{ $datetime($log->created_at) }}</td>
-                        <td data-label="Perubahan">{{ $statusLabel($log->from_status) }} → {{ $statusLabel($log->to_status) }}</td>
-                        <td data-label="Oleh">{{ $log->changedBy?->name ?? 'Tamu' }}{{ $log->staffMember ? ' · '.$log->staffMember->name : '' }}</td>
-                        <td data-label="Catatan" class="text-break">{{ $log->note ?? '–' }}</td>
+                        <th class="border-gray-200">Waktu</th>
+                        <th class="border-gray-200">Perubahan</th>
+                        <th class="border-gray-200">Oleh akun</th>
+                        <th class="border-gray-200">Catatan</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($visit->statusLogs as $log)
+                        <tr>
+                            <td data-label="Waktu">{{ $datetime($log->created_at) }}</td>
+                            <td data-label="Perubahan">{{ $statusLabel($log->from_status) }} → {{ $statusLabel($log->to_status) }}</td>
+                            <td data-label="Oleh">{{ $log->changedBy?->name ?? 'Tamu' }}{{ $log->staffMember ? ' · '.$log->staffMember->name : '' }}</td>
+                            <td data-label="Catatan" class="text-break">{{ $log->note ?? '–' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
     @if ($canReopen)

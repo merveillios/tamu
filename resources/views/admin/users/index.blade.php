@@ -48,62 +48,64 @@
         </div>
     </form>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">Nama</th>
-                    <th class="border-gray-200">Email</th>
-                    <th class="border-gray-200">Peran</th>
-                    <th class="border-gray-200">Lokasi</th>
-                    <th class="border-gray-200">Status</th>
-                    <th class="border-gray-200">Login terakhir</th>
-                    <th class="border-gray-200">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($users as $user)
+    <div class="card card-body border-0 shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
                     <tr>
-                        <td class="fw-bold">{{ $user->name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->role->label() }}</td>
-                        <td class="small">
-                            @switch($user->role)
-                                @case(\App\Enums\UserRole::Pic)
-                                    {{ $user->department?->name }} — {{ $user->department?->location?->name }}
-                                    @break
-                                @case(\App\Enums\UserRole::Receptionist)
-                                    {{ $user->qr_codes_count }} QR
-                                    @break
-                                @default
-                                    Semua lokasi
-                            @endswitch
-                        </td>
-                        <td>
-                            <span class="badge bg-{{ $user->is_active ? 'success' : 'secondary' }}">{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                            @if ($user->locked_until?->isFuture())
-                                <span class="badge bg-danger">Terkunci</span>
-                            @endif
-                        </td>
-                        <td class="small">{{ $user->last_login_at?->format('d/m/Y H:i') ?? '–' }}</td>
-                        <td>
-                            @if (auth()->user()->canManageAccount($user))
-                                <div class="d-flex flex-wrap gap-1">
-                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                    @include('admin.users.partials.actions', ['user' => $user])
-                                </div>
-                            @else
-                                <span class="small text-gray-500">Dikelola Super Admin</span>
-                            @endif
-                        </td>
+                        <th class="border-gray-200">Nama</th>
+                        <th class="border-gray-200">Email</th>
+                        <th class="border-gray-200">Peran</th>
+                        <th class="border-gray-200">Lokasi</th>
+                        <th class="border-gray-200">Status</th>
+                        <th class="border-gray-200">Login terakhir</th>
+                        <th class="border-gray-200">Aksi</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center text-gray-600 py-4">Tidak ada akun yang cocok.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($users as $user)
+                        <tr>
+                            <td class="fw-bold">{{ $user->name }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->role->label() }}</td>
+                            <td class="small">
+                                @switch($user->role)
+                                    @case(\App\Enums\UserRole::Pic)
+                                        {{ $user->department?->name }} — {{ $user->department?->location?->name }}
+                                        @break
+                                    @case(\App\Enums\UserRole::Receptionist)
+                                        {{ $user->qr_codes_count }} QR
+                                        @break
+                                    @default
+                                        Semua lokasi
+                                @endswitch
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $user->is_active ? 'success' : 'secondary' }}">{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                @if ($user->locked_until?->isFuture())
+                                    <span class="badge bg-danger">Terkunci</span>
+                                @endif
+                            </td>
+                            <td class="small">{{ $user->last_login_at?->format('d/m/Y H:i') ?? '–' }}</td>
+                            <td>
+                                @if (auth()->user()->canManageAccount($user))
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                        @include('admin.users.partials.actions', ['user' => $user])
+                                    </div>
+                                @else
+                                    <span class="small text-gray-500">Dikelola Super Admin</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-gray-600 py-4">Tidak ada akun yang cocok.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <div class="mt-3">{{ $users->links() }}</div>
     </div>

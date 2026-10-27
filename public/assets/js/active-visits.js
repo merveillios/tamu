@@ -114,7 +114,61 @@
         return tr;
     }
 
+    // Daftar Ditutup hari ini hanya ada di halaman Resepsionis (RSP-10).
+    var closedSection = document.querySelector('[data-closed-today]');
+
+    function renderClosedRow(row) {
+        var tr = el('tr');
+        var assigned = row.assigned_department ? row.assigned_department + (row.served_by ? ' — ' + row.served_by : '') : null;
+        var badge = el('span', 'badge bg-' + (row.status === 'cancelled' ? 'danger' : 'success'), row.status_label);
+        var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
+        detail.href = row.detail_url;
+
+        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
+        tr.appendChild(cell('Nama', row.name, 'fw-bold'));
+        tr.appendChild(cell('Instansi', row.organization));
+        tr.appendChild(cell('Keperluan', row.category));
+        tr.appendChild(cell('Departemen', assigned));
+        tr.appendChild(cell('Status', badge));
+        tr.appendChild(cell('Jam ditutup', row.closed_at));
+        tr.appendChild(cell('Alasan batal', row.cancel_reason, 'small text-break'));
+        tr.appendChild(cell('Aksi', detail));
+
+        return tr;
+    }
+
+    function renderClosed(rows) {
+        var closedBody = closedSection.querySelector('[data-closed-rows]');
+        closedBody.textContent = '';
+
+        if (rows.length === 0) {
+            var empty = el('tr');
+            var td = el('td', 'text-center text-gray-600 py-4', 'Belum ada kunjungan yang ditutup hari ini.');
+            td.colSpan = 9;
+            empty.appendChild(td);
+            closedBody.appendChild(empty);
+        }
+
+        rows.forEach(function (row) {
+            closedBody.appendChild(renderClosedRow(row));
+        });
+
+        closedSection.querySelector('[data-closed-count]').textContent = rows.length;
+    }
+
+    if (closedSection) {
+        var closedToggle = closedSection.querySelector('[data-closed-toggle]');
+        var closedPanel = document.getElementById('closedToday');
+
+        closedPanel.addEventListener('shown.bs.collapse', function () { closedToggle.textContent = 'Sembunyikan'; });
+        closedPanel.addEventListener('hidden.bs.collapse', function () { closedToggle.textContent = 'Tampilkan'; });
+    }
+
     function render(data) {
+        if (closedSection && data.closed_today) {
+            renderClosed(data.closed_today);
+        }
+
         tbody.textContent = '';
 
         if (data.rows.length === 0) {
@@ -221,6 +275,9 @@
     var departmentSelect = document.getElementById('assign_department');
     var staffSelect = document.getElementById('assign_staff');
     var departments = [];
+    // RSP-9: kedua pilihan dapat dicari; select asli tetap menjadi sumber nilai.
+    var departmentSearch = assignForm ? SearchableSelect.enhance(departmentSelect) : null;
+    var staffSearch = assignForm ? SearchableSelect.enhance(staffSelect) : null;
 
     function fillStaff(selectedStaffId) {
         staffSelect.textContent = '';
@@ -231,6 +288,10 @@
         (department ? department.staff : []).forEach(function (staff) {
             staffSelect.appendChild(new Option(staff.name, staff.id, false, staff.id === selectedStaffId));
         });
+
+        // Orang yang ditemui baru bisa dipilih setelah departemen dipilih.
+        staffSelect.disabled = !department;
+        staffSearch.refresh();
     }
 
     function openAssign(row) {
@@ -252,6 +313,7 @@
             departments.forEach(function (department) {
                 departmentSelect.appendChild(new Option(department.name, department.id, false, department.id === data.selected_department_id));
             });
+            departmentSearch.refresh();
 
             var suggestion = departments.find(function (item) { return item.id === data.suggested_department_id; });
             assignForm.querySelector('[data-assign-suggestion]').textContent = suggestion

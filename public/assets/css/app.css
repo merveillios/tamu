@@ -60,6 +60,59 @@ body {
     border-color: var(--sitamu-primary);
 }
 
+/* Dropdown yang bisa dicari (RSP-9, searchable-select.js) */
+.searchable-select {
+    position: relative;
+}
+
+.searchable-select-native {
+    /* Tetap dirender (bukan display:none) agar validasi bawaan browser berjalan. */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.searchable-select-list {
+    position: absolute;
+    z-index: 1060;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12);
+}
+
+.searchable-select-option {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+}
+
+.searchable-select-option[aria-selected="true"] {
+    font-weight: 600;
+}
+
+.searchable-select-option.active,
+.searchable-select-option:hover {
+    background-color: rgba(var(--sitamu-primary-rgb), 0.1);
+    color: var(--sitamu-primary-hover);
+}
+
+.searchable-select-empty {
+    padding: 0.5rem 0.75rem;
+    color: #6b7280;
+}
+
 /* Logo dan identitas */
 .brand-logo {
     height: 40px;
@@ -277,10 +330,6 @@ body {
     color: var(--sitamu-primary);
 }
 
-.auth-card {
-    max-width: 440px;
-}
-
 .auth-banner {
     background-color: #0b3d7b;
     padding: 1.25rem 1.5rem;
@@ -361,6 +410,30 @@ body {
     position: absolute;
     color: rgba(255, 255, 255, 0.55);
     animation: disdag-float 6s ease-in-out infinite;
+}
+
+/* Posisi tiap hiasan ditaruh di sini, bukan atribut style, karena CSP memblokir style inline. */
+.hero-deco-float-1 {
+    top: 18%;
+    right: 22%;
+}
+
+.hero-deco-float-2 {
+    top: 12%;
+    left: 38%;
+    animation-delay: 1.2s;
+}
+
+.hero-deco-float-3 {
+    bottom: 14%;
+    left: 18%;
+    animation-delay: 2.1s;
+}
+
+.hero-deco-float-4 {
+    bottom: 22%;
+    right: 12%;
+    animation-delay: 0.7s;
 }
 
 @keyframes disdag-float {
@@ -537,6 +610,11 @@ body {
 }
 
 /* Judul besar panel kiri */
+.hero-welcome {
+    z-index: 1;
+    max-width: 420px;
+}
+
 .hero-welcome-title {
     color: #ffffff;
     font-size: 2rem;
@@ -677,16 +755,16 @@ body {
     line-height: 1.4;
 }
 
-
 /* Halaman cetak QR ukuran A4 (QR-5) */
 .qr-print-sheet {
     max-width: 180mm;
     margin: 0 auto;
 }
 
-.qr-print-logo {
-    height: 64px;
-    width: auto;
+.qr-print-banner {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .qr-print-code {
@@ -703,5 +781,338 @@ body {
 @media print {
     .no-print {
         display: none !important;
+    }
+
+    body {
+        background-color: #ffffff !important;
+    }
+
+    .qr-print-sheet,
+    .guest-header-banner,
+    .guest-banner-badge {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .qr-print-banner {
+        box-shadow: none !important;
+    }
+}
+
+/* ============================================================
+   Halaman Login Staf — Layout Kartu di Tengah Halaman
+   ============================================================ */
+
+body.auth-page-body {
+    background-color: #eef3f9;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Lingkaran / Blob biru muda di kanan atas di belakang kartu */
+.auth-bg-blob-tr {
+    position: fixed;
+    top: -140px;
+    right: -100px;
+    width: 480px;
+    height: 480px;
+    background: #dbe7f6;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Lingkaran cincin biru tebal di kiri bawah di belakang kartu */
+.auth-bg-ring-bl {
+    position: fixed;
+    bottom: -180px;
+    left: -140px;
+    width: 440px;
+    height: 440px;
+    border: 75px solid #1a63c8;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    box-sizing: border-box;
+}
+
+/* Wrapper kartu di tengah halaman */
+.auth-page-wrapper {
+    width: 100%;
+    max-width: 1140px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+    display: block;
+    /* Volt memberi main overflow hidden sehingga bayangan kartu terpotong kotak di sudut bawah. */
+    overflow: visible;
+}
+
+/* Kartu Login Utama */
+.auth-card {
+    width: 100%;
+    max-width: 1140px;
+    min-height: 640px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 48px rgba(18, 60, 110, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    z-index: 1;
+}
+
+/* Panel Kiri: Gradasi Biru SiTamu (±45%) */
+.auth-card-left {
+    flex: 0 0 45%;
+    width: 45%;
+    max-width: 45%;
+    min-width: 45%;
+    background: linear-gradient(150deg, #0b3d7b 0%, #12569f 55%, #1a6fc4 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3.5rem 2.5rem;
+    box-sizing: border-box;
+}
+
+/* Logo Jatim di pojok kiri atas */
+.auth-card-logo-wrap {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.auth-card-brand-text {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.auth-card-logo {
+    height: 80px; /* Target ±76–84px */
+    width: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+/* Dot grid dekoratif di panel kiri */
+.auth-card-dots {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.auth-card-dots-tr {
+    top: 28px;
+    right: 28px;
+}
+
+.auth-card-dots-bl {
+    bottom: 28px;
+    left: 28px;
+}
+
+/* Di layar sempit hiasan kanan atas bertabrakan dengan nama instansi di samping logo. */
+@media (max-width: 1199.98px) {
+    .auth-card-dots-tr {
+        display: none;
+    }
+}
+
+/* Konten tengah panel kiri */
+.auth-card-left-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    margin-top: 15px;
+}
+
+/* Ilustrasi HP + Petugas */
+.auth-illustration-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.auth-card-illustration {
+    width: 330px;
+    max-width: 340px; /* Kunci max-width: 340px; JANGAN lebih besar dari itu */
+    height: auto;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.12));
+}
+
+/* Teks Selamat Datang */
+.auth-welcome-wrap {
+    width: 100%;
+    text-align: center;
+    padding: 0 0.5rem;
+}
+
+.auth-welcome-title {
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    letter-spacing: -0.01em;
+}
+
+.auth-welcome-subtitle {
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    text-align: center;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+/* Panel Kanan: Area Form Putih (±55%) */
+.auth-card-right {
+    flex: 0 0 55%;
+    width: 55%;
+    max-width: 55%;
+    min-width: 55%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 3.5rem;
+    box-sizing: border-box;
+}
+
+.auth-card-right-inner {
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-form-title {
+    color: #1e293b;
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.01em;
+}
+
+.auth-form-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+}
+
+.auth-input-label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.45rem;
+}
+
+.auth-input-pill {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 999px !important;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.92rem;
+    color: #1e293b;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input-pill::placeholder {
+    color: #94a3b8;
+}
+
+.auth-input-pill:focus {
+    background-color: #ffffff;
+    border-color: #1860c2;
+    box-shadow: 0 0 0 3px rgba(24, 96, 194, 0.15);
+    outline: none;
+}
+
+.auth-btn-pill {
+    width: 100%;
+    background-color: #1a63c8;
+    border: none;
+    border-radius: 999px !important;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.auth-btn-pill:hover {
+    background-color: #1452a8;
+    color: #ffffff;
+}
+
+.auth-btn-pill:active {
+    transform: scale(0.99);
+}
+
+.auth-copyright {
+    color: #64748b;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    text-align: center;
+    max-width: 320px;
+    margin: 2.25rem auto 0 auto;
+}
+
+/* Responsif: layar tablet & mobile */
+@media (max-width: 991.98px) {
+    body.auth-page-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .auth-card {
+        flex-direction: column;
+        max-width: 480px;
+        min-height: auto;
+        border-radius: 20px;
+    }
+
+    .auth-card-left {
+        display: none;
+    }
+
+    .auth-card-right {
+        flex: 0 0 100%;
+        max-width: 100%;
+        min-width: 100%;
+        width: 100%;
+        padding: 2.75rem 2rem;
     }
 }

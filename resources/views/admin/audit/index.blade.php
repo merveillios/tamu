@@ -41,35 +41,37 @@
         </div>
     </form>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr>
-                    <th class="border-gray-200">Waktu</th>
-                    <th class="border-gray-200">Akun</th>
-                    <th class="border-gray-200">Aksi</th>
-                    <th class="border-gray-200">Data</th>
-                    <th class="border-gray-200">Alamat IP</th>
-                    <th class="border-gray-200">Detail</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($logs as $log)
+    <div class="card card-body border-0 shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
                     <tr>
-                        <td class="small text-nowrap">{{ $log->created_at->format('d/m/Y H:i') }}</td>
-                        <td>{{ $log->user?->name ?? '–' }}</td>
-                        <td><code>{{ $log->action }}</code></td>
-                        <td class="small">{{ $log->entity_type ? $log->entity_type.' #'.$log->entity_id : '–' }}</td>
-                        <td class="small">{{ $log->ip_address ?? '–' }}</td>
-                        <td class="small text-break">{{ $log->detail ? json_encode($log->detail, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : '–' }}</td>
+                        <th class="border-gray-200">Waktu</th>
+                        <th class="border-gray-200">Akun</th>
+                        <th class="border-gray-200">Aksi</th>
+                        <th class="border-gray-200">Data</th>
+                        <th class="border-gray-200">Alamat IP</th>
+                        <th class="border-gray-200">Detail</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-gray-600 py-4">Belum ada catatan audit.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($logs as $log)
+                        <tr>
+                            <td class="small text-nowrap">{{ $log->created_at->format('d/m/Y H:i') }}</td>
+                            <td>{{ $log->user?->name ?? '–' }}</td>
+                            <td><code>{{ $log->action }}</code></td>
+                            <td class="small">{{ $log->entity_type ? $log->entity_type.' #'.$log->entity_id : '–' }}</td>
+                            <td class="small">{{ $log->ip_address ?? '–' }}</td>
+                            <td class="small text-break">{{ $log->detail ? json_encode($log->detail, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : '–' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-gray-600 py-4">Belum ada catatan audit.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <div class="mt-3">{{ $logs->links() }}</div>
     </div>

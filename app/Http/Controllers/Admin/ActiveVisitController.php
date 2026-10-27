@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Tamu Aktif untuk Resepsionis, Admin, dan Super Admin (RSP-1, RSP-5 sampai RSP-8, ADM-1).
+ * Tamu Aktif untuk Resepsionis, Admin, dan Super Admin (RSP-1, RSP-5 sampai RSP-8, RSP-10, ADM-1).
  */
 class ActiveVisitController extends Controller
 {
@@ -45,7 +45,8 @@ class ActiveVisitController extends Controller
     }
 
     /**
-     * Data JSON untuk polling: daftar, jumlah per label status, dan waktu server.
+     * Data JSON untuk polling: daftar, jumlah per label status, waktu server, dan khusus
+     * Resepsionis daftar kunjungan yang ditutup hari ini (RSP-10).
      */
     public function data(Request $request): JsonResponse
     {
@@ -64,6 +65,9 @@ class ActiveVisitController extends Controller
                     'total' => $visits->total(),
                 ],
                 'server_time' => now()->format('H:i:s'),
+                'closed_today' => $user->role === UserRole::Receptionist
+                    ? $this->lists->receptionistClosedToday($user, $filters['q'])->map(fn ($visit) => $this->lists->closedRow($visit))->values()
+                    : null,
             ],
         ]);
     }

@@ -35,43 +35,45 @@
             </div>
         </div>
 
-        <div class="card card-body border-0 shadow table-wrapper table-responsive">
+        <div class="card card-body border-0 shadow">
             <p class="small text-gray-600">Petugas adalah orang yang dapat ditemui tamu dan dipilih resepsionis saat menugaskan kunjungan.</p>
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th class="border-gray-200">Nama</th>
-                        <th class="border-gray-200">Status</th>
-                        <th class="border-gray-200">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($staffMembers as $member)
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
                         <tr>
-                            <td class="fw-bold">{{ $member->name }}</td>
-                            <td>
-                                <span class="badge bg-{{ $member->is_active ? 'success' : 'secondary' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-wrap gap-1">
-                                    <a href="{{ route('admin.staff.edit', $member->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
-                                    <form method="POST" action="{{ route('admin.staff.status', $member->id) }}">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm {{ $member->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                                @if ($member->is_active) data-deactivate-message="Nonaktifkan petugas {{ $member->name }}? Petugas ini tidak akan muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
-                                            {{ $member->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            <th class="border-gray-200">Nama</th>
+                            <th class="border-gray-200">Status</th>
+                            <th class="border-gray-200">Aksi</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="text-center text-gray-600 py-4">Belum ada petugas di departemen ini.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($staffMembers as $member)
+                            <tr>
+                                <td class="fw-bold">{{ $member->name }}</td>
+                                <td>
+                                    <span class="badge bg-{{ $member->is_active ? 'success' : 'secondary' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="{{ route('admin.staff.edit', $member->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
+                                        <form method="POST" action="{{ route('admin.staff.status', $member->id) }}">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm {{ $member->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                                    @if ($member->is_active) data-deactivate-message="Nonaktifkan petugas {{ $member->name }}? Petugas ini tidak akan muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
+                                                {{ $member->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-gray-600 py-4">Belum ada petugas di departemen ini.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     @endif
 @endsection

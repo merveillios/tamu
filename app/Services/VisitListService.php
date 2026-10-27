@@ -11,6 +11,7 @@ use App\Rules\IndonesianPhone;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Query dan bentuk data daftar Tamu Aktif (RSP-1, ADM-1) dan Penugasan PIC (PIC-1).
@@ -78,6 +79,88 @@ class VisitListService
             ->with(self::RELATIONS)
             ->tap(fn (Builder $query) => $this->applyPriorityOrdering($query))
             ->get();
+    }
+
+    /**
+     * Kunjungan departemen PIC yang diselesaikan hari ini, urut terbaru selesai (PIC-7).
+     * Sengaja dibatasi hari ini agar data tamu tidak terbuka lama di akun PIC yang dipakai bersama.
+     *
+     * @return Collection<int, GuestVisit>
+     */
+    public function picCompletedToday(User $pic): Collection
+    {
+        return GuestVisit::query()
+            ->forUser($pic)
+            ->where('status', VisitStatus::Completed)
+            ->where('completed_at', '>=', today())
+            ->with('servedBy:id,name')
+            ->latest('completed_at')
+            ->get();
+    }
+
+    /**
+     * Baris ringkas kunjungan selesai untuk PIC: tanpa telepon, alamat, dan email (PIC-7).
+     *
+     * @return array<string, mixed>
+     */
+    public function completedRow(GuestVisit $visit): array
+    {
+        return [
+            'id' => $visit->id,
+            'number' => $visit->daily_number,
+            'name' => $visit->name,
+            'organization' => $visit->organization,
+            'category' => $visit->purpose_category_name,
+            'purpose' => $visit->purpose,
+            'served_by' => $visit->servedBy?->name,
+            'completed_at' => $visit->completed_at->format('H:i'),
+            'result_excerpt' => Str::limit((string) $visit->result, 120),
+            'detail_url' => route('admin.visits.show', $visit->id),
+        ];
+    }
+
+    /**
+     * Kunjungan dari QR resepsionis yang selesai atau dibatalkan hari ini, urut terbaru ditutup (RSP-10).
+     *
+     * @return Collection<int, GuestVisit>
+     */
+    public function receptionistClosedToday(User $receptionist, ?string $search): Collection
+    {
+        return GuestVisit::query()
+            ->forUser($receptionist)
+            ->where(fn (Builder $query) => $query
+                ->where(fn (Builder $completed) => $completed->where('status', VisitStatus::Completed)->where('completed_at', '>=', today()))
+                ->orWhere(fn (Builder $cancelled) => $cancelled->where('status', VisitStatus::Cancelled)->where('cancelled_at', '>=', today())))
+            ->when($search, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->with(['assignedDepartment:id,name', 'servedBy:id,name'])
+            ->get()
+            ->sortByDesc(fn (GuestVisit $visit) => $visit->completed_at ?? $visit->cancelled_at)
+            ->values();
+    }
+
+    /**
+     * Baris ringkas kunjungan yang ditutup untuk resepsionis: tanpa isi hasil, telepon, alamat, dan email (RSP-10).
+     *
+     * @return array<string, mixed>
+     */
+    public function closedRow(GuestVisit $visit): array
+    {
+        $isCancelled = $visit->status === VisitStatus::Cancelled;
+
+        return [
+            'id' => $visit->id,
+            'number' => $visit->daily_number,
+            'name' => $visit->name,
+            'organization' => $visit->organization,
+            'category' => $visit->purpose_category_name,
+            'assigned_department' => $visit->assignedDepartment?->name,
+            'served_by' => $visit->servedBy?->name,
+            'status' => $visit->status->value,
+            'status_label' => $visit->status->label(),
+            'closed_at' => ($isCancelled ? $visit->cancelled_at : $visit->completed_at)->format('H:i'),
+            'cancel_reason' => $isCancelled ? $visit->cancel_reason : null,
+            'detail_url' => route('admin.visits.show', $visit->id),
+        ];
     }
 
     /**
