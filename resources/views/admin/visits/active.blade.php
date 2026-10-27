@@ -88,6 +88,41 @@
     </div>
 
     @if ($isReceptionist)
+        {{-- RSP-10: kunjungan dari QR ini yang selesai atau dibatalkan hari ini; tertutup secara default. --}}
+        <section class="card card-body border-0 shadow mt-4" data-closed-today>
+            <div class="d-flex justify-content-between align-items-center gap-2">
+                <h2 class="h6 mb-0">Ditutup hari ini <span class="badge bg-gray-200 text-gray-800" data-closed-count>0</span></h2>
+                <button type="button" class="btn btn-sm btn-outline-gray-800" data-bs-toggle="collapse" data-bs-target="#closedToday"
+                        aria-expanded="false" aria-controls="closedToday" data-closed-toggle>Tampilkan</button>
+            </div>
+            <div class="collapse" id="closedToday">
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover align-middle mb-0 table-cards">
+                        <thead>
+                            <tr>
+                                <th class="border-gray-200">No.</th>
+                                <th class="border-gray-200">Nama</th>
+                                <th class="border-gray-200">Instansi</th>
+                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Departemen / ditemui</th>
+                                <th class="border-gray-200">Status</th>
+                                <th class="border-gray-200">Jam ditutup</th>
+                                <th class="border-gray-200">Alasan batal</th>
+                                <th class="border-gray-200">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody data-closed-rows>
+                            <tr>
+                                <td colspan="9" class="text-center text-gray-600 py-4">Memuat data…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if ($isReceptionist)
         <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalTitle" aria-hidden="true">
             <div class="modal-dialog">
                 <form class="modal-content" data-assign-form>

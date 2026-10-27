@@ -120,6 +120,50 @@ class VisitListService
     }
 
     /**
+     * Kunjungan dari QR resepsionis yang selesai atau dibatalkan hari ini, urut terbaru ditutup (RSP-10).
+     *
+     * @return Collection<int, GuestVisit>
+     */
+    public function receptionistClosedToday(User $receptionist, ?string $search): Collection
+    {
+        return GuestVisit::query()
+            ->forUser($receptionist)
+            ->where(fn (Builder $query) => $query
+                ->where(fn (Builder $completed) => $completed->where('status', VisitStatus::Completed)->where('completed_at', '>=', today()))
+                ->orWhere(fn (Builder $cancelled) => $cancelled->where('status', VisitStatus::Cancelled)->where('cancelled_at', '>=', today())))
+            ->when($search, fn (Builder $query, string $search) => $this->applySearch($query, $search))
+            ->with(['assignedDepartment:id,name', 'servedBy:id,name'])
+            ->get()
+            ->sortByDesc(fn (GuestVisit $visit) => $visit->completed_at ?? $visit->cancelled_at)
+            ->values();
+    }
+
+    /**
+     * Baris ringkas kunjungan yang ditutup untuk resepsionis: tanpa isi hasil, telepon, alamat, dan email (RSP-10).
+     *
+     * @return array<string, mixed>
+     */
+    public function closedRow(GuestVisit $visit): array
+    {
+        $isCancelled = $visit->status === VisitStatus::Cancelled;
+
+        return [
+            'id' => $visit->id,
+            'number' => $visit->daily_number,
+            'name' => $visit->name,
+            'organization' => $visit->organization,
+            'category' => $visit->purpose_category_name,
+            'assigned_department' => $visit->assignedDepartment?->name,
+            'served_by' => $visit->servedBy?->name,
+            'status' => $visit->status->value,
+            'status_label' => $visit->status->label(),
+            'closed_at' => ($isCancelled ? $visit->cancelled_at : $visit->completed_at)->format('H:i'),
+            'cancel_reason' => $isCancelled ? $visit->cancel_reason : null,
+            'detail_url' => route('admin.visits.show', $visit->id),
+        ];
+    }
+
+    /**
      * Jumlah penugasan baru (waiting) untuk badge menu PIC (PIC-4).
      */
     public function newAssignmentCount(User $pic): int
