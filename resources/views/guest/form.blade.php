@@ -156,5 +156,6 @@
     @if ($needsSignature)
         <script src="{{ asset('assets/js/signature-pad.js') }}"></script>
     @endif
-    <script src="{{ asset('assets/js/guest-form.js') }}"></script>
+    <script src="{{ asset('assets/js/searchable-select.js') }}?v={{ filemtime(public_path('assets/js/searchable-select.js')) }}"></script>
+    <script src="{{ asset('assets/js/guest-form.js') }}?v={{ filemtime(public_path('assets/js/guest-form.js')) }}"></script>
 @endpush
