@@ -146,6 +146,43 @@ class VisitAccessTest extends TestCase
         $this->as('admin')->get('/admin/tamu')->assertOk()->assertDontSee('Ditutup hari ini');
     }
 
+    public function test_detail_back_button_returns_to_list_page_with_filters(): void
+    {
+        $id = $this->data['visitA']->id;
+
+        $this->as('admin')->withHeader('referer', url('/admin/history?status=dibatalkan'))
+            ->get("/admin/kunjungan/{$id}")
+            ->assertOk()
+            ->assertSee('href="'.url('/admin/history?status=dibatalkan').'"', false)
+            ->assertSee('Kembali');
+    }
+
+    public function test_detail_back_button_falls_back_to_role_page(): void
+    {
+        $id = $this->data['visitA']->id;
+        $cases = [
+            // Situs luar, endpoint JSON polling, dan detail itu sendiri tidak dipakai sebagai tujuan.
+            'receptionistA' => ['https://situs-luar.test/admin/tamu', '/admin/tamu'],
+            'picA' => [url('/admin/penugasan/data'), '/admin/penugasan'],
+            'admin' => [url("/admin/kunjungan/{$id}"), '/admin/history'],
+            'superAdmin' => [null, '/admin/history'],
+        ];
+
+        foreach ($cases as $actor => [$referer, $expected]) {
+            // Header bawaan tes terbawa antar-request; dikosongkan agar kasus tanpa referer benar-benar tanpa referer.
+            $this->flushHeaders();
+            $request = $this->as($actor);
+
+            if ($referer !== null) {
+                $request->withHeader('referer', $referer);
+            }
+
+            $request->get("/admin/kunjungan/{$id}")
+                ->assertOk()
+                ->assertSee('href="'.url($expected).'"', false);
+        }
+    }
+
     /**
      * @return array<string, array{0: string, 1: string, 2: string}>
      */

@@ -11,6 +11,7 @@ use App\Http\Requests\CancelVisitRequest;
 use App\Http\Requests\ReopenVisitRequest;
 use App\Models\Department;
 use App\Models\GuestVisit;
+use App\Models\User;
 use App\Models\VisitSignature;
 use App\Services\AccessScope;
 use App\Services\VisitService;
@@ -51,7 +52,30 @@ class VisitController extends Controller
             'hasSignature' => $canSeeSignature && VisitSignature::query()->whereKey($visit->id)->exists(),
             'canSeeSignature' => $canSeeSignature,
             'canReopen' => $user->role === UserRole::Admin && ! $visit->status->isActive(),
+            'backUrl' => $this->backUrl($user),
         ]);
+    }
+
+    /**
+     * Tujuan tombol Kembali di detail kunjungan: daftar asal beserta filternya bila
+     * jelas, selain itu halaman kerja utama peran. Hanya daftar staf yang diterima
+     * agar tidak kembali ke situs luar, ke endpoint JSON polling, atau ke detail itu sendiri.
+     */
+    private function backUrl(User $user): string
+    {
+        $previous = url()->previous();
+        $path = trim((string) parse_url($previous, PHP_URL_PATH), '/');
+        $listPages = ['admin', 'admin/tamu', 'admin/penugasan', 'admin/history'];
+
+        if (str_starts_with($previous, url('/')) && in_array($path, $listPages, true)) {
+            return $previous;
+        }
+
+        return match ($user->role) {
+            UserRole::Receptionist => route('admin.visits.active'),
+            UserRole::Pic => route('admin.assignments.index'),
+            UserRole::Admin, UserRole::SuperAdmin => route('admin.history.index'),
+        };
     }
 
     /**

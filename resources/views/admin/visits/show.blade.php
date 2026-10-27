@@ -8,6 +8,10 @@
 @endphp
 
 @section('content')
+    <a href="{{ $backUrl }}" class="btn btn-sm btn-gray-200 mb-3 d-inline-flex align-items-center" data-no-confirm>
+        <span aria-hidden="true" class="me-1">&larr;</span> Kembali
+    </a>
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
             <h2 class="h4 mb-0">No. {{ $visit->daily_number }} · {{ $visit->name }}</h2>
