@@ -153,7 +153,7 @@ class QrController extends Controller
 
         $this->qrService->recordDownload($qr, $format, $request->user());
 
-        $parts = [$qr->location->name, $qr->department?->name, $qr->label ?: 'qr-'.$qr->id];
+        $parts = [$qr->location->name, $qr->label ?: 'qr-'.$qr->id];
         $filename = 'qr-'.collect($parts)->filter()->map(fn (string $part) => Str::slug($part))->implode('-').'.'.$format;
 
         return response($this->qrService->image($qr, $format), 200, [

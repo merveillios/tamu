@@ -152,14 +152,18 @@ class QrManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'qr.download', 'entity_id' => $qr->id]);
     }
 
-    public function test_print_page_contains_qr_and_instruction(): void
+    public function test_print_page_contains_qr_and_instruction_without_department(): void
     {
-        $qr = $this->createQr($this->createLocation('Kantor Dinas'), $this->createUser(UserRole::Receptionist));
+        $location = $this->createLocation('Kantor Dinas');
+        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
+        $qr->update(['label' => 'Pintu Timur', 'department_id' => $this->createDepartment($location, 'Sekretariat')->id]);
 
         $this->actingAs($this->superAdmin)->get("/admin/qr/{$qr->id}/cetak")
             ->assertOk()
             ->assertSee('Pindai untuk mengisi buku tamu')
             ->assertSee('Kantor Dinas')
+            ->assertSee('Pintu Timur')
+            ->assertDontSee('Sekretariat')
             ->assertSee('data:image/svg+xml;base64,', false);
     }
 

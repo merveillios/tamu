@@ -13,15 +13,9 @@
             @include('guest.partials.banner', ['location' => $qr->location])
         </div>
 
-        @if ($qr->department || $qr->label)
-            <div class="qr-print-meta mb-2">
-                @if ($qr->department)
-                    <p class="h5 fw-bold mb-1">{{ $qr->department->name }}</p>
-                @endif
-                @if ($qr->label)
-                    <p class="text-gray-700 mb-0">{{ $qr->label }}</p>
-                @endif
-            </div>
+        {{-- Departemen QR hanya syarat teknis saat membuat QR, jadi tidak dicetak untuk tamu. --}}
+        @if ($qr->label)
+            <p class="h5 fw-bold text-gray-800 mb-2">{{ $qr->label }}</p>
         @endif
 
         <img src="{{ $imageUri }}" class="qr-print-code my-4" alt="QR Code buku tamu {{ $qr->location->name }}">
