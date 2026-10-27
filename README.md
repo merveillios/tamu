@@ -91,6 +91,17 @@ Prasyarat: PHP 8.1 dengan ekstensi standar Laravel ditambah `pdo_mysql`, `curl`,
 
 Setiap kali kode diperbarui, ulangi `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, lalu ketiga perintah cache di atas.
 
+### Di balik reverse proxy / Cloudflare Tunnel
+
+Bila aplikasi diakses lewat reverse proxy yang meneruskan HTTPS (misalnya Cloudflare Tunnel, nginx, atau load balancer), proxy mengirim skema asli lewat header `X-Forwarded-Proto`. Tanpa kepercayaan pada proxy itu, Laravel membuat URL berawalan `http://` dan cookie tanpa flag `Secure`, sehingga verifikasi Google tamu diblokir browser (pelanggaran CSP `connect-src` atau sesi hilang/419). Atur di `.env` produksi:
+
+```env
+TRUSTED_PROXIES=*
+SESSION_SECURE_COOKIE=true
+```
+
+`TRUSTED_PROXIES=*` hanya aman bila server **tidak dapat diakses langsung** tanpa lewat proxy (misalnya aplikasi hanya listen di `127.0.0.1`). Bila server dapat diakses langsung, isi dengan daftar IP/CIDR proxy dipisah koma — untuk Cloudflare, lihat https://www.cloudflare.com/ips. Middleware `App\Http\Middleware\TrustProxies` membaca nilai ini dari `config/sitamu.php`. Setelah mengubah, jalankan `php artisan config:cache` kembali.
+
 ## Urutan pengisian data awal
 
 Setelah instalasi, isi data sesuai urutan PRD Bab 8.1:
