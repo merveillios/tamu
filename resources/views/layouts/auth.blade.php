@@ -56,7 +56,7 @@
                     <div class="auth-welcome-wrap">
                         <h1 class="auth-welcome-title">Selamat Datang!</h1>
                         <p class="auth-welcome-subtitle">
-                            Masuk untuk mengelola buku tamu digital Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur.
+                            @yield('welcome_subtitle', 'Masuk untuk mengelola buku tamu digital Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur.')
                         </p>
                     </div>
                 </div>
