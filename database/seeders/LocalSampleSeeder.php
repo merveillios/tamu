@@ -58,7 +58,6 @@ class LocalSampleSeeder extends Seeder
         QrCode::firstOrCreate(
             ['location_id' => $headquarters->id, 'label' => 'Pintu Timur'],
             [
-                'department_id' => $departments['Sekretariat']->id,
                 'receptionist_id' => $receptionist->id,
                 'token' => bin2hex(random_bytes(32)),
                 'status' => 'active',

@@ -8,25 +8,29 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\QrRequest;
 use App\Models\Department;
 use App\Models\Location;
+use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\User;
 use App\Services\AccessScope;
+use App\Services\GuestQrResolver;
 use App\Services\QrService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Manajemen QR Code oleh Admin dan Super Admin (QR-1 sampai QR-7).
+ * Manajemen QR Code oleh Admin dan Super Admin (QR-1 sampai QR-6).
  */
 class QrController extends Controller
 {
     public function __construct(
         private readonly AccessScope $scope,
         private readonly QrService $qrService,
+        private readonly GuestQrResolver $resolver,
     ) {
     }
 
@@ -43,25 +47,27 @@ class QrController extends Controller
         $qrCodes = QrCode::query()
             ->forUser($user)
             ->when($selected, fn ($query) => $query->where('location_id', $selected->id))
-            ->with(['location:id,name', 'department:id,name,is_active', 'receptionist:id,name,is_active'])
+            ->with(['location:id,name,is_active', 'receptionist:id,name,is_active'])
             // QR yang sudah dicabut ditaruh paling bawah sebagai riwayat.
             ->orderByRaw('status = ?', [QrStatus::Revoked->value])
             ->orderByDesc('created_at')
             ->paginate(25)
             ->withQueryString();
 
-        $departments = Department::query()
-            ->forUser($user)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get(['id', 'location_id', 'name']);
+        // Jumlah per lokasi untuk peringatan di form buat QR dan status "Belum siap" di daftar.
+        $categoryCounts = $this->activeCountsPerLocation(PurposeCategory::query()->forUser($user));
 
         return view('admin.qr.index', [
             'locations' => Location::query()->forUser($user)->orderBy('name')->get(['id', 'name', 'is_active']),
             'selected' => $selected,
             'qrCodes' => $qrCodes,
-            'departments' => $departments,
-            'departmentCounts' => $departments->groupBy('location_id')->map->count(),
+            'blockers' => $qrCodes->getCollection()->mapWithKeys(fn (QrCode $qr) => [
+                $qr->id => $qr->status === QrStatus::Active
+                    ? $this->resolver->blockers($qr, $categoryCounts->get($qr->location_id, 0) > 0)
+                    : [],
+            ]),
+            'departmentCounts' => $this->activeCountsPerLocation(Department::query()->forUser($user)),
+            'categoryCounts' => $categoryCounts,
             'receptionists' => User::query()
                 ->where('role', UserRole::Receptionist)
                 ->where('is_active', true)
@@ -71,18 +77,24 @@ class QrController extends Controller
     }
 
     /**
-     * Membuat QR baru untuk lokasi dan departemen terpilih (QR-2).
+     * Membuat QR baru untuk lokasi terpilih (QR-2). Lokasi tanpa kategori keperluan aktif
+     * tetap boleh dibuatkan QR agar bisa dicetak lebih dulu, disertai catatan bahwa
+     * QR belum dapat dipakai tamu (TAM-6).
      */
     public function store(QrRequest $request): RedirectResponse
     {
         $location = $this->scope->findOrDeny(Location::class, $request->validated('location_id'), $request->user());
-        $department = Department::findOrFail($request->validated('department_id'));
         $receptionist = User::findOrFail($request->validated('receptionist_id'));
 
-        $this->qrService->create($location, $department, $receptionist, $request->validated('label'), $request->user());
+        $this->qrService->create($location, $receptionist, $request->validated('label'), $request->user());
 
-        return redirect()->route('admin.qr.index', ['lokasi' => $location->id])
-            ->with('success', "QR Code baru untuk {$department->name} berhasil dibuat.");
+        $message = "QR Code baru untuk {$location->name} berhasil dibuat.";
+
+        if (! $location->purposeCategories()->where('is_active', true)->exists()) {
+            $message .= ' QR belum dapat dipakai tamu sampai lokasi ini punya kategori keperluan aktif.';
+        }
+
+        return redirect()->route('admin.qr.index', ['lokasi' => $location->id])->with('success', $message);
     }
 
     /**
@@ -96,29 +108,6 @@ class QrController extends Controller
         $this->qrService->changeReceptionist($qr, $receptionist, $request->user());
 
         return back()->with('success', "QR kini dipegang {$receptionist->name}.");
-    }
-
-    /**
-     * Mengganti departemen tujuan QR; hanya departemen aktif di lokasi QR yang dapat dipilih (QR-7).
-     */
-    public function changeDepartment(Request $request, int $id): RedirectResponse
-    {
-        $qr = $this->scope->findOrDeny(QrCode::class, $id, $request->user());
-
-        $departmentId = $request->validate([
-            'department_id' => [
-                'required',
-                'integer',
-                Rule::exists('departments', 'id')->where('location_id', $qr->location_id)->where('is_active', true),
-            ],
-        ], [
-            'department_id.*' => 'Pilih departemen aktif di lokasi QR ini.',
-        ])['department_id'];
-
-        $department = Department::findOrFail($departmentId);
-        $this->qrService->changeDepartment($qr, $department, $request->user());
-
-        return back()->with('success', "QR kini diarahkan ke {$department->name}.");
     }
 
     /**
@@ -171,8 +160,18 @@ class QrController extends Controller
         $qr = $this->scope->findOrDeny(QrCode::class, $id, $request->user());
 
         return view('admin.qr.print', [
-            'qr' => $qr->load('location', 'department'),
+            'qr' => $qr->load('location'),
             'imageUri' => $this->qrService->svgDataUri($qr),
         ]);
+    }
+
+    /**
+     * Jumlah data aktif per lokasi, dengan kunci location_id.
+     *
+     * @return Collection<int, int>
+     */
+    private function activeCountsPerLocation(Builder $query): Collection
+    {
+        return $query->where('is_active', true)->pluck('location_id')->countBy();
     }
 }

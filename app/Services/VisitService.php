@@ -70,8 +70,7 @@ class VisitService
                 'email_verified_at' => $emailVerifiedAt,
                 'purpose_category_id' => $category->id,
                 'purpose_category_name' => $category->name,
-                // Saran dari kategori lebih spesifik; departemen QR menjadi cadangan bila kategori tanpa saran.
-                'suggested_department_id' => $category->suggested_department_id ?? $qr->department_id,
+                'suggested_department_id' => $category->suggested_department_id,
                 'purpose' => $data['purpose'],
                 'vulnerable_group' => $data['vulnerable_group'],
                 'name' => $data['name'],

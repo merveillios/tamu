@@ -32,20 +32,20 @@ class QrManagementTest extends TestCase
     public function test_creates_qr_with_random_token_and_receptionist(): void
     {
         $location = $this->createLocation();
-        $department = $this->createDepartment($location);
+        $this->createCategory($location);
         $receptionist = $this->createUser(UserRole::Receptionist);
 
         $this->actingAs($this->superAdmin)
             ->post('/admin/qr', [
                 'location_id' => $location->id,
-                'department_id' => $department->id,
                 'label' => 'Pintu Timur',
                 'receptionist_id' => $receptionist->id,
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success', "QR Code baru untuk {$location->name} berhasil dibuat.");
 
         $qr = QrCode::firstOrFail();
-        $this->assertSame($department->id, $qr->department_id);
+        $this->assertNull($qr->department_id);
         $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $qr->token);
         $this->assertSame(QrStatus::Active, $qr->status);
         $this->assertSame($receptionist->id, $qr->receptionist_id);
@@ -53,16 +53,85 @@ class QrManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'qr.create', 'entity_id' => $qr->id]);
     }
 
+    public function test_location_without_active_category_still_gets_qr_with_warning(): void
+    {
+        $location = $this->createLocation();
+        $receptionist = $this->createUser(UserRole::Receptionist);
+
+        foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->actingAs($actor)
+                ->post('/admin/qr', ['location_id' => $location->id, 'receptionist_id' => $receptionist->id])
+                ->assertSessionHasNoErrors()
+                ->assertSessionHas('success', fn (string $message) => str_contains($message, 'belum dapat dipakai tamu'));
+        }
+
+        $this->assertDatabaseCount('qr_codes', 2);
+    }
+
+    public function test_create_form_marks_locations_without_department_or_category(): void
+    {
+        $empty = $this->createLocation('Gedung Kosong');
+        $withDepartment = $this->createLocation('Gedung Departemen');
+        $this->createDepartment($withDepartment);
+        $ready = $this->createLocation('Gedung Siap');
+        $this->createCategory($ready, $this->createDepartment($ready));
+
+        foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->actingAs($actor)->get('/admin/qr')
+                ->assertOk()
+                ->assertDontSee('name="department_id"', false)
+                ->assertSee('data-qr-location-warning', false)
+                ->assertSee('value="'.$empty->id.'" data-departments="0" data-categories="0"', false)
+                ->assertSee('value="'.$withDepartment->id.'" data-departments="1" data-categories="0"', false)
+                ->assertSee('value="'.$ready->id.'" data-departments="1" data-categories="1"', false);
+        }
+    }
+
+    public function test_list_shows_active_only_when_guest_page_would_accept_qr(): void
+    {
+        $location = $this->createLocation();
+        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
+
+        foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->actingAs($actor)->get('/admin/qr')
+                ->assertOk()
+                ->assertDontSee('<th class="border-gray-200">Departemen</th>', false)
+                ->assertSee('Belum siap')
+                ->assertSee('Belum ada kategori keperluan aktif.');
+        }
+        $this->get("/tamu/{$qr->token}")->assertNotFound();
+
+        $this->createCategory($location, $this->createDepartment($location));
+
+        $this->actingAs($this->superAdmin)->get('/admin/qr')->assertOk()->assertDontSee('Belum siap');
+
+        $location->update(['is_active' => false]);
+
+        $this->actingAs($this->superAdmin)->get('/admin/qr')
+            ->assertSee('Belum siap')
+            ->assertSee('Lokasi nonaktif.')
+            ->assertDontSee('Belum ada kategori keperluan aktif.');
+    }
+
+    public function test_inactive_qr_keeps_nonaktif_label_even_when_location_is_not_ready(): void
+    {
+        $this->createQr($this->createLocation(), $this->createUser(UserRole::Receptionist), QrStatus::Inactive);
+
+        $this->actingAs($this->superAdmin)->get('/admin/qr')
+            ->assertOk()
+            ->assertSee('Nonaktif')
+            ->assertDontSee('Belum siap');
+    }
+
     public function test_receptionist_must_be_active_receptionist(): void
     {
         $location = $this->createLocation();
-        $department = $this->createDepartment($location);
         $inactive = $this->createUser(UserRole::Receptionist, ['is_active' => false]);
         $admin = $this->createUser(UserRole::Admin);
 
         foreach ([$inactive, $admin] as $candidate) {
             $this->actingAs($this->superAdmin)
-                ->post('/admin/qr', ['location_id' => $location->id, 'department_id' => $department->id, 'receptionist_id' => $candidate->id])
+                ->post('/admin/qr', ['location_id' => $location->id, 'receptionist_id' => $candidate->id])
                 ->assertSessionHasErrors('receptionist_id');
         }
 
@@ -152,31 +221,29 @@ class QrManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'qr.download', 'entity_id' => $qr->id]);
     }
 
-    public function test_print_page_contains_qr_and_instruction_without_department(): void
+    public function test_print_page_contains_qr_and_instruction(): void
     {
         $location = $this->createLocation('Kantor Dinas');
         $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
-        $qr->update(['label' => 'Pintu Timur', 'department_id' => $this->createDepartment($location, 'Sekretariat')->id]);
+        $qr->update(['label' => 'Pintu Timur']);
 
         $this->actingAs($this->superAdmin)->get("/admin/qr/{$qr->id}/cetak")
             ->assertOk()
             ->assertSee('Pindai untuk mengisi buku tamu')
             ->assertSee('Kantor Dinas')
             ->assertSee('Pintu Timur')
-            ->assertDontSee('Sekretariat')
             ->assertSee('data:image/svg+xml;base64,', false);
     }
 
     public function test_admin_manages_qr(): void
     {
         $location = $this->createLocation();
-        $department = $this->createDepartment($location);
         $receptionist = $this->createUser(UserRole::Receptionist);
         $admin = $this->createAdmin();
 
         $this->actingAs($admin)->get("/admin/qr?lokasi={$location->id}")->assertOk();
         $this->actingAs($admin)
-            ->post('/admin/qr', ['location_id' => $location->id, 'department_id' => $department->id, 'receptionist_id' => $receptionist->id])
+            ->post('/admin/qr', ['location_id' => $location->id, 'receptionist_id' => $receptionist->id])
             ->assertSessionHasNoErrors();
 
         $qr = QrCode::firstOrFail();

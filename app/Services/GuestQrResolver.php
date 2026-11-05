@@ -35,14 +35,41 @@ class GuestQrResolver
     }
 
     /**
+     * Alasan QR berstatus aktif belum dapat dipakai tamu; kosong berarti siap dipakai.
+     *
+     * Dipakai juga oleh daftar QR staf agar label "Aktif" di sana selalu sama dengan
+     * perilaku halaman tamu. Jumlah kategori dihitung pemanggil agar daftar tidak
+     * menjalankan satu query per baris.
+     *
+     * @return array<int, string>
+     */
+    public function blockers(QrCode $qr, bool $hasActiveCategory): array
+    {
+        if ($qr->location === null) {
+            return ['Lokasi sudah dihapus.'];
+        }
+
+        return array_values(array_filter([
+            $qr->location->is_active ? null : 'Lokasi nonaktif.',
+            $hasActiveCategory ? null : 'Belum ada kategori keperluan aktif.',
+        ]));
+    }
+
+    /**
      * Mengecek status QR, status lokasi, dan ketersediaan kategori aktif.
      */
     private function isUsable(?QrCode $qr): bool
     {
         return $qr !== null
             && $qr->status === QrStatus::Active
-            && $qr->location !== null
-            && $qr->location->is_active
-            && $qr->location->purposeCategories()->where('is_active', true)->exists();
+            && $this->blockers($qr, $this->hasActiveCategory($qr)) === [];
+    }
+
+    /**
+     * Mengecek apakah lokasi QR memiliki minimal satu kategori keperluan aktif.
+     */
+    private function hasActiveCategory(QrCode $qr): bool
+    {
+        return $qr->location?->purposeCategories()->where('is_active', true)->exists() ?? false;
     }
 }

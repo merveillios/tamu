@@ -2,6 +2,18 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-05 — QR tidak lagi memilih departemen (QR-2)
+
+- **Konteks:** Form buat QR mewajibkan satu departemen, padahal departemen QR hanya dipakai sebagai cadangan saran departemen bila kategori keperluan tidak punya saran. Sejak kategori wajib punya saran departemen, cadangan itu hampir tidak pernah terpakai, sementara admin bisa salah mengira QR hanya untuk satu departemen.
+- **Keputusan:**
+  - Form buat QR (Admin dan Super Admin) hanya berisi lokasi, label opsional, dan akun resepsionis, sesuai teks QR-2. Fitur ganti departemen QR dan audit `qr.change_department` dihapus.
+  - Saran departemen kunjungan hanya berasal dari kategori keperluan; departemen QR tidak lagi menjadi cadangan.
+  - Form menampilkan peringatan, bukan penolakan, bila lokasi terpilih belum punya departemen aktif atau kategori keperluan aktif, karena QR-nya akan tampil "tidak aktif" bagi tamu (TAM-6). Pesan sukses setelah membuat QR juga memuat catatan ini. QR tetap boleh dibuat agar bisa dicetak lebih dulu.
+  - Kolom `qr_codes.department_id` tidak dihapus agar data QR lama tetap utuh; kolom itu tidak lagi dibaca atau diisi aplikasi.
+  - Daftar QR menampilkan "Belum siap" beserta alasannya untuk QR aktif yang ditolak halaman tamu (lokasi nonaktif atau tanpa kategori keperluan aktif). Syaratnya diambil dari `GuestQrResolver::blockers()`, sumber yang sama dengan halaman tamu. Status di database tidak diubah otomatis, sehingga QR yang sengaja dinonaktifkan admin tetap dapat dibedakan dan QR langsung tampil "Aktif" begitu kategori ditambahkan.
+  - Kolom Departemen (jumlah departemen di lokasi) dihapus dari daftar QR karena QR tidak lagi terhubung ke departemen.
+- **Alasan:** Mengurangi langkah dan kebingungan saat membuat QR tanpa mengubah alur penugasan, karena departemen tujuan tetap dipilih resepsionis (RSP-2).
+
 ## 2026-10-26 — Admin mengelola semua lokasi (PRD v0.11)
 
 - **Konteks:** Klien meminta Super Admin sebisa mungkin tidak dipakai kecuali darurat, sehingga pekerjaan harian Super Admin (lokasi, departemen, QR, dan akun) dipindah ke Admin. Admin juga tidak lagi dibatasi lokasi.

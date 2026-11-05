@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\QrStatus;
-use App\Models\Department;
 use App\Models\Location;
 use App\Models\QrCode;
 use App\Models\User;
@@ -41,17 +40,12 @@ class QrService
     }
 
     /**
-     * Membuat QR baru dengan token acak untuk lokasi, departemen, dan akun resepsionis tertentu (QR-1, QR-2).
+     * Membuat QR baru dengan token acak untuk lokasi dan akun resepsionis tertentu (QR-1, QR-2).
      */
-    public function create(Location $location, Department $department, User $receptionist, ?string $label, User $actor): QrCode
+    public function create(Location $location, User $receptionist, ?string $label, User $actor): QrCode
     {
-        if ($department->location_id !== $location->id) {
-            throw ValidationException::withMessages(['department_id' => 'Pilih departemen aktif di lokasi yang dipilih.']);
-        }
-
         $qr = QrCode::create([
             'location_id' => $location->id,
-            'department_id' => $department->id,
             'receptionist_id' => $receptionist->id,
             'token' => $this->newToken(),
             'label' => $label,
@@ -61,7 +55,6 @@ class QrService
 
         $this->audit->record('qr.create', $qr, [
             'location_id' => $location->id,
-            'department_id' => $department->id,
             'receptionist_id' => $receptionist->id,
         ], $actor);
 
@@ -96,7 +89,6 @@ class QrService
         return DB::transaction(function () use ($qr, $actor) {
             $replacement = QrCode::create([
                 'location_id' => $qr->location_id,
-                'department_id' => $qr->department_id,
                 'receptionist_id' => $qr->receptionist_id,
                 'token' => $this->newToken(),
                 'label' => $qr->label,
@@ -127,24 +119,6 @@ class QrService
         $qr->forceFill(['receptionist_id' => $receptionist->id])->save();
 
         $this->audit->record('qr.change_receptionist', $qr, ['from' => $previousId, 'to' => $receptionist->id], $actor);
-    }
-
-    /**
-     * Memindahkan QR ke departemen lain di lokasi yang sama (QR-7).
-     */
-    public function changeDepartment(QrCode $qr, Department $department, User $actor): void
-    {
-        $this->ensureNotRevoked($qr);
-
-        $previousId = $qr->department_id;
-
-        if ($previousId === $department->id) {
-            return;
-        }
-
-        $qr->forceFill(['department_id' => $department->id])->save();
-
-        $this->audit->record('qr.change_department', $qr, ['from' => $previousId, 'to' => $department->id], $actor);
     }
 
     /**

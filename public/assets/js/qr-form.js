@@ -1,6 +1,7 @@
 /*
- * Form buat QR: pilihan departemen hanya menampilkan departemen di lokasi terpilih (QR-2).
- * Server tetap menolak departemen dari lokasi lain.
+ * Form buat QR: peringatan bila lokasi terpilih belum punya departemen atau kategori
+ * keperluan aktif, karena QR-nya belum dapat dipakai tamu (TAM-6). Hanya peringatan;
+ * QR tetap boleh dibuat.
  */
 document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-qr-form]');
@@ -10,30 +11,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var locationSelect = form.querySelector('[data-qr-location]');
-    var departmentSelect = form.querySelector('[data-qr-department]');
-    var emptyNote = form.querySelector('[data-qr-department-empty]');
-    var options = Array.prototype.slice.call(departmentSelect.querySelectorAll('option[data-location]'));
+    var warning = form.querySelector('[data-qr-location-warning]');
+    var noDepartment = warning.querySelector('[data-warning="no-department"]');
+    var noCategory = warning.querySelector('[data-warning="no-category"]');
 
-    function filterDepartments() {
-        var locationId = locationSelect.value;
-        var visible = 0;
+    function updateWarning() {
+        var option = locationSelect.options[locationSelect.selectedIndex];
+        var chosen = option && option.value !== '';
+        var departments = chosen ? Number(option.dataset.departments) : 0;
+        var categories = chosen ? Number(option.dataset.categories) : 0;
 
-        options.forEach(function (option) {
-            var matches = option.dataset.location === locationId;
-
-            option.hidden = !matches;
-            option.disabled = !matches;
-            visible += matches ? 1 : 0;
-
-            if (!matches && option.selected) {
-                departmentSelect.value = '';
-            }
-        });
-
-        departmentSelect.disabled = locationId === '' || visible === 0;
-        emptyNote.hidden = locationId === '' || visible > 0;
+        noDepartment.hidden = !chosen || departments > 0;
+        noCategory.hidden = !chosen || departments === 0 || categories > 0;
+        warning.hidden = noDepartment.hidden && noCategory.hidden;
     }
 
-    locationSelect.addEventListener('change', filterDepartments);
-    filterDepartments();
+    locationSelect.addEventListener('change', updateWarning);
+    updateWarning();
 });

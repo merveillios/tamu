@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * QR Code titik masuk; setiap QR terhubung ke satu lokasi, satu departemen, dan satu akun resepsionis.
+ * QR Code titik masuk; setiap QR terhubung ke satu lokasi dan satu akun resepsionis.
+ * Kolom department_id tidak dipakai lagi dan dibiarkan agar data QR lama tetap utuh.
  */
 class QrCode extends Model
 {
@@ -19,7 +20,6 @@ class QrCode extends Model
 
     protected $fillable = [
         'location_id',
-        'department_id',
         'receptionist_id',
         'token',
         'label',
@@ -39,14 +39,6 @@ class QrCode extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
-    }
-
-    /**
-     * Departemen tujuan QR ini; kosong untuk QR yang dibuat sebelum kolom ini ada.
-     */
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
     }
 
     /**

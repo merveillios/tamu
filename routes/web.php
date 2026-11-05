@@ -91,7 +91,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
 
         Route::get('/qr', [QrController::class, 'index'])->name('qr.index');
         Route::post('/qr', [QrController::class, 'store'])->name('qr.store');
-        Route::post('/qr/{id}/departemen', [QrController::class, 'changeDepartment'])->whereNumber('id')->name('qr.department');
         Route::post('/qr/{id}/resepsionis', [QrController::class, 'changeReceptionist'])->whereNumber('id')->name('qr.receptionist');
         Route::post('/qr/{id}/status', [QrController::class, 'toggleStatus'])->whereNumber('id')->name('qr.status');
         Route::post('/qr/{id}/regenerate', [QrController::class, 'regenerate'])->whereNumber('id')->name('qr.regenerate');
