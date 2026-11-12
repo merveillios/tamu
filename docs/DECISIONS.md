@@ -2,6 +2,17 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Ekspor bergaya buku tamu, tanpa kunjungan Dibatalkan (revisi HRD #3)
+
+- **Konteks:** HRD meminta ekspor mengikuti buku tamu fisik dan opsi untuk kunjungan Dibatalkan. Pemilik proyek menetapkan kolom buku tamu (9 kolom berurutan) dan aturan bahwa buku tamu memuat semua kunjungan selain yang Dibatalkan, termasuk yang masih Menunggu. Ini juga menjawab pertanyaan HRD nomor 2.
+- **Keputusan:**
+  - Kolom PDF: NO, NAMA, INSTANSI / PERUSAHAAN, BERTEMU, JAM, KEPERLUAN, NO. TELP, ALAMAT, TTD. BERTEMU berisi nama orang yang ditemui saja (tanpa Bidang/UPT). JAM berisi tanggal dan jam (`dd/mm/yyyy HH:mm`) dalam satu tabel, bukan tabel per hari, dan NO berurutan sampai akhir file. Lokasi, kelompok rentan, email, Bidang/UPT, status, dan hasil tidak lagi diekspor.
+  - Ekspor selalu mengecualikan Dibatalkan dan diurutkan dari yang datang paling awal seperti menulis di buku. Tidak ada centang "sertakan Dibatalkan"; filter status Dibatalkan menyembunyikan tombol ekspor, dan server menolak request ekspor dengan `status=dibatalkan`.
+  - Bawaan halaman History disamakan dengan isi buku tamu: semua kunjungan kecuali Dibatalkan, termasuk Menunggu dan Sedang direview. Filter status menjadi Menunggu, Sedang direview, Selesai, dan Dibatalkan, sehingga kunjungan Dibatalkan tetap bisa dicari. Dengan begitu jumlah di halaman History sama dengan jumlah baris PDF.
+  - Kepala PDF berjudul "BUKU TAMU" dan menampilkan filter dalam kalimat (Periode, Tanggal, Status, Bidang/UPT, Kelompok rentan, Pencarian), bukan kode seperti `department_id = 3`.
+  - Ekspor Resepsionis (T7) ikut memakai template ini; tombol "Ekspor PDF hari ini" di Tamu Aktif kini juga memuat tamu yang masih Menunggu.
+- **Alasan:** Buku tamu mencatat siapa saja yang datang, sedangkan kunjungan yang dibatalkan dianggap tidak jadi bertamu. Menyamakan bawaan History dengan ekspor mencegah selisih antara yang terlihat di layar dan isi file.
+
 ## 2026-11-12 — Resepsionis dapat membuka History dan mengekspor PDF (revisi HRD #10)
 
 - **Konteks:** HRD meminta ekspor PDF untuk resepsionis. Sebelumnya History dan ekspor hanya untuk Admin dan Super Admin, dan Resepsionis hanya punya Tamu Aktif.

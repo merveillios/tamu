@@ -11,7 +11,7 @@ use Tests\Concerns\InteractsWithGuestPages;
 use Tests\TestCase;
 
 /**
- * Menguji History Kunjungan dan ekspor PDF (HIS-1 sampai HIS-5, Bab 12.4, revisi HRD #13).
+ * Menguji History Kunjungan dan ekspor PDF buku tamu (HIS-1 sampai HIS-6, Bab 12.4, revisi HRD #3 dan #13).
  */
 class HistoryExportTest extends TestCase
 {
@@ -51,15 +51,39 @@ class HistoryExportTest extends TestCase
         ];
     }
 
-    public function test_history_shows_completed_and_cancelled_of_all_locations_by_default(): void
+    public function test_history_shows_all_but_cancelled_of_all_locations_by_default(): void
     {
         $this->actingAs($this->data['admin'])->get('/admin/history')
             ->assertOk()
             ->assertSee('Tamu Selesai')
+            ->assertSee('Tamu Menunggu')
+            ->assertSee('Tamu Direview')
+            ->assertSee('Tamu Lokasi B')
+            ->assertDontSee('HYPERLINK');
+    }
+
+    public function test_cancelled_visits_are_shown_only_by_filter_and_never_exported(): void
+    {
+        $admin = $this->data['admin'];
+
+        $this->actingAs($admin)->get('/admin/history?status=dibatalkan')
+            ->assertOk()
             ->assertSee('HYPERLINK')
-            ->assertDontSee('Tamu Menunggu')
-            ->assertDontSee('Tamu Direview')
-            ->assertSee('Tamu Lokasi B');
+            ->assertDontSee('Tamu Selesai')
+            ->assertSee('Kunjungan Dibatalkan tidak masuk ekspor buku tamu.')
+            ->assertDontSee('/admin/history/export', false);
+
+        $this->actingAs($admin)->from('/admin/history?status=dibatalkan')->get('/admin/history/export?status=dibatalkan')
+            ->assertRedirect('/admin/history?status=dibatalkan')
+            ->assertSessionHasErrors('status');
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'visit.export']);
+    }
+
+    public function test_status_filter_can_show_waiting_visits(): void
+    {
+        $this->actingAs($this->data['admin'])->get('/admin/history?status=menunggu')
+            ->assertSee('Tamu Menunggu')
+            ->assertDontSee('Tamu Selesai');
     }
 
     public function test_receptionist_history_only_shows_visits_from_own_qr(): void
@@ -87,7 +111,7 @@ class HistoryExportTest extends TestCase
         $this->actingAs($receptionist)->get('/admin/history/export')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/pdf');
-        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $receptionist->id, 'detail->rows' => 2]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $receptionist->id, 'detail->rows' => 3]);
 
         // Resepsionis tanpa QR tidak melihat kunjungan siapa pun.
         $other = $this->createUser(UserRole::Receptionist);
@@ -145,17 +169,19 @@ class HistoryExportTest extends TestCase
         // Tanda tangan disematkan sebagai gambar di PDF.
         $this->assertStringContainsString('/Subtype /Image', $pdf);
         $this->assertMatchesRegularExpression('/sitamu_semua_\d{8}-\d{4}\.pdf/', $response->headers->get('Content-Disposition'));
-        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['admin']->id, 'detail->format' => 'pdf', 'detail->rows' => 3]);
+        // Semua kecuali Dibatalkan: Selesai A, Menunggu, Sedang direview, Selesai B.
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['admin']->id, 'detail->format' => 'pdf', 'detail->rows' => 4]);
     }
 
     public function test_pdf_table_rows_are_escaped_and_numbered(): void
     {
         $exports = app(ExportService::class);
-        $visits = GuestVisit::query()->with(['location', 'assignedDepartment', 'servedBy'])->orderBy('id')->get();
+        $visits = GuestVisit::query()->with('servedBy')->orderBy('id')->get();
 
         $html = view('admin.export.pdf', [
             'rows' => $visits->map(fn (GuestVisit $visit, int $index) => ['values' => $exports->row($visit, $index + 1), 'signature' => null]),
-            'columns' => array_merge(ExportService::COLUMNS, ['Tanda Tangan']),
+            'columns' => array_merge(ExportService::COLUMNS, ['TTD']),
+            'widths' => ExportService::COLUMN_WIDTHS,
             'locationName' => 'Semua lokasi',
             'filters' => [],
             'rowCount' => $visits->count(),
@@ -164,6 +190,39 @@ class HistoryExportTest extends TestCase
         $this->assertStringContainsString('=HYPERLINK(&quot;http://jahat.test&quot;)', $html);
         $this->assertStringNotContainsString('No. Urut', $html);
         $this->assertSame('1', $exports->row($visits->first(), 1)[0]);
+        $this->assertStringContainsString('BUKU TAMU', $html);
+    }
+
+    public function test_export_uses_nine_guest_book_columns(): void
+    {
+        $this->assertSame(
+            ['NO', 'NAMA', 'INSTANSI / PERUSAHAAN', 'BERTEMU', 'JAM', 'KEPERLUAN', 'NO. TELP', 'ALAMAT'],
+            ExportService::COLUMNS,
+        );
+        $this->assertCount(count(ExportService::COLUMNS) + 1, ExportService::COLUMN_WIDTHS);
+
+        $staff = $this->createStaffMember($this->data['departmentA']);
+        $visit = GuestVisit::where('name', 'Tamu Selesai')->firstOrFail();
+        GuestVisit::whereKey($visit->id)->update(['served_by_staff_id' => $staff->id, 'check_in_at' => '2026-11-12 08:15:00']);
+        $visit = $visit->fresh('servedBy');
+
+        $this->assertSame(
+            ['3', 'Tamu Selesai', 'Pribadi', $staff->name, '12/11/2026 08:15', 'Konsultasi ekspor kopi', '081234567890', 'Jl. Ahmad Yani No. 1, Surabaya'],
+            app(ExportService::class)->row($visit, 3),
+        );
+    }
+
+    public function test_filter_summary_is_readable(): void
+    {
+        $summary = app(ExportService::class)->filterSummary([
+            'from' => '2026-11-01', 'to' => '2026-11-12', 'status' => 'selesai',
+            'department_id' => $this->data['departmentA']->id, 'vulnerable_group' => 'lansia', 'q' => 'kopi',
+        ]);
+
+        $this->assertSame([
+            'Tanggal: 01/11/2026 – 12/11/2026', 'Status: Selesai', 'Bidang/UPT: Bidang A', 'Kelompok rentan: Lansia', 'Pencarian: "kopi"',
+        ], $summary);
+        $this->assertSame(['Periode: Hari ini'], app(ExportService::class)->filterSummary(['period' => 'hari_ini']));
     }
 
     public function test_history_page_offers_only_pdf_export(): void

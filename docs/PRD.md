@@ -537,10 +537,10 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| HIS-1 | `/admin/history` menampilkan kunjungan `completed` dan `cancelled` di cakupannya. | Wajib | Urutan default `check_in_at DESC`. Paginasi 25 baris. \[DIUBAH v0.10\] Filter status berisi Selesai, Dibatalkan, dan Sedang direview; pilihan Sedang direview menampilkan kunjungan processing (yang tetap tampil juga di Tamu Aktif) agar dapat dicari dan diekspor. |
+| HIS-1 | \[DIUBAH revisi HRD #3\] `/admin/history` menampilkan semua kunjungan di cakupannya **kecuali `cancelled`**, termasuk yang masih `waiting` dan `processing`, sama seperti isi buku tamu. | Wajib | Urutan default `check_in_at DESC`. Paginasi 25 baris. Filter status: "Semua kecuali Dibatalkan" (bawaan), Menunggu, Sedang direview, Selesai, dan Dibatalkan. Kunjungan Dibatalkan hanya tampil lewat filter Dibatalkan. |
 | HIS-2 | \[DIUBAH v0.10\] Admin dapat mencari dan memfilter. | Wajib | Pencarian teks pada nama, instansi, dan rincian keperluan. Filter: rentang tanggal `check_in_at`, preset periode (Hari ini, 7 hari terakhir, Bulan ini), status, lokasi, kategori keperluan, Bidang/UPT tujuan, dan kelompok rentan. Filter tersimpan di query string. |
 | HIS-3 | \[DIHAPUS revisi HRD #6 dan #7\] Filter kategori keperluan dihapus bersama kategori. | – | Pencarian teks pada rincian keperluan (HIS-2) tetap tersedia. |
-| HIS-4 | Admin dapat melihat detail kunjungan dan mengekspor data sesuai cakupan. | Wajib | Ekspor mengikuti filter aktif dan cakupan. Spesifikasi di Bab 12.4. Setiap ekspor tercatat di audit log beserta format, filter, dan jumlah baris. |
+| HIS-4 | Admin dapat melihat detail kunjungan dan mengekspor data sesuai cakupan. | Wajib | Ekspor mengikuti filter aktif dan cakupan. \[DIUBAH revisi HRD #3\] Kunjungan Dibatalkan tidak pernah ikut ekspor: dengan filter Dibatalkan tombol Ekspor PDF diganti keterangan "Kunjungan Dibatalkan tidak masuk ekspor buku tamu.", dan request ekspor `status=dibatalkan` ditolak tanpa tercatat sebagai ekspor. Spesifikasi di Bab 12.4. Setiap ekspor tercatat di audit log beserta format, filter, dan jumlah baris. |
 | HIS-6 | \[BARU revisi HRD #10\] Resepsionis dapat membuka History dan mengekspor PDF, hanya untuk kunjungan dari QR miliknya. | Wajib | Halaman, filter, dan ekspor sama dengan Admin (HIS-1 sampai HIS-5); cakupan dari `AccessScope` (QR dengan status apa pun, mengikuti kepemilikan QR saat ini seperti tanda tangan). Pilihan lokasi hanya lokasi QR miliknya; `location_id` lain menghasilkan 404. Halaman menampilkan keterangan "hanya dari QR milik Anda", dan kepala PDF memuat "Cakupan: QR milik resepsionis <nama akun>". Tamu Aktif Resepsionis menampilkan tombol "Ekspor PDF hari ini" (ekspor dengan `period=hari_ini`) dan tautan ke History untuk periode lain. Ekspor tercatat di audit log seperti HIS-4. PIC tetap tidak memiliki History. |
 | HIS-5 | \[DIUBAH revisi HRD #13\] Tombol **Ekspor PDF**; ekspor hanya tersedia dalam format PDF. | Wajib | Parameter `format` opsional dan hanya menerima `pdf`; nilai lain (termasuk `csv` dan `xlsx`) ditolak dengan pesan "Ekspor hanya tersedia dalam format PDF.". Tidak ada batas baris: semua baris hasil filter diekspor. |
 
@@ -1209,22 +1209,21 @@ Aturan:
 
 &#91;DIHAPUS v0.10\] `emergency_pass.create`, `emergency_pass.use`. Penugasan dicatat di `visit_assignments`; perubahan status (Terima, Selesai, Batal) di `visit_status_logs`. `detail` tidak boleh berisi password, token, data URL tanda tangan, atau isi hasil. Untuk `visit.export`, `detail` berisi format, filter aktif, dan jumlah baris.
 
-## 12.4 Ekspor Data (PDF) \[DIUBAH revisi HRD #13\]
+## 12.4 Ekspor Data (PDF) \[DIUBAH revisi HRD #3 dan #13\]
 
 Ekspor CSV dan Excel dihapus; satu-satunya format adalah PDF untuk semua peran yang memiliki hak ekspor.
 
 **Umum**
 
-- Tombol **Ekspor PDF** di History mengikuti filter aktif dan cakupan.
-- Kolom data (14 kolom): No. (nomor baris 1, 2, 3 di file ekspor, bukan nomor urut kunjungan), Waktu Datang (`dd/mm/yyyy HH:mm`), Lokasi, Nama Tamu, Instansi/Perusahaan, Kelompok Rentan, Rincian Keperluan, No. Telepon, Alamat, Email, Bidang/UPT Tujuan, Orang yang Ditemui (dipilih resepsionis), Status (Selesai, Dibatalkan, atau Sedang direview), Hasil (kosong bila belum Selesai).
-- **PDF menambah kolom terakhir Tanda Tangan** berupa gambar (15 kolom).
+- Tombol **Ekspor PDF** di History mengikuti filter aktif dan cakupan. \[DIUBAH revisi HRD #3\] Isinya buku tamu: semua kunjungan kecuali Dibatalkan, urut dari yang datang paling awal (`check_in_at ASC`).
+- \[DIUBAH revisi HRD #3\] Kolom mengikuti buku tamu fisik (9 kolom, judul huruf kapital): NO (nomor baris 1, 2, 3 di file ekspor, bukan nomor urut kunjungan), NAMA, INSTANSI / PERUSAHAAN, BERTEMU (orang yang ditemui, dipilih resepsionis; kosong bila belum ditugaskan), JAM (`dd/mm/yyyy HH:mm`, tanggal ikut karena ekspor bisa mencakup beberapa hari), KEPERLUAN (rincian keperluan), NO. TELP, ALAMAT, TTD (gambar tanda tangan). Lokasi, kelompok rentan, email, Bidang/UPT, status, dan hasil tidak ikut ekspor; datanya tetap ada di History dan Detail Kunjungan.
 - Nama file: `sitamu_{nama-lokasi atau semua}_{YYYYMMDD-HHmm}.pdf`.
 - Header respons: `Content-Type: application/pdf`, `Content-Disposition: attachment`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`.
 
 **PDF**
 
-- `dompdf/dompdf` dari view Blade di `resources/views/admin/export/`. A4 landscape \[DEFAULT\], font 7 pt, header tabel berulang di setiap halaman, nomor halaman di footer.
-- Bagian atas memuat nama instansi, lokasi (atau "Semua lokasi"), filter aktif, waktu pembuatan, dan jumlah baris.
+- `dompdf/dompdf` dari view Blade di `resources/views/admin/export/`. A4 landscape \[DEFAULT\], font 8 pt \[DIUBAH revisi HRD #3\], lebar kolom tetap (`ExportService::COLUMN_WIDTHS`), header tabel berulang di setiap halaman, nomor halaman di footer.
+- Bagian atas memuat judul "BUKU TAMU" dan nama instansi, lokasi (atau "Semua lokasi"), cakupan resepsionis (HIS-6), waktu pembuatan, jumlah baris, dan filter aktif dalam kalimat yang mudah dibaca (misalnya "Periode: 7 hari terakhir · Bidang/UPT: Bidang Perdagangan") \[DIUBAH revisi HRD #3\].
 - Gambar tanda tangan sebagai data URI hasil perkecilan GD. `isRemoteEnabled` dimatikan; semua nilai di-escape Blade.
 
 **Batas dan performa**

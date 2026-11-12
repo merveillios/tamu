@@ -47,7 +47,7 @@
     </div>
 
     @if ($isReceptionist && ! $receptionistWithoutQr)
-        {{-- Ekspor resepsionis (revisi HRD #10): kunjungan Selesai/Dibatalkan dari QR miliknya. --}}
+        {{-- Ekspor resepsionis (revisi HRD #10): buku tamu hari ini dari QR miliknya, tanpa kunjungan Dibatalkan. --}}
         <div class="d-flex flex-wrap gap-2 justify-content-end mb-3">
             <a href="{{ route('admin.history.export', ['period' => 'hari_ini']) }}" class="btn btn-primary btn-sm">Ekspor PDF hari ini</a>
             <a href="{{ route('admin.history.index') }}" class="btn btn-outline-gray-800 btn-sm">History &amp; ekspor periode lain</a>

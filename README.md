@@ -344,8 +344,8 @@ Fitur:
   PIC lain — PIC diganti, status kembali Menunggu, alasan pengalihan wajib
   diisi, dan jejaknya tercatat di audit log serta riwayat kunjungan.
 - **Batalkan kunjungan** dengan alasan wajib yang tercatat.
-- **History dan ekspor PDF**: riwayat kunjungan Selesai/Dibatalkan **hanya dari
-  QR miliknya**, dengan filter yang sama seperti Admin, dan dapat diekspor ke PDF.
+- **History dan ekspor PDF**: riwayat kunjungan **hanya dari QR miliknya**, dengan
+  filter yang sama seperti Admin, dan dapat diekspor ke PDF bergaya buku tamu.
 - **Petugas yang dihubungi tamu** bila tamu gagal login Google: tamu yang sudah
   mengikuti saran di halaman Bantuan Login Google (membuka halaman di Chrome
   atau Safari) dan masih belum bisa, diarahkan untuk menghubungi petugas.
@@ -396,8 +396,10 @@ Fitur:
 - **Kelola Kelompok Rentan**: menambah, mengubah, menonaktifkan, dan menghapus
   pilihan kelompok rentan di formulir tamu, serta mengatur prioritas antrean.
   Kelompok yang sudah dipakai kunjungan hanya dapat dinonaktifkan.
-- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke PDF sesuai
-  filter (tanpa batas baris).
+- **History dan ekspor**: riwayat seluruh kunjungan (bawaannya semua kecuali
+  Dibatalkan), diekspor ke PDF bergaya buku tamu sesuai filter, tanpa batas baris.
+  Kolom PDF: NO, NAMA, INSTANSI / PERUSAHAAN, BERTEMU, JAM, KEPERLUAN, NO. TELP,
+  ALAMAT, TTD. Kunjungan Dibatalkan tidak pernah ikut ekspor.
 - **Audit Log** (hanya baca).
 
 ### 5. Super Admin

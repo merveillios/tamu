@@ -33,8 +33,8 @@
             <div class="col-6 col-lg-2">
                 <label for="status" class="form-label small mb-1">Status</label>
                 <select name="status" id="status" class="form-select">
-                    <option value="">Selesai & Dibatalkan</option>
-                    @foreach (['selesai' => 'Selesai', 'dibatalkan' => 'Dibatalkan', 'direview' => 'Sedang direview'] as $value => $label)
+                    <option value="">Semua kecuali Dibatalkan</option>
+                    @foreach ($statusLabels as $value => $label)
                         <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
@@ -84,8 +84,12 @@
                 · hanya dari QR milik Anda
             @endif
         </span>
-        {{-- Ekspor hanya PDF (revisi HRD #13); seluruh baris sesuai filter ikut diekspor. --}}
-        <a href="{{ route('admin.history.export', $filters) }}" class="btn btn-primary btn-sm">Ekspor PDF</a>
+        {{-- Ekspor hanya PDF (revisi HRD #13) bergaya buku tamu; Dibatalkan tidak pernah ikut (revisi HRD #3). --}}
+        @if (($filters['status'] ?? '') === 'dibatalkan')
+            <span class="small text-gray-600">Kunjungan Dibatalkan tidak masuk ekspor buku tamu.</span>
+        @else
+            <a href="{{ route('admin.history.export', $filters) }}" class="btn btn-primary btn-sm">Ekspor PDF</a>
+        @endif
     </div>
 
     <div class="card card-body border-0 shadow">

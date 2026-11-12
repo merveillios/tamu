@@ -7,6 +7,7 @@ use App\Http\Requests\HistoryRequest;
 use App\Models\Location;
 use App\Services\ExportService;
 use App\Services\HistoryService;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,17 +39,22 @@ class HistoryController extends Controller
             'visits' => $visits,
             'filters' => $filters,
             'periods' => HistoryService::PERIODS,
+            'statusLabels' => HistoryService::STATUS_LABELS,
         ]));
     }
 
     /**
-     * Unduh ekspor PDF mengikuti filter aktif dan cakupan (Bab 12.4, revisi HRD #13).
+     * Unduh ekspor PDF buku tamu mengikuti filter aktif dan cakupan (Bab 12.4, revisi HRD #3 dan #13).
      */
     public function export(HistoryRequest $request, ExportService $exports): Response
     {
         $user = $request->user();
         $filters = $request->filters();
         $this->history->ensureFiltersInScope($user, $filters);
+
+        if (($filters['status'] ?? null) === 'dibatalkan') {
+            throw ValidationException::withMessages(['status' => 'Kunjungan Dibatalkan tidak masuk buku tamu, jadi tidak dapat diekspor.']);
+        }
 
         $locationName = empty($filters['location_id']) ? null : Location::query()->whereKey($filters['location_id'])->value('name');
 

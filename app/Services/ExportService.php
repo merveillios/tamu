@@ -4,35 +4,41 @@ namespace App\Services;
 
 use App\Enums\UserRole;
 use App\Enums\VisitStatus;
+use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\User;
 use App\Models\VisitSignature;
+use App\Models\VulnerableGroup;
 use App\Rules\IndonesianPhone;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Ekspor History ke PDF sesuai filter dan cakupan (HIS-4, HIS-5, PRD Bab 12.4).
+ * Ekspor History ke PDF bergaya buku tamu sesuai filter dan cakupan (HIS-4, HIS-5, PRD Bab 12.4).
  *
  * Sejak revisi HRD #13 satu-satunya format adalah PDF, tanpa batas baris: jumlah
- * baris mengikuti filter yang dipilih.
+ * baris mengikuti filter yang dipilih. Sejak revisi HRD #3 kolomnya mengikuti buku
+ * tamu fisik dan kunjungan Dibatalkan tidak pernah ikut.
  */
 class ExportService
 {
     /**
-     * Kolom data per kunjungan; PDF menambah kolom Tanda Tangan di akhir.
+     * Kolom data per kunjungan, urut seperti buku tamu fisik (revisi HRD #3); PDF
+     * menambah kolom TTD di akhir.
      */
-    public const COLUMNS = [
-        'No.', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
-        'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Bidang/UPT Tujuan',
-        'Orang yang Ditemui', 'Status', 'Hasil',
-    ];
+    public const COLUMNS = ['NO', 'NAMA', 'INSTANSI / PERUSAHAAN', 'BERTEMU', 'JAM', 'KEPERLUAN', 'NO. TELP', 'ALAMAT'];
 
-    private const RELATIONS = ['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name', 'vulnerableGroupOption:code,name'];
+    /**
+     * Lebar kolom di PDF A4 landscape (persen), termasuk TTD di akhir.
+     */
+    public const COLUMN_WIDTHS = [3, 12, 12, 10, 10, 22, 9, 13, 9];
+
+    private const RELATIONS = ['servedBy:id,name'];
 
     /**
      * Lebar maksimal gambar tanda tangan di PDF.
@@ -50,6 +56,9 @@ class ExportService
      */
     public function download(Builder $query, array $filters, ?string $locationName, User $actor): Response
     {
+        // Buku tamu memuat semua kunjungan kecuali yang Dibatalkan, urut dari yang datang
+        // paling awal seperti buku tamu fisik (revisi HRD #3).
+        $query->where('status', '!=', VisitStatus::Cancelled)->reorder()->orderBy('check_in_at')->orderBy('id');
         $rows = (clone $query)->count();
 
         $this->audit->record('visit.export', null, ['format' => 'pdf', 'filters' => $filters, 'rows' => $rows], $actor);
@@ -65,6 +74,43 @@ class ExportService
     }
 
     /**
+     * Filter aktif dalam kalimat yang mudah dibaca untuk kepala PDF. Lokasi sudah
+     * tampil terpisah sehingga tidak diulang.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<int, string>
+     */
+    public function filterSummary(array $filters): array
+    {
+        $date = fn (string $value) => Carbon::parse($value)->format('d/m/Y');
+        $summary = [];
+
+        if (! empty($filters['period'])) {
+            $summary[] = 'Periode: '.(HistoryService::PERIODS[$filters['period']] ?? $filters['period']);
+        } elseif (! empty($filters['from']) || ! empty($filters['to'])) {
+            $summary[] = 'Tanggal: '.(empty($filters['from']) ? '…' : $date($filters['from'])).' – '.(empty($filters['to']) ? '…' : $date($filters['to']));
+        }
+
+        if (! empty($filters['status'])) {
+            $summary[] = 'Status: '.(HistoryService::STATUS_LABELS[$filters['status']] ?? $filters['status']);
+        }
+
+        if (! empty($filters['department_id'])) {
+            $summary[] = 'Bidang/UPT: '.Department::query()->whereKey($filters['department_id'])->value('name');
+        }
+
+        if (! empty($filters['vulnerable_group'])) {
+            $summary[] = 'Kelompok rentan: '.VulnerableGroup::query()->where('code', $filters['vulnerable_group'])->value('name');
+        }
+
+        if (! empty($filters['q'])) {
+            $summary[] = "Pencarian: \"{$filters['q']}\"";
+        }
+
+        return $summary;
+    }
+
+    /**
      * Keterangan cakupan di kepala PDF untuk akun yang datanya dibatasi; Admin dan
      * Super Admin melihat semua lokasi sehingga tidak perlu keterangan (HIS-6).
      */
@@ -76,8 +122,10 @@ class ExportService
     }
 
     /**
-     * Nilai 14 kolom untuk satu kunjungan. Kolom pertama adalah nomor baris di file
+     * Nilai 8 kolom buku tamu untuk satu kunjungan. NO adalah nomor baris di file
      * ekspor, bukan nomor urut kunjungan yang tidak lagi ditampilkan (revisi HRD #5).
+     * BERTEMU berisi orang yang ditemui (kosong bila belum ditugaskan); JAM memuat
+     * tanggal karena satu ekspor bisa mencakup beberapa hari.
      *
      * @return array<int, string>
      */
@@ -85,19 +133,13 @@ class ExportService
     {
         return [
             (string) $rowNumber,
-            $visit->check_in_at->format('d/m/Y H:i'),
-            $visit->location->name,
             $visit->name,
             $visit->organization,
-            $visit->vulnerableGroupLabel(),
+            $visit->servedBy?->name ?? '',
+            $visit->check_in_at->format('d/m/Y H:i'),
             $visit->purpose,
             IndonesianPhone::display($visit->phone),
             $visit->address,
-            $visit->email,
-            $visit->assignedDepartment?->name ?? '',
-            $visit->servedBy?->name ?? '',
-            $visit->status->label(),
-            $visit->status === VisitStatus::Completed ? (string) $visit->result : '',
         ];
     }
 
@@ -125,9 +167,10 @@ class ExportService
                 'values' => $this->row($visit, $index + 1),
                 'signature' => $signatures->get($visit->id),
             ]),
-            'columns' => array_merge(self::COLUMNS, ['Tanda Tangan']),
+            'columns' => array_merge(self::COLUMNS, ['TTD']),
+            'widths' => self::COLUMN_WIDTHS,
             'locationName' => $locationName ?? 'Semua lokasi',
-            'filters' => $filters,
+            'filters' => $this->filterSummary($filters),
             'rowCount' => $rowCount,
             'scopeNote' => $scopeNote,
         ])->render();

@@ -18,12 +18,24 @@ use Illuminate\Support\Collection;
 class HistoryService
 {
     /**
-     * Pilihan filter status: Selesai, Dibatalkan, dan Sedang direview (HIS-1).
+     * Pilihan filter status (HIS-1). Tanpa filter, History seperti buku tamu: semua
+     * kunjungan kecuali Dibatalkan, termasuk yang masih Menunggu (revisi HRD #3).
      */
     public const STATUS_FILTERS = [
+        'menunggu' => VisitStatus::Waiting,
+        'direview' => VisitStatus::Processing,
         'selesai' => VisitStatus::Completed,
         'dibatalkan' => VisitStatus::Cancelled,
-        'direview' => VisitStatus::Processing,
+    ];
+
+    /**
+     * Label pilihan filter status di halaman History.
+     */
+    public const STATUS_LABELS = [
+        'menunggu' => 'Menunggu',
+        'direview' => 'Sedang direview',
+        'selesai' => 'Selesai',
+        'dibatalkan' => 'Dibatalkan',
     ];
 
     /**
@@ -55,7 +67,7 @@ class HistoryService
             ->when(
                 $status !== null,
                 fn (Builder $query) => $query->where('status', $status),
-                fn (Builder $query) => $query->whereIn('status', [VisitStatus::Completed, VisitStatus::Cancelled]),
+                fn (Builder $query) => $query->where('status', '!=', VisitStatus::Cancelled),
             )
             ->when($search !== '', fn (Builder $query) => $query->where(fn (Builder $inner) => $inner
                 ->where('name', 'like', "%{$search}%")
