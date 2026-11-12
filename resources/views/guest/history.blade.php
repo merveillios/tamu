@@ -7,7 +7,18 @@
 @section('content')
     @include('guest.partials.email-block')
 
+    @if (session('success'))
+        <div class="alert alert-success small" role="status">{{ session('success') }}</div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger small" role="alert">{{ $errors->first() }}</div>
+    @endif
+
     <a href="{{ route('guest.form', $qr->token) }}" class="btn btn-primary w-100 mb-4">Isi formulir lagi</a>
+
+    @if ($canCompleteProfile)
+        @include('guest.partials.profile-documents')
+    @endif
 
     <h1 class="h5 mb-3">Riwayat kunjungan Anda</h1>
 
@@ -56,3 +67,9 @@
         </nav>
     @endif
 @endsection
+
+@if ($canCompleteProfile)
+    @push('scripts')
+        <script src="{{ asset('assets/js/guest-document.js') }}?v={{ filemtime(public_path('assets/js/guest-document.js')) }}"></script>
+    @endpush
+@endif

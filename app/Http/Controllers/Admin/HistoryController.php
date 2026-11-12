@@ -32,6 +32,8 @@ class HistoryController extends Controller
 
         $visits = $this->history->query($user, $filters)
             ->with(['location:id,name', 'assignedDepartment:id,name', 'vulnerableGroupOption:code,name'])
+            // Penanda tamu yang sudah mengunggah KTP lewat "Lengkapi profil" (TAM-18).
+            ->withExists(['documents as has_ktp' => fn ($query) => $query->where('type', 'ktp')])
             ->paginate(25)
             ->withQueryString();
 

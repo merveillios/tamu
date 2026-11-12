@@ -180,6 +180,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Semua lokasi | Tidak | Tidak | – |
 | Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Bidang/UPT-nya | – |
 | Gambar tanda tangan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
+| \[BARU revisi HRD #4\] Foto KTP dan selfie tamu (TAM-18) | Semua lokasi | Semua lokasi | Tamu dengan kunjungan dari QR miliknya | Tidak | Unggah, ganti, dan lihat milik sendiri |
 | History: lihat, cari, filter, ekspor PDF | Semua lokasi | Semua lokasi | \[DIUBAH revisi HRD #10\] QR miliknya | Tidak | – |
 | Kelola daftar petugas Bidang/UPT | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola lokasi | Ya | Ya | Tidak | Tidak | – |
@@ -333,6 +334,9 @@ Key bawaan Laravel dibaca framework langsung. Key aplikasi dipetakan di `config/
 | `WAITING_ALERT_MINUTES` | `15` | \[DEFAULT\] Batas menunggu sebelum kunjungan ditandai. |
 | `SIGNATURE_MAX_KB` | `200` | \[DEFAULT\] Ukuran maksimal gambar tanda tangan setelah di-decode. |
 | `GUEST_HISTORY_PER_PAGE` | `10` | \[DEFAULT\] \[BARU v0.10\] Jumlah kunjungan per halaman riwayat tamu. |
+| `GUEST_DOCUMENT_MAX_KB` | `1024` | \[BARU revisi HRD #4\] Ukuran maksimal foto KTP/selfie setelah disimpan ulang server (TAM-18). |
+| `GUEST_DOCUMENT_MAX_SIDE` | `1600` | \[BARU revisi HRD #4\] Sisi terpanjang foto KTP/selfie yang disimpan (piksel). |
+| `GUEST_DOCUMENT_RATE_LIMIT_MAX` | `10` | \[BARU revisi HRD #4\] Batas unggah foto per IP per QR dalam `GUEST_RATE_LIMIT_WINDOW_MINUTES`. |
 | `EXPORT_PDF_MEMORY_LIMIT` | `1024M` | \[DEFAULT\] Batas memori PHP khusus saat membuat PDF ekspor (revisi HRD #13). |
 | `EXPORT_PDF_TIME_LIMIT` | `300` | \[DEFAULT\] Batas waktu (detik) saat membuat PDF ekspor. |
 | `INSTITUTION_NAME` | `Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur (Disperindag)` | \[DEFAULT\] |
@@ -476,6 +480,7 @@ Pilihan kelompok rentan di formulir tamu berasal dari tabel `vulnerable_groups`,
 | TAM-15 | \[BARU v0.10\] Setelah verifikasi email, sistem otomatis menentukan tamu baru atau tamu lama. | Wajib | Pengecekan dilakukan server, bukan pilihan tamu: tamu lama = ada minimal satu `guest_visits` dengan `email` yang sama, di lokasi mana pun \[DEFAULT\]. Tamu baru diarahkan ke `/tamu/{token}/formulir` (formulir kosong). Tamu lama diarahkan ke `/tamu/{token}/riwayat` yang memuat tombol "Isi formulir lagi". |
 | TAM-16 | \[BARU v0.10\] Formulir tamu lama menampilkan data diri yang terisi otomatis dan terkunci. | Wajib | Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, dan Alamat diisi dari kunjungan terakhir dengan email yang sama (`check_in_at` terbaru) dan tampil read-only. Saat POST, server mengambil kelima nilai itu dari database lewat `ReturningGuestService`, bukan dari input browser. Kategori, Rincian keperluan, Tanda tangan, dan persetujuan diisi ulang. Kategori yang pernah dilaporkan tetap dapat dipilih \[DEFAULT\]. |
 | TAM-17 | \[BARU v0.10\] Tamu dapat melihat riwayat kunjungannya sendiri. | Wajib | `/tamu/{token}/riwayat` hanya dapat dibuka dengan email terverifikasi di session dan hanya menampilkan kunjungan dengan `email` yang sama, urut terbaru, paginasi `GUEST_HISTORY_PER_PAGE`. Per kunjungan tampil: tanggal dan jam datang, lokasi, kategori dan rincian keperluan, label status, Bidang/UPT tujuan, orang yang ditemui, dan hasil (hanya bila Selesai). Nomor telepon, alamat, tanda tangan, dan alasan batal tidak ditampilkan. Tersedia tombol "Isi formulir lagi" dan "Ganti akun". |
+| TAM-18 | \[BARU revisi HRD #4\] Tamu lama dapat melengkapi profil dengan foto KTP dan selfie dari halaman riwayat. | Penting | Bagian "Lengkapi profil" di `/tamu/{token}/riwayat`, hanya untuk email terverifikasi yang sudah punya minimal satu kunjungan (server menolak 403 bila belum). Opsional dan tanpa centang persetujuan tambahan; teks bagian itu menjelaskan bahwa foto dipakai untuk dokumentasi kunjungan, hanya dilihat petugas Disperindag, dapat diganti tetapi tidak dapat dihapus. Foto tersimpan per email (bukan per kunjungan) sehingga kunjungan berikutnya sudah memilikinya. KTP dari kamera atau galeri; selfie membuka kamera depan (`capture="user"`). Browser memperkecil foto ke sisi terpanjang 1600 px (JPEG 0,8) sebelum dikirim; tanpa JavaScript file asli dikirim (JPG/PNG/WebP, maks. 10 MB). Server membaca ulang foto dengan GD, memperkecil ke `GUEST_DOCUMENT_MAX_SIDE`, dan menyimpannya sebagai JPEG baru (metadata EXIF/GPS terbuang); sisi terpendek minimal 300 px; hasil maks. `GUEST_DOCUMENT_MAX_KB`. Mengganti foto menambah baris baru di `guest_documents`; foto lama tetap tersimpan dan yang dipakai selalu yang terbaru. Tidak ada penghapusan dan tidak ada batas waktu simpan (untuk dokumentasi). Unggahan dibatasi `GUEST_DOCUMENT_RATE_LIMIT_MAX` per IP per QR dan tercatat di audit log (`guest_document.upload`). Petugas melihat foto terbaru di Detail Kunjungan lewat route berbatas peran, mengikuti hak lihat tanda tangan; setiap pembukaan foto oleh petugas tercatat (`guest_document.view`). History menampilkan penanda "KTP" pada nama tamu yang sudah mengunggah KTP. Foto tidak ikut ekspor. |
 
 ### 6.6.1 Data yang dicatat per kunjungan \[DIUBAH v0.10\]
 
@@ -914,6 +919,24 @@ CREATE TABLE visit_status_logs (
   CONSTRAINT fk_vsl_staff FOREIGN KEY (staff_member_id) REFERENCES staff_members(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE guest_documents (             -- [BARU revisi HRD #4] foto KTP dan selfie tamu (TAM-18); hanya ditambah, tidak pernah diubah/dihapus
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(254) NOT NULL,               -- email Google terverifikasi pemilik foto
+  type ENUM('ktp','selfie') NOT NULL,
+  image MEDIUMBLOB NOT NULL,                 -- JPEG hasil simpan ulang GD
+  mime_type VARCHAR(20) NOT NULL DEFAULT 'image/jpeg',
+  width SMALLINT UNSIGNED NOT NULL,
+  height SMALLINT UNSIGNED NOT NULL,
+  size_bytes INT UNSIGNED NOT NULL,
+  sha256 CHAR(64) NOT NULL,
+  qr_code_id BIGINT UNSIGNED NULL,           -- QR tempat foto diunggah
+  ip_address VARCHAR(45) NULL,
+  created_at DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY idx_guest_documents_email_type (email, type, id),
+  CONSTRAINT fk_guest_documents_qr FOREIGN KEY (qr_code_id) REFERENCES qr_codes(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE audit_logs (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT UNSIGNED NULL,
@@ -980,7 +1003,9 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | POST | `/tamu/{token}/verifikasi-google` | AJAX: terima ID token Google (CSRF, rate limit), verifikasi, simpan email di session (TAM-11). Respons memuat URL tujuan berikutnya. |
 | POST | `/tamu/{token}/ganti-akun` | Hapus hasil verifikasi di session, kembali ke Langkah 1. |
 | GET | `/tamu/{token}/bantuan` | Halaman "Tidak bisa login Google?" (TAM-12). |
-| GET | `/tamu/{token}/riwayat` | \[BARU v0.10\] Riwayat kunjungan tamu (TAM-17). Wajib email terverifikasi di session. |
+| GET | `/tamu/{token}/riwayat` | \[BARU v0.10\] Riwayat kunjungan tamu (TAM-17) dan "Lengkapi profil" (TAM-18). Wajib email terverifikasi di session. |
+| POST | `/tamu/{token}/profil/{type}` | \[BARU revisi HRD #4\] Unggah foto `ktp` atau `selfie` (TAM-18). Body: `image_data` (data URL hasil kompresi) atau `photo` (file). CSRF, rate limit `guest-document`, wajib email terverifikasi yang sudah punya kunjungan. |
+| GET | `/tamu/{token}/profil/{type}` | \[BARU revisi HRD #4\] Foto terbaru milik email terverifikasi sendiri. `Cache-Control: private, no-store`. |
 | GET | `/tamu/{token}/formulir` | \[BARU v0.10\] Formulir kosong (tamu baru) atau terisi dan terkunci (tamu lama, TAM-16). Wajib email terverifikasi di session. |
 | POST | `/tamu/{token}/formulir` | \[DIUBAH v0.10\] Simpan kunjungan (CSRF, rate limit, honeypot, token sekali pakai TAM-14). Sukses → redirect 303 ke halaman terima kasih. |
 | GET | `/tamu/{token}/terima-kasih` | Halaman konfirmasi dari flash session. |
@@ -1006,6 +1031,7 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET | `/admin/tamu` | Tamu Aktif. Query: `q`, `status` (`menunggu`, `menunggu_pic`, `direview`), `location_id`. |
 | GET | `/admin/tamu/data` | JSON untuk polling; filter sama; berisi daftar, jumlah per label status, dan `server_time`. |
 | POST | `/admin/kunjungan/{id}/batal` | AJAX: → `cancelled`. Body: `reason`, `reason_text`. |
+| GET | `/admin/kunjungan/{id}/foto/{type}` | \[BARU revisi HRD #4\] Foto `ktp` atau `selfie` terbaru milik email tamu kunjungan ini (TAM-18), dalam cakupan `AccessScope`. `Cache-Control: private, no-store`. Tercatat `guest_document.view`. |
 | GET | `/admin/history` | \[DIUBAH revisi HRD #10\] History; Resepsionis hanya kunjungan dari QR miliknya (HIS-6). Query: `q`, `from`, `to`, `period`, `status`, `location_id`, `purpose_category_id`, `department_id`, `vulnerable_group`, `page`. |
 | GET | `/admin/history/export` | Unduh ekspor dengan filter yang sama. Query tambahan: `format` (hanya `pdf`, opsional). Selalu menghasilkan PDF. |
 
@@ -1237,7 +1263,7 @@ Ekspor CSV dan Excel dihapus; satu-satunya format adalah PDF untuk semua peran y
 | --- | --- |
 | Responsivitas | Halaman tamu mobile first (base 360 px, satu kolom, tombol besar). Panel staf responsif; pada layar < 768 px, tabel Tamu Aktif dan Penugasan berubah menjadi kartu. |
 | Integritas data | Kunjungan tidak pernah dihapus. Semua waktu dari server. Perubahan status dan penugasan atomik (Bab 7.2). |
-| Privasi | Hanya data Bab 6.6.1 yang dikumpulkan. Nomor telepon, alamat, email, dan tanda tangan tidak ditampilkan di daftar Tamu Aktif, Penugasan, maupun History; hanya di halaman detail sesuai peran. Kelompok rentan ditampilkan di daftar staf. |
+| Privasi | Hanya data Bab 6.6.1 yang dikumpulkan, ditambah foto KTP dan selfie yang diunggah tamu secara opsional (TAM-18) \[BARU revisi HRD #4\]. Nomor telepon, alamat, email, tanda tangan, dan foto KTP/selfie tidak ditampilkan di daftar Tamu Aktif, Penugasan, maupun History; hanya di halaman detail sesuai peran. Foto KTP/selfie tidak pernah diekspor dan tidak dapat dilihat PIC. Kelompok rentan ditampilkan di daftar staf. |
 | Performa | Tamu Aktif, Penugasan, dan dashboard tampil < 1 detik untuk 50.000 kunjungan, memanfaatkan index Bab 9.2 dan eager loading (`with()`). |
 | Kompatibilitas | Chrome, Firefox, Safari, dan Edge versi terbaru; Chrome Android dan Safari iOS untuk halaman tamu. |
 | Aksesibilitas | Setiap input memiliki `<label>`; pesan error terhubung ke field; kontras mengikuti standar Bootstrap. |
@@ -1253,7 +1279,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Langkah 1: verifikasi email | Logo dan nama instansi, badge nama lokasi, satu kalimat petunjuk, tombol "Pilih akun Google" lebar penuh, tautan kecil "Tidak bisa login Google?". Tidak ada elemen lain. |
 | Bantuan login Google | "Coba buka halaman ini di Chrome atau Safari. Jika masih belum bisa, silakan hubungi petugas." dan tombol "Coba lagi". |
-| Riwayat kunjungan \[BARU v0.10\] | Logo, badge lokasi, email terverifikasi dengan tombol "Ganti akun", tombol utama "Isi formulir lagi". Daftar kartu kunjungan (terbaru di atas): tanggal dan jam, lokasi, kategori dan rincian keperluan, badge status, Bidang/UPT tujuan, orang yang ditemui, dan kotak Hasil (bila Selesai). Paginasi sederhana "Sebelumnya / Berikutnya". |
+| Riwayat kunjungan \[BARU v0.10\] | Logo, badge lokasi, email terverifikasi dengan tombol "Ganti akun", tombol utama "Isi formulir lagi". Daftar kartu kunjungan (terbaru di atas): tanggal dan jam, lokasi, kategori dan rincian keperluan, badge status, Bidang/UPT tujuan, orang yang ditemui, dan kotak Hasil (bila Selesai). Paginasi sederhana "Sebelumnya / Berikutnya". \[BARU revisi HRD #4\] Untuk tamu yang sudah punya kunjungan, kartu "Lengkapi profil (opsional)" di bawah tombol utama berisi dua bagian, Foto KTP dan Foto selfie: pratinjau foto terbaru beserta tanggal simpan, pilihan foto, dan tombol simpan (TAM-18). |
 | Formulir tamu baru | Logo dan nama instansi, badge lokasi, blok Email read-only dengan tombol "Ganti akun", teks "Jam datang dicatat otomatis saat formulir dikirim.", lalu field sesuai urutan Bab 11.1: Keperluan (dropdown) → Rincian keperluan (muncul setelah kategori dipilih) → Kelompok rentan → Nama lengkap → Instansi/perusahaan → Nomor telepon/WhatsApp → Alamat → kotak tanda tangan (lebar penuh, tinggi sekitar 180 px, tombol "Hapus Tanda Tangan", halaman tidak bergulir saat menggambar) → checkbox persetujuan → tombol "Kirim Formulir" lebar penuh, dinonaktifkan setelah diklik. |
 | Formulir tamu lama \[BARU v0.10\] | Sama dengan formulir tamu baru, tetapi Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, dan Alamat tampil terisi dan read-only (`disabled`), dengan keterangan "Data diri diambil dari kunjungan terakhir Anda." |
 | Terima kasih | Ikon sukses, judul "Kunjungan terkirim", lalu "Terima kasih, {nama}. Kunjungan Anda di {lokasi} sudah kami terima pada pukul {HH:mm}. Silakan menunggu petugas." dan tautan "Lihat riwayat kunjungan". |

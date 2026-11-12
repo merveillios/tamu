@@ -53,6 +53,13 @@ class AppServiceProvider extends ServiceProvider
             )->by($request->ip().'|'.$request->route('token'));
         });
 
+        RateLimiter::for('guest-document', function (Request $request) {
+            return Limit::perMinutes(
+                config('sitamu.guest.rate_limit_window_minutes'),
+                config('sitamu.guest.document_rate_limit_max'),
+            )->by($request->ip().'|'.$request->route('token'));
+        });
+
         RateLimiter::for('google-verify', function (Request $request) {
             return Limit::perMinutes(
                 config('sitamu.guest.rate_limit_window_minutes'),

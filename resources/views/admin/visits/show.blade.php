@@ -53,6 +53,20 @@
                                 –
                             @endif
                         </dd>
+                        @foreach (\App\Models\GuestDocument::TYPES as $type => $label)
+                            <dt class="col-5 text-gray-600 fw-normal">{{ $label }}</dt>
+                            <dd class="col-7">
+                                @if ($document = $documents->get($type))
+                                    <a href="{{ route('admin.visits.document', [$visit->id, $type]) }}" target="_blank" rel="noopener">
+                                        <img src="{{ route('admin.visits.document', [$visit->id, $type]) }}" alt="{{ $label }} {{ $visit->name }}"
+                                             loading="lazy" class="img-fluid border rounded bg-white visit-document-photo">
+                                    </a>
+                                    <div class="small text-gray-600">Diunggah tamu {{ $document->created_at->format('d/m/Y H:i') }}</div>
+                                @else
+                                    –
+                                @endif
+                            </dd>
+                        @endforeach
                     @endif
                 </dl>
             </div>

@@ -2,6 +2,18 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-13 — Foto KTP dan selfie lewat "Lengkapi profil" (revisi HRD #4)
+
+- **Konteks:** HRD meminta unggah KTP yang dapat dilihat kembali sesuai hak akses. Dokumen HRD menyebut petugas yang mengunggah dari Detail Kunjungan; pemilik proyek memutuskan tamu sendiri yang mengunggah, ditambah selfie. Pertanyaan HRD nomor 4 (boleh disimpan, berapa lama, siapa yang melihat) dijawab pemilik proyek.
+- **Keputusan:**
+  - Tamu lama mengunggah foto KTP dan selfie di bagian "Lengkapi profil" pada halaman riwayat tamu. Opsional, tersimpan per email Google (bukan per kunjungan), dapat diganti, **tidak dapat dihapus**, dan **disimpan tanpa batas waktu** untuk dokumentasi.
+  - Tidak ada centang persetujuan khusus KTP karena unggahan bersifat sukarela di "Lengkapi profil"; teks bagian itu menjelaskan tujuan, siapa yang melihat, dan bahwa foto tidak dapat dihapus.
+  - Foto disimpan di database (tabel baru `guest_documents`, MEDIUMBLOB) seperti tanda tangan, agar backup tetap cukup satu dump database. Mengganti foto menambah baris baru; foto lama tetap ada sebagai dokumentasi dan yang dipakai selalu yang terbaru.
+  - Browser memperkecil foto ke 1600 px sebelum dikirim. Server membaca ulang dengan GD dan menyimpan JPEG baru (metadata EXIF/GPS terbuang, isi selain gambar ditolak), dengan sisi terpendek minimal 300 px agar tulisan KTP terbaca.
+  - Hak lihat mengikuti tanda tangan: Admin, Super Admin, dan Resepsionis untuk tamu yang punya kunjungan dari QR miliknya; PIC tidak. Foto tampil di Detail Kunjungan lewat route berbatas peran, dan History memberi penanda "KTP". Setiap pembukaan foto oleh petugas tercatat di audit log karena KTP memuat NIK. Foto tidak ikut ekspor.
+- **Alasan:** Tamu yang paling tahu datanya sendiri dan cukup mengunggah sekali. Menyimpan di database menjaga satu jalur backup; foto per email kecil (sekitar 150–300 KB per foto) sehingga pertumbuhan database terkendali.
+- **Catatan:** Karena foto tidak dapat dihapus lewat aplikasi, permintaan hapus dari tamu (hak subjek data UU PDP) harus ditangani manual oleh pengelola database.
+
 ## 2026-11-12 — Ekspor bergaya buku tamu, tanpa kunjungan Dibatalkan (revisi HRD #3)
 
 - **Konteks:** HRD meminta ekspor mengikuti buku tamu fisik dan opsi untuk kunjungan Dibatalkan. Pemilik proyek menetapkan kolom buku tamu (9 kolom berurutan) dan aturan bahwa buku tamu memuat semua kunjungan selain yang Dibatalkan, termasuk yang masih Menunggu. Ini juga menjawab pertanyaan HRD nomor 2.

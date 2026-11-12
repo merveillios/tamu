@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\VisitController;
 use App\Http\Controllers\Admin\VulnerableGroupController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Guest\GoogleVerificationController;
+use App\Http\Controllers\Guest\GuestDocumentController;
 use App\Http\Controllers\Guest\GuestEntryController;
 use App\Http\Controllers\Guest\GuestFormController;
 use App\Http\Controllers\Guest\GuestHistoryController;
@@ -32,6 +33,8 @@ Route::prefix('tamu/{token}')->name('guest.')->group(function () {
     Route::post('/verifikasi-google', [GoogleVerificationController::class, 'verify'])->middleware('throttle:google-verify')->name('verify');
     Route::post('/ganti-akun', [GoogleVerificationController::class, 'switchAccount'])->name('switch');
     Route::get('/riwayat', [GuestHistoryController::class, 'show'])->name('history');
+    Route::post('/profil/{type}', [GuestDocumentController::class, 'store'])->whereIn('type', ['ktp', 'selfie'])->middleware('throttle:guest-document')->name('documents.store');
+    Route::get('/profil/{type}', [GuestDocumentController::class, 'show'])->whereIn('type', ['ktp', 'selfie'])->name('documents.show');
     Route::get('/formulir', [GuestFormController::class, 'show'])->name('form');
     Route::post('/formulir', [GuestFormController::class, 'store'])->middleware('throttle:guest-form')->name('store');
     Route::get('/terima-kasih', [GuestFormController::class, 'thanks'])->name('thanks');
@@ -57,6 +60,7 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/tamu/data', [ActiveVisitController::class, 'data'])->name('visits.active.data');
         Route::post('/kunjungan/{id}/batal', [VisitController::class, 'cancel'])->whereNumber('id')->name('visits.cancel');
         Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
+        Route::get('/kunjungan/{id}/foto/{type}', [VisitController::class, 'document'])->whereNumber('id')->whereIn('type', ['ktp', 'selfie'])->name('visits.document');
         // Resepsionis hanya melihat dan mengekspor kunjungan dari QR miliknya (AccessScope, revisi HRD #10).
         Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
         Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');

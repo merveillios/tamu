@@ -128,7 +128,7 @@ Pemulihan ke database kosong:
 mysql --default-character-set=utf8mb4 -u USER -p sitamu < sitamu_YYYYMMDD.sql
 ```
 
-Simpan juga salinan `.env` (terutama `APP_KEY`) di tempat aman yang terpisah. Ukuran database tumbuh sekitar 5–30 KB per kunjungan karena gambar tanda tangan.
+Simpan juga salinan `.env` (terutama `APP_KEY`) di tempat aman yang terpisah. Ukuran database tumbuh sekitar 5–30 KB per kunjungan karena gambar tanda tangan, ditambah sekitar 150–300 KB per foto KTP atau selfie yang diunggah tamu (maks. 1 MB per foto). Foto disimpan per tamu, bukan per kunjungan, tetapi setiap penggantian foto menambah satu foto baru karena foto lama tetap disimpan. Contoh: 2.000 tamu yang mengunggah KTP dan selfie sekali menambah sekitar 0,6–1,2 GB.
 
 ## Pemulihan darurat akun Super Admin
 
@@ -329,6 +329,11 @@ Alur tamu lama (pernah melapor):
    Rentan, Nama Lengkap, Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat)
    terisi otomatis dan terkunci; Keperluan, Rincian keperluan, tanda tangan, dan
    persetujuan UU PDP tetap wajib diisi ulang.
+3. Opsional: di halaman riwayat, bagian **Lengkapi profil** untuk mengunggah foto
+   KTP dan selfie. Foto diperkecil di HP sebelum dikirim, cukup sekali untuk
+   kunjungan berikutnya, dapat diganti, tetapi tidak dapat dihapus. Foto hanya
+   dapat dilihat Admin, Super Admin, dan Resepsionis (tamu dari QR miliknya) di
+   Detail Kunjungan, dan tidak ikut ekspor.
 
 ### 2. Resepsionis
 

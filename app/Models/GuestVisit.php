@@ -108,6 +108,14 @@ class GuestVisit extends Model
     }
 
     /**
+     * Foto KTP dan selfie milik email tamu ini, dari semua unggahan (TAM-18).
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(GuestDocument::class, 'email', 'email');
+    }
+
+    /**
      * Kelompok rentan yang dipilih tamu, dicocokkan lewat kode (VUL-1).
      */
     public function vulnerableGroupOption(): BelongsTo

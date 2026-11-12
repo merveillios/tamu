@@ -322,6 +322,14 @@ body {
     white-space: pre-line;
 }
 
+/* Foto KTP dan selfie (TAM-18): pratinjau tidak memenuhi layar */
+.guest-document-preview,
+.visit-document-photo {
+    display: block;
+    max-height: 240px;
+    object-fit: contain;
+}
+
 /* Tamu Aktif dan Penugasan: sorotan baris (RSP-7, RSP-8, PIC-4) */
 .row-new {
     animation: row-flash 3s ease-out;

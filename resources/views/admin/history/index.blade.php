@@ -113,7 +113,12 @@
                     @forelse ($visits as $visit)
                         <tr>
                             <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
-                            <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
+                            <td data-label="Nama" class="fw-bold">
+                                {{ $visit->name }}
+                                @if ($visit->has_ktp)
+                                    <span class="badge bg-gray-200 text-gray-800 fw-normal" title="Tamu sudah mengunggah foto KTP; lihat di Detail">KTP</span>
+                                @endif
+                            </td>
                             <td data-label="Instansi">{{ $visit->organization }}</td>
                             <td data-label="Kelompok rentan">{{ $visit->vulnerableGroupLabel() }}</td>
                             <td data-label="Rincian keperluan" class="small text-break" title="{{ $visit->purpose }}">{{ \Illuminate\Support\Str::limit($visit->purpose, 80) }}</td>

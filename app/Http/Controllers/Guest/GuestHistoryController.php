@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
+use App\Services\GuestDocumentService;
 use App\Services\GuestQrResolver;
 use App\Services\GuestSessionService;
 use App\Services\ReturningGuestService;
@@ -10,7 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 /**
- * Riwayat kunjungan tamu sendiri beserta hasil dari PIC (TAM-17).
+ * Riwayat kunjungan tamu sendiri beserta hasil dari PIC (TAM-17) dan "Lengkapi profil"
+ * untuk foto KTP dan selfie (TAM-18).
  */
 class GuestHistoryController extends Controller
 {
@@ -22,6 +24,7 @@ class GuestHistoryController extends Controller
         GuestQrResolver $resolver,
         GuestSessionService $guestSession,
         ReturningGuestService $returning,
+        GuestDocumentService $documents,
     ): View|RedirectResponse {
         $qr = $resolver->resolve($token);
         $email = $guestSession->verifiedEmail($qr);
@@ -36,6 +39,9 @@ class GuestHistoryController extends Controller
             'location' => $qr->location,
             'email' => $email,
             'visits' => $returning->history($email),
+            // Profil hanya dilengkapi tamu yang sudah punya kunjungan tercatat.
+            'canCompleteProfile' => $returning->isReturning($email),
+            'documents' => $documents->latest($email),
         ]);
     }
 }

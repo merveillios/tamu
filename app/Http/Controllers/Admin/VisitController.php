@@ -14,6 +14,8 @@ use App\Models\GuestVisit;
 use App\Models\User;
 use App\Models\VisitSignature;
 use App\Services\AccessScope;
+use App\Services\AuditService;
+use App\Services\GuestDocumentService;
 use App\Services\VisitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,7 +36,7 @@ class VisitController extends Controller
     /**
      * Detail kunjungan sesuai peran (ADM-4, PIC-5, Bab 13.2).
      */
-    public function show(Request $request, int $id): View
+    public function show(Request $request, int $id, GuestDocumentService $documents): View
     {
         $user = $request->user();
         $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $user)->load([
@@ -51,8 +53,29 @@ class VisitController extends Controller
             // Gambar tidak di-JOIN; keberadaannya dicek dengan query terpisah (Bab 9.2).
             'hasSignature' => $canSeeSignature && VisitSignature::query()->whereKey($visit->id)->exists(),
             'canSeeSignature' => $canSeeSignature,
+            // Foto KTP dan selfie mengikuti hak lihat tanda tangan (TAM-18); PIC tidak melihatnya.
+            'documents' => $canSeeSignature ? $documents->latest($visit->email) : collect(),
             'canReopen' => $user->role === UserRole::Admin && ! $visit->status->isActive(),
             'backUrl' => $this->backUrl($user),
+        ]);
+    }
+
+    /**
+     * Foto KTP atau selfie terbaru milik email tamu kunjungan ini (TAM-18). Hanya Admin,
+     * Super Admin, dan Resepsionis pemilik QR (lewat route dan AccessScope); setiap
+     * pembukaan tercatat di audit log karena KTP memuat NIK.
+     */
+    public function document(Request $request, int $id, string $type, GuestDocumentService $documents, AuditService $audit): Response
+    {
+        $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $request->user());
+        $document = $documents->latestImage($visit->email, $type) ?? abort(404);
+
+        $audit->record('guest_document.view', $document, ['type' => $type, 'visit_id' => $visit->id], $request->user());
+
+        return response($document->image, 200, [
+            'Content-Type' => $document->mime_type,
+            'Cache-Control' => 'private, no-store',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 

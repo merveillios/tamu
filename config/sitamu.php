@@ -25,6 +25,10 @@ return [
         'google_verify_rate_limit_max' => (int) env('GOOGLE_VERIFY_RATE_LIMIT_MAX', 10),
         'email_verify_ttl_minutes' => (int) env('EMAIL_VERIFY_TTL_MINUTES', 30),
         'history_per_page' => (int) env('GUEST_HISTORY_PER_PAGE', 10),
+        // Foto KTP dan selfie (TAM-18): ukuran file setelah dikompres dan sisi terpanjang gambar.
+        'document_max_kb' => (int) env('GUEST_DOCUMENT_MAX_KB', 1024),
+        'document_max_side' => (int) env('GUEST_DOCUMENT_MAX_SIDE', 1600),
+        'document_rate_limit_max' => (int) env('GUEST_DOCUMENT_RATE_LIMIT_MAX', 10),
     ],
 
     'google_client_id' => env('GOOGLE_CLIENT_ID'),
