@@ -20,6 +20,9 @@
     <h1>{{ config('sitamu.institution_name') }} — History Kunjungan</h1>
     <div class="meta">
         Lokasi: {{ $locationName }} ·
+        @if (! empty($scopeNote))
+            {{ $scopeNote }} ·
+        @endif
         Dibuat: {{ now()->format('d/m/Y H:i') }} ·
         Jumlah baris: {{ $rowCount }}
         @if ($filters !== [])

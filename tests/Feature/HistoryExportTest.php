@@ -27,7 +27,8 @@ class HistoryExportTest extends TestCase
         $locationA = $this->createLocation('Kantor A');
         $locationB = $this->createLocation('Kantor B');
         $departmentA = $this->createDepartment($locationA, 'Bidang A');
-        $qrA = $this->createQr($locationA, $this->createUser(UserRole::Receptionist));
+        $receptionistA = $this->createUser(UserRole::Receptionist);
+        $qrA = $this->createQr($locationA, $receptionistA);
         $qrB = $this->createQr($locationB, $this->createUser(UserRole::Receptionist));
         $categoryA = $this->createCategory($locationA, $departmentA);
         $categoryB = $this->createCategory($locationB);
@@ -44,7 +45,7 @@ class HistoryExportTest extends TestCase
         $png = base64_decode(substr($this->signatureDataUrl(), strlen('data:image/png;base64,')));
         VisitSignature::create(['visit_id' => $completed->id, 'image' => $png, 'size_bytes' => strlen($png), 'sha256' => hash('sha256', $png)]);
 
-        $this->data = compact('locationA', 'locationB', 'departmentA') + [
+        $this->data = compact('locationA', 'locationB', 'departmentA', 'receptionistA') + [
             'admin' => $this->createAdmin(),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
         ];
@@ -59,6 +60,48 @@ class HistoryExportTest extends TestCase
             ->assertDontSee('Tamu Menunggu')
             ->assertDontSee('Tamu Direview')
             ->assertSee('Tamu Lokasi B');
+    }
+
+    public function test_receptionist_history_only_shows_visits_from_own_qr(): void
+    {
+        $receptionist = $this->data['receptionistA'];
+
+        $this->actingAs($receptionist)->get('/admin/history')
+            ->assertOk()
+            ->assertSee('Tamu Selesai')
+            ->assertSee('hanya dari QR milik Anda')
+            ->assertSee('Ekspor PDF')
+            ->assertDontSee('Tamu Lokasi B');
+
+        $this->actingAs($receptionist)->get('/admin/history?location_id='.$this->data['locationA']->id)->assertOk();
+        $this->actingAs($receptionist)->get('/admin/history?location_id='.$this->data['locationB']->id)->assertNotFound();
+    }
+
+    public function test_receptionist_export_contains_only_own_qr_visits(): void
+    {
+        $receptionist = $this->data['receptionistA'];
+
+        $this->actingAs($receptionist)->get('/admin/tamu')->assertOk()->assertSee('Ekspor PDF hari ini');
+        $this->actingAs($this->data['admin'])->get('/admin/tamu')->assertOk()->assertDontSee('Ekspor PDF hari ini');
+
+        $this->actingAs($receptionist)->get('/admin/history/export')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $receptionist->id, 'detail->rows' => 2]);
+
+        // Resepsionis tanpa QR tidak melihat kunjungan siapa pun.
+        $other = $this->createUser(UserRole::Receptionist);
+        $this->actingAs($other)->get('/admin/history')->assertOk()->assertDontSee('Tamu Selesai')->assertDontSee('Tamu Lokasi B');
+        $this->actingAs($other)->get('/admin/history/export')->assertOk();
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $other->id, 'detail->rows' => 0]);
+    }
+
+    public function test_pic_cannot_open_history_or_export(): void
+    {
+        $pic = $this->createPic($this->data['departmentA']);
+
+        $this->actingAs($pic)->get('/admin/history')->assertForbidden();
+        $this->actingAs($pic)->get('/admin/history/export')->assertForbidden();
     }
 
     public function test_status_filter_can_show_processing_visits(): void

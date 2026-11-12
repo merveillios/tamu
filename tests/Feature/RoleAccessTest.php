@@ -27,7 +27,7 @@ class RoleAccessTest extends TestCase
             'ganti password' => ['/admin/password', $all],
             'tamu aktif' => ['/admin/tamu', [UserRole::SuperAdmin, UserRole::Admin, UserRole::Receptionist]],
             'penugasan' => ['/admin/penugasan', [UserRole::Pic]],
-            'history' => ['/admin/history', [UserRole::SuperAdmin, UserRole::Admin]],
+            'history' => ['/admin/history', [UserRole::SuperAdmin, UserRole::Admin, UserRole::Receptionist]],
             'daftar pengguna' => ['/admin/pengguna', [UserRole::SuperAdmin, UserRole::Admin]],
             'tambah pengguna' => ['/admin/pengguna/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
             'audit log' => ['/admin/audit-log', [UserRole::SuperAdmin, UserRole::Admin]],

@@ -32,7 +32,7 @@ class LayoutTest extends TestCase
 
     public function test_receptionist_menu(): void
     {
-        $this->assertMenu(UserRole::Receptionist, ['Tamu Aktif', 'Ganti Password'], ['Dashboard', 'Penugasan', 'History', 'Pengguna']);
+        $this->assertMenu(UserRole::Receptionist, ['Tamu Aktif', 'History', 'Ganti Password'], ['Dashboard', 'Penugasan', 'Pengguna', 'Kelompok Rentan']);
     }
 
     public function test_pic_menu(): void

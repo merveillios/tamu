@@ -11,7 +11,8 @@ use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * History Kunjungan dan ekspor untuk Admin dan Super Admin (HIS-1 sampai HIS-5).
+ * History Kunjungan dan ekspor untuk Admin, Super Admin (semua lokasi), dan Resepsionis
+ * (hanya kunjungan dari QR miliknya) (HIS-1 sampai HIS-6).
  */
 class HistoryController extends Controller
 {
@@ -29,7 +30,7 @@ class HistoryController extends Controller
         $this->history->ensureFiltersInScope($user, $filters);
 
         $visits = $this->history->query($user, $filters)
-            ->with(['location:id,name', 'assignedDepartment:id,name'])
+            ->with(['location:id,name', 'assignedDepartment:id,name', 'vulnerableGroupOption:code,name'])
             ->paginate(25)
             ->withQueryString();
 

@@ -162,7 +162,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 
 - **Super Admin:** \[DIUBAH v0.11\] akun cadangan untuk keadaan darurat. Memiliki semua hak Admin kecuali membuka kembali kunjungan \[DEFAULT\], ditambah satu hak yang tidak dimiliki Admin: mengelola akun Admin dan Super Admin (USR-6). Dalam operasional harian tidak perlu dipakai.
 - **Admin:** \[DIUBAH v0.11\] pengelola harian untuk **semua lokasi**, tanpa penugasan lokasi (ADM-5). Memantau tamu aktif, membatalkan dan membuka kembali kunjungan, melihat dan mengekspor History, mengelola lokasi, Bidang/UPT, QR Code, kategori keperluan, daftar petugas, serta akun Resepsionis dan PIC, dan melihat audit log. Admin tidak menugaskan kunjungan dan tidak mengelola akun Admin maupun Super Admin (USR-6).
-- **Resepsionis:** akun bersama per pos penerimaan tamu (misalnya "Resepsionis Pintu Timur"), dipakai bergantian oleh petugas yang sedang jaga. Cakupannya adalah QR yang terhubung ke akunnya. Melihat tamu aktif dari QR tersebut, menugaskan dan menugaskan ulang kunjungan ke Bidang/UPT sekaligus memilih orang yang ditemui (petugas yang akan mereview tamu), serta membatalkan kunjungan.
+- **Resepsionis:** akun bersama per pos penerimaan tamu (misalnya "Resepsionis Pintu Timur"), dipakai bergantian oleh petugas yang sedang jaga. Cakupannya adalah QR yang terhubung ke akunnya. Melihat tamu aktif dari QR tersebut, menugaskan dan menugaskan ulang kunjungan ke Bidang/UPT sekaligus memilih orang yang ditemui (petugas yang akan mereview tamu), serta membatalkan kunjungan. \[DIUBAH revisi HRD #10\] Melihat dan mengekspor History kunjungan dari QR tersebut (HIS-6).
 - **PIC:** akun bersama per Bidang/UPT (misalnya "PIC Bidang Perdagangan Dalam Negeri"), satu akun per Bidang/UPT yang dipakai beberapa orang secara bergantian. Cakupannya adalah kunjungan yang ditugaskan ke Bidang/UPT-nya. Menerima penugasan, lalu orang yang ditemui yang dipilih resepsionis mereview keperluan tamu lewat akun ini, menulis hasil, dan menyelesaikan kunjungan.
 - **Tamu:** tidak memiliki akun. Memindai QR, memverifikasi email lewat akun Google, mengisi formulir dan membubuhkan tanda tangan, menerima konfirmasi bahwa kunjungannya terkirim, dan melihat riwayat kunjungannya sendiri beserta hasil dari PIC.
 
@@ -180,7 +180,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Semua lokasi | Tidak | Tidak | – |
 | Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Bidang/UPT-nya | – |
 | Gambar tanda tangan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
-| History: lihat, cari, filter, ekspor PDF | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
+| History: lihat, cari, filter, ekspor PDF | Semua lokasi | Semua lokasi | \[DIUBAH revisi HRD #10\] QR miliknya | Tidak | – |
 | Kelola daftar petugas Bidang/UPT | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola lokasi | Ya | Ya | Tidak | Tidak | – |
 | Kelola Bidang/UPT | Ya | Ya | Tidak | Tidak | – |
@@ -533,7 +533,7 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 | ADM-5 | \[BARU v0.11\] Admin tidak dibatasi lokasi. | Wajib | `AccessScope` memperlakukan Admin seperti Super Admin untuk data kunjungan dan master data (Bab 12.2). Tidak ada penugasan lokasi Admin (USR-2 dihapus). |
 | ADM-4 | Admin dan Super Admin melihat detail lengkap kunjungan. | Wajib | 12 data Bab 6.6.1 termasuk gambar tanda tangan, lokasi, QR, saran Bidang/UPT, Bidang/UPT tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status. |
 
-## 6.10 Admin dan Super Admin — History Kunjungan
+## 6.10 Admin, Super Admin, dan Resepsionis — History Kunjungan \[DIUBAH revisi HRD #10\]
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
@@ -541,6 +541,7 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 | HIS-2 | \[DIUBAH v0.10\] Admin dapat mencari dan memfilter. | Wajib | Pencarian teks pada nama, instansi, dan rincian keperluan. Filter: rentang tanggal `check_in_at`, preset periode (Hari ini, 7 hari terakhir, Bulan ini), status, lokasi, kategori keperluan, Bidang/UPT tujuan, dan kelompok rentan. Filter tersimpan di query string. |
 | HIS-3 | \[DIHAPUS revisi HRD #6 dan #7\] Filter kategori keperluan dihapus bersama kategori. | – | Pencarian teks pada rincian keperluan (HIS-2) tetap tersedia. |
 | HIS-4 | Admin dapat melihat detail kunjungan dan mengekspor data sesuai cakupan. | Wajib | Ekspor mengikuti filter aktif dan cakupan. Spesifikasi di Bab 12.4. Setiap ekspor tercatat di audit log beserta format, filter, dan jumlah baris. |
+| HIS-6 | \[BARU revisi HRD #10\] Resepsionis dapat membuka History dan mengekspor PDF, hanya untuk kunjungan dari QR miliknya. | Wajib | Halaman, filter, dan ekspor sama dengan Admin (HIS-1 sampai HIS-5); cakupan dari `AccessScope` (QR dengan status apa pun, mengikuti kepemilikan QR saat ini seperti tanda tangan). Pilihan lokasi hanya lokasi QR miliknya; `location_id` lain menghasilkan 404. Halaman menampilkan keterangan "hanya dari QR milik Anda", dan kepala PDF memuat "Cakupan: QR milik resepsionis <nama akun>". Tamu Aktif Resepsionis menampilkan tombol "Ekspor PDF hari ini" (ekspor dengan `period=hari_ini`) dan tautan ke History untuk periode lain. Ekspor tercatat di audit log seperti HIS-4. PIC tetap tidak memiliki History. |
 | HIS-5 | \[DIUBAH revisi HRD #13\] Tombol **Ekspor PDF**; ekspor hanya tersedia dalam format PDF. | Wajib | Parameter `format` opsional dan hanya menerima `pdf`; nilai lain (termasuk `csv` dan `xlsx`) ditolak dengan pesan "Ekspor hanya tersedia dalam format PDF.". Tidak ada batas baris: semua baris hasil filter diekspor. |
 
 ## 6.11 Dashboard \[DIUBAH v0.10\]
@@ -1005,6 +1006,8 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET | `/admin/tamu` | Tamu Aktif. Query: `q`, `status` (`menunggu`, `menunggu_pic`, `direview`), `location_id`. |
 | GET | `/admin/tamu/data` | JSON untuk polling; filter sama; berisi daftar, jumlah per label status, dan `server_time`. |
 | POST | `/admin/kunjungan/{id}/batal` | AJAX: → `cancelled`. Body: `reason`, `reason_text`. |
+| GET | `/admin/history` | \[DIUBAH revisi HRD #10\] History; Resepsionis hanya kunjungan dari QR miliknya (HIS-6). Query: `q`, `from`, `to`, `period`, `status`, `location_id`, `purpose_category_id`, `department_id`, `vulnerable_group`, `page`. |
+| GET | `/admin/history/export` | Unduh ekspor dengan filter yang sama. Query tambahan: `format` (hanya `pdf`, opsional). Selalu menghasilkan PDF. |
 
 ## 10.4 Resepsionis (`role:receptionist`)
 
@@ -1029,8 +1032,6 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | Method | Path | Keterangan |
 | --- | --- | --- |
 | GET | `/admin/kunjungan/{id}/tanda-tangan` | Gambar PNG tanda tangan. Header: `Content-Type: image/png`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`. |
-| GET | `/admin/history` | History. Query: `q`, `from`, `to`, `period`, `status`, `location_id`, `purpose_category_id`, `department_id`, `vulnerable_group`, `page`. |
-| GET | `/admin/history/export` | Unduh ekspor dengan filter yang sama. Query tambahan: `format` (hanya `pdf`, opsional). Selalu menghasilkan PDF. |
 | GET | `/admin/petugas` | \[BARU v0.10\] Daftar petugas per Bidang/UPT. Query: `department_id`. |
 | GET / POST | `/admin/petugas/tambah` | \[BARU v0.10\] Form dan simpan petugas. |
 | GET / POST | `/admin/petugas/{id}/ubah` | \[BARU v0.10\] Form dan simpan perubahan. |
@@ -1265,7 +1266,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Login | Email, password, pesan error seragam. |
 | Layout staf | Sidebar di desktop, offcanvas di ponsel. Menu sesuai peran (di bawah). Nama akun, peran, dan tombol logout di pojok kanan atas. |
-| Menu per peran | **Resepsionis:** Tamu Aktif, Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin dan Super Admin:** \[DIUBAH revisi HRD #6, #7, dan #12\] Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT), QR Code, Petugas, Kelompok Rentan, Pengguna, Audit Log, Ganti Password. Menu Kategori Keperluan dihapus. |
+| Menu per peran | **Resepsionis:** Tamu Aktif, History \[DIUBAH revisi HRD #10\], Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin dan Super Admin:** \[DIUBAH revisi HRD #6, #7, dan #12\] Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT), QR Code, Petugas, Kelompok Rentan, Pengguna, Audit Log, Ganti Password. Menu Kategori Keperluan dihapus. |
 | Dashboard (Admin, Super Admin) | Kartu angka (DSH-1/DSH-3), Tamu Aktif ringkas, grafik 14 hari (Super Admin). |
 | Tamu Aktif — Resepsionis | Kotak pencarian dan filter label status; tabel/kartu: nama, instansi, kelompok rentan, rincian keperluan (dipotong, teks lengkap di tooltip), Bidang/UPT dan orang yang ditemui, jam datang, lama menunggu, badge status, tombol aksi. Tombol per kondisi: Menunggu → Tugaskan, Batal; Menunggu PIC → Tugaskan ulang, Batal; Sedang direview → Batal. Modal Tugaskan menampilkan rincian keperluan lengkap, lalu pilihan Bidang/UPT (saran terpilih otomatis hanya untuk kunjungan lama yang punya kategori), lalu pilihan orang yang ditemui dari daftar petugas Bidang/UPT tersebut. Modal alasan batal. Toast setelah aksi. |
 | Tamu Aktif — Admin, Super Admin | Sama dengan versi Resepsionis ditambah kolom lokasi dan QR serta filter lokasi; tombol hanya Batal dan Detail. |

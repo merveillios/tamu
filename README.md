@@ -344,6 +344,8 @@ Fitur:
   PIC lain — PIC diganti, status kembali Menunggu, alasan pengalihan wajib
   diisi, dan jejaknya tercatat di audit log serta riwayat kunjungan.
 - **Batalkan kunjungan** dengan alasan wajib yang tercatat.
+- **History dan ekspor PDF**: riwayat kunjungan Selesai/Dibatalkan **hanya dari
+  QR miliknya**, dengan filter yang sama seperti Admin, dan dapat diekspor ke PDF.
 - **Petugas yang dihubungi tamu** bila tamu gagal login Google: tamu yang sudah
   mengikuti saran di halaman Bantuan Login Google (membuka halaman di Chrome
   atau Safari) dan masih belum bisa, diarahkan untuk menghubungi petugas.

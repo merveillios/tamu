@@ -2,6 +2,17 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Resepsionis dapat membuka History dan mengekspor PDF (revisi HRD #10)
+
+- **Konteks:** HRD meminta ekspor PDF untuk resepsionis. Sebelumnya History dan ekspor hanya untuk Admin dan Super Admin, dan Resepsionis hanya punya Tamu Aktif.
+- **Keputusan:**
+  - Route `/admin/history` dan `/admin/history/export` dipindah ke grup `role:receptionist,admin,super_admin`, dan menu History tampil untuk Resepsionis. Sesuai permintaan tombol ekspor di dashboard resepsionis, Tamu Aktif Resepsionis mendapat tombol "Ekspor PDF hari ini" dan tautan ke History untuk periode lain. Tidak ada halaman atau template PDF terpisah: History, filter, dan ekspor sama dengan milik Admin, termasuk kolom telepon, alamat, email, dan tanda tangan, karena Resepsionis memang sudah melihat semua data itu di Detail Kunjungan.
+  - Cakupan kunjungan tetap dari `AccessScope` (kunjungan dari QR miliknya, apa pun status QR-nya). Pilihan dan pemeriksaan filter lokasi kini memakai `AccessScope::locationIds()`, bukan cakupan master data, karena Resepsionis tidak mengelola lokasi; lokasi di luar cakupan menghasilkan 404.
+  - Halaman History Resepsionis menampilkan "hanya dari QR milik Anda", dan kepala PDF menampilkan "Cakupan: QR milik resepsionis <nama akun>" agar file yang beredar tidak terbaca sebagai data semua lokasi.
+  - PIC tetap tanpa History, karena akun PIC dipakai bersama dan data tamunya sengaja dibatasi (PIC-7).
+- **Alasan:** Memakai jalur yang sama dengan Admin membuat aturan ekspor (hanya PDF, tanpa batas baris, audit log) berlaku otomatis bagi Resepsionis tanpa kode ganda.
+- **Catatan:** Cakupan mengikuti kepemilikan QR saat ini. Setelah QR dipindahkan ke resepsionis lain (QR-6), History dan ekspor kunjungan lama QR itu pindah ke resepsionis baru.
+
 ## 2026-11-12 — Kelompok rentan menjadi master data (revisi HRD #12)
 
 - **Konteks:** Pilihan kelompok rentan ditulis di enum `VulnerableGroup`, dan urutan prioritas antrean (Lansia, Disabilitas, Ibu hamil) ditulis langsung di `VisitListService`. HRD meminta halaman tambah, ubah, dan hapus untuk Admin.

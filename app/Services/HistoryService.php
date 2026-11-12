@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\Enums\VisitStatus;
-use App\Models\VulnerableGroup;
 use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\Location;
 use App\Models\User;
+use App\Models\VulnerableGroup;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -77,7 +77,13 @@ class HistoryService
      */
     public function filterOptions(User $user): array
     {
-        $locations = Location::query()->forUser($user)->orderBy('name')->get(['id', 'name']);
+        // Lokasi dari cakupan kunjungan, bukan cakupan master data: Resepsionis tidak mengelola
+        // lokasi tetapi tetap perlu memfilter lokasi QR miliknya.
+        $scopeIds = $this->scope->locationIds($user);
+        $locations = Location::query()
+            ->when($scopeIds !== null, fn (Builder $query) => $query->whereIn('id', $scopeIds))
+            ->orderBy('name')
+            ->get(['id', 'name']);
         $locationIds = $locations->pluck('id');
 
         return [
@@ -95,15 +101,20 @@ class HistoryService
      */
     public function ensureFiltersInScope(User $user, array $filters): void
     {
+        $locationIds = $this->scope->locationIds($user);
+
         if (! empty($filters['location_id'])) {
-            $this->scope->findOrDeny(Location::class, $filters['location_id'], $user);
+            $inScope = Location::query()->whereKey($filters['location_id'])
+                ->when($locationIds !== null, fn (Builder $query) => $query->whereIn('id', $locationIds))
+                ->exists();
+
+            abort_unless($inScope, 404);
         }
 
         if (empty($filters['department_id'])) {
             return;
         }
 
-        $locationIds = $this->scope->locationIds($user);
         $inScope = Department::query()->whereKey($filters['department_id'])
             ->when($locationIds !== null, fn (Builder $query) => $query->whereIn('location_id', $locationIds))
             ->exists();

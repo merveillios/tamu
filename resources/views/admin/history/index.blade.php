@@ -78,7 +78,12 @@
     </form>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="small text-gray-600">{{ $visits->total() }} kunjungan</span>
+        <span class="small text-gray-600">
+            {{ $visits->total() }} kunjungan
+            @if (auth()->user()->role === \App\Enums\UserRole::Receptionist)
+                · hanya dari QR milik Anda
+            @endif
+        </span>
         {{-- Ekspor hanya PDF (revisi HRD #13); seluruh baris sesuai filter ikut diekspor. --}}
         <a href="{{ route('admin.history.export', $filters) }}" class="btn btn-primary btn-sm">Ekspor PDF</a>
     </div>

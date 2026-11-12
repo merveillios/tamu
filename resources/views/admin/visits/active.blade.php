@@ -46,6 +46,14 @@
         <span class="text-gray-500 ms-auto">Diperbarui <span data-server-time>–</span></span>
     </div>
 
+    @if ($isReceptionist && ! $receptionistWithoutQr)
+        {{-- Ekspor resepsionis (revisi HRD #10): kunjungan Selesai/Dibatalkan dari QR miliknya. --}}
+        <div class="d-flex flex-wrap gap-2 justify-content-end mb-3">
+            <a href="{{ route('admin.history.export', ['period' => 'hari_ini']) }}" class="btn btn-primary btn-sm">Ekspor PDF hari ini</a>
+            <a href="{{ route('admin.history.index') }}" class="btn btn-outline-gray-800 btn-sm">History &amp; ekspor periode lain</a>
+        </div>
+    @endif
+
     <div class="card card-body border-0 shadow">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0 table-cards"

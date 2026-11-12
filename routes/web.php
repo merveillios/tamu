@@ -57,6 +57,9 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/tamu/data', [ActiveVisitController::class, 'data'])->name('visits.active.data');
         Route::post('/kunjungan/{id}/batal', [VisitController::class, 'cancel'])->whereNumber('id')->name('visits.cancel');
         Route::get('/kunjungan/{id}/tanda-tangan', [VisitController::class, 'signature'])->whereNumber('id')->name('visits.signature');
+        // Resepsionis hanya melihat dan mengekspor kunjungan dari QR miliknya (AccessScope, revisi HRD #10).
+        Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+        Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
     });
 
     Route::middleware('role:receptionist')->group(function () {
@@ -105,9 +108,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::post('/pengguna/{id}/buka-kunci', [UserController::class, 'unlock'])->whereNumber('id')->name('users.unlock');
 
         Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit.index');
-
-        Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
-        Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
 
         Route::get('/petugas', [StaffMemberController::class, 'index'])->name('staff.index');
         Route::get('/petugas/tambah', [StaffMemberController::class, 'create'])->name('staff.create');

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserRole;
 use App\Enums\VisitStatus;
 use App\Models\GuestVisit;
 use App\Models\User;
@@ -55,12 +56,23 @@ class ExportService
 
         $filename = sprintf('sitamu_%s_%s.pdf', $locationName ? Str::slug($locationName) : 'semua', now()->format('Ymd-Hi'));
 
-        return response($this->pdf($query->with(self::RELATIONS), $filters, $locationName, $rows), 200, [
+        return response($this->pdf($query->with(self::RELATIONS), $filters, $locationName, $rows, $this->scopeNote($actor)), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'private, no-store',
             'X-Content-Type-Options' => 'nosniff',
         ]);
+    }
+
+    /**
+     * Keterangan cakupan di kepala PDF untuk akun yang datanya dibatasi; Admin dan
+     * Super Admin melihat semua lokasi sehingga tidak perlu keterangan (HIS-6).
+     */
+    private function scopeNote(User $actor): ?string
+    {
+        return $actor->role === UserRole::Receptionist
+            ? "Cakupan: QR milik resepsionis {$actor->name}"
+            : null;
     }
 
     /**
@@ -94,7 +106,7 @@ class ExportService
      *
      * @param  array<string, mixed>  $filters
      */
-    private function pdf(Builder $query, array $filters, ?string $locationName, int $rowCount): string
+    private function pdf(Builder $query, array $filters, ?string $locationName, int $rowCount, ?string $scopeNote): string
     {
         // Tanpa batas baris, Dompdf menyusun seluruh tabel di memori; batas PHP dinaikkan
         // khusus untuk request ini agar filter yang lebar tidak terhenti di tengah jalan.
@@ -117,6 +129,7 @@ class ExportService
             'locationName' => $locationName ?? 'Semua lokasi',
             'filters' => $filters,
             'rowCount' => $rowCount,
+            'scopeNote' => $scopeNote,
         ])->render();
 
         $options = new Options();
