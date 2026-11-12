@@ -83,7 +83,7 @@ class UserManagementTest extends TestCase
 
         $this->actingAs($this->superAdmin)
             ->post('/admin/pengguna/tambah', $this->payload(['role' => 'pic', 'department_id' => $department->id]))
-            ->assertSessionHasErrors(['department_id' => 'Departemen ini sudah memiliki akun PIC aktif.']);
+            ->assertSessionHasErrors(['department_id' => 'Bidang/UPT ini sudah memiliki akun PIC aktif.']);
 
         $this->assertDatabaseMissing('users', ['email' => 'baru@contoh.test']);
     }

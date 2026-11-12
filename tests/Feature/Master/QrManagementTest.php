@@ -95,7 +95,7 @@ class QrManagementTest extends TestCase
         foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
             $this->actingAs($actor)->get('/admin/qr')
                 ->assertOk()
-                ->assertDontSee('<th class="border-gray-200">Departemen</th>', false)
+                ->assertDontSee('<th class="border-gray-200">Bidang/UPT</th>', false)
                 ->assertSee('Belum siap')
                 ->assertSee('Belum ada kategori keperluan aktif.');
         }

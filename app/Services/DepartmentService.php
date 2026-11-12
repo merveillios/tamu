@@ -74,7 +74,7 @@ class DepartmentService
             ->exists();
 
         if ($taken) {
-            throw ValidationException::withMessages(['name' => 'Nama departemen sudah digunakan di lokasi ini.']);
+            throw ValidationException::withMessages(['name' => 'Nama Bidang/UPT sudah digunakan di lokasi ini.']);
         }
     }
 }

@@ -39,7 +39,7 @@ class AssignVisitRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'department_id.*' => 'Pilih departemen tujuan.',
+            'department_id.*' => 'Pilih Bidang/UPT tujuan.',
             'staff_member_id.*' => 'Pilih orang yang ditemui.',
         ];
     }

@@ -2,6 +2,12 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Istilah "departemen" menjadi "Bidang/UPT" (revisi HRD #1)
+
+- **Konteks:** Struktur organisasi Disperindag Jatim memakai istilah Bidang dan UPT, bukan departemen.
+- **Keputusan:** Semua teks yang terlihat pengguna (menu, judul, label, tombol, pesan validasi, notifikasi, header ekspor) serta README dan PRD memakai satu penulisan: "Bidang/UPT". Nama tabel, model, class, route, URL (`/departemen`), parameter query (`departemen`), kode aksi audit log (`department.*`), dan komentar kode tidak diubah.
+- **Alasan:** Mengganti nama teknis berisiko memutus data, tes, dan tautan lama tanpa manfaat bagi pengguna.
+
 ## 2026-11-12 — Resepsionis boleh melihat tanda tangan (TAM-9)
 
 - **Konteks:** Commit `3ddb218` membuka route tanda tangan dan gambar di detail kunjungan untuk Resepsionis, sedangkan PRD (matriks peran, TAM-9, Bab 13) masih menyebut hanya Admin dan Super Admin. Audit keamanan 2026-10-29 mencatat ketidaksesuaian ini.

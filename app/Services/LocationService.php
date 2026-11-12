@@ -68,7 +68,7 @@ class LocationService
     {
         if ($this->hasData($location)) {
             throw ValidationException::withMessages([
-                'location' => 'Lokasi yang sudah memiliki kunjungan, departemen, atau QR tidak dapat dihapus, hanya dinonaktifkan.',
+                'location' => 'Lokasi yang sudah memiliki kunjungan, Bidang/UPT, atau QR tidak dapat dihapus, hanya dinonaktifkan.',
             ]);
         }
 

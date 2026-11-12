@@ -63,7 +63,7 @@
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
                         <th class="border-gray-200">Keperluan</th>
-                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Bidang/UPT</th>
                         <th class="border-gray-200">Nama PIC</th>
                         @unless ($isReceptionist)
                             <th class="border-gray-200">Lokasi / QR</th>
@@ -104,7 +104,7 @@
                                 <th class="border-gray-200">Nama</th>
                                 <th class="border-gray-200">Instansi</th>
                                 <th class="border-gray-200">Keperluan</th>
-                                <th class="border-gray-200">Departemen / ditemui</th>
+                                <th class="border-gray-200">Bidang/UPT dan orang ditemui</th>
                                 <th class="border-gray-200">Status</th>
                                 <th class="border-gray-200">Jam ditutup</th>
                                 <th class="border-gray-200">Alasan batal</th>
@@ -133,7 +133,7 @@
                     <div class="modal-body">
                         <p class="small text-gray-600" data-assign-guest></p>
                         <div class="mb-3">
-                            <label for="assign_department" class="form-label">Departemen tujuan</label>
+                            <label for="assign_department" class="form-label">Bidang/UPT tujuan</label>
                             <select id="assign_department" name="department_id" class="form-select" required></select>
                             <div class="form-text" data-assign-suggestion></div>
                         </div>

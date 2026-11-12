@@ -7,7 +7,7 @@
         <div class="col-12 col-xl-6">
             <div class="card card-body border-0 shadow mb-4">
                 <h2 class="h5 mb-1">{{ $staffMember->exists ? 'Ubah petugas '.$staffMember->name : 'Petugas baru' }}</h2>
-                <p class="small text-gray-600 mb-4">Departemen: {{ $department->name }}</p>
+                <p class="small text-gray-600 mb-4">Bidang/UPT: {{ $department->name }}</p>
 
                 <form method="POST" action="{{ $staffMember->exists ? route('admin.staff.update', $staffMember->id) : route('admin.staff.store', ['department_id' => $department->id]) }}">
                     @csrf

@@ -15,14 +15,14 @@
                     <div class="mb-3">
                         @if ($fixedDepartment !== null)
                             {{-- Ditambah dari halaman departemen: departemen sudah ditentukan dan tidak dipilih lagi. --}}
-                            <label for="department_name" class="form-label">Departemen</label>
+                            <label for="department_name" class="form-label">Bidang/UPT</label>
                             <input type="text" id="department_name" value="{{ $fixedDepartment->name }}" class="form-control" readonly>
                             <input type="hidden" name="suggested_department_id" value="{{ $fixedDepartment->id }}">
                         @else
-                            <label for="suggested_department_id" class="form-label">Departemen</label>
+                            <label for="suggested_department_id" class="form-label">Bidang/UPT</label>
                             <select name="suggested_department_id" id="suggested_department_id" required
                                     class="form-select @error('suggested_department_id') is-invalid @enderror" aria-describedby="suggested_department_id_error">
-                                <option value="">Pilih departemen</option>
+                                <option value="">Pilih Bidang/UPT</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}" @selected((int) old('suggested_department_id', $category->suggested_department_id) === $department->id)>
                                         {{ $department->name }}
@@ -33,7 +33,7 @@
                         @error('suggested_department_id')
                             <div class="invalid-feedback d-block" id="suggested_department_id_error">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Di formulir tamu, pertanyaan tampil di bawah nama departemen ini. Departemen ini juga dipilih otomatis sebagai saran saat resepsionis menugaskan kunjungan.</div>
+                        <div class="form-text">Di formulir tamu, pertanyaan tampil di bawah nama Bidang/UPT ini. Bidang/UPT ini juga dipilih otomatis sebagai saran saat resepsionis menugaskan kunjungan.</div>
                     </div>
 
                     <div class="mb-3">
@@ -53,7 +53,7 @@
                         @error('sort_order')
                             <div class="invalid-feedback" id="sort_order_error">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Angka kecil tampil lebih dulu di dalam grup departemennya.</div>
+                        <div class="form-text">Angka kecil tampil lebih dulu di dalam grup Bidang/UPT-nya.</div>
                     </div>
 
                     <div class="d-flex gap-2">

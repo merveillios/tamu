@@ -66,7 +66,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan.',
             'email.*' => 'Email tidak valid.',
             'role.*' => 'Pilih peran akun.',
-            'department_id.*' => 'Pilih departemen aktif untuk akun PIC.',
+            'department_id.*' => 'Pilih Bidang/UPT aktif untuk akun PIC.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'password.*' => 'Password minimal 8 karakter.',
         ];

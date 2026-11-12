@@ -62,9 +62,9 @@
                 </select>
             </div>
             <div class="col-6 col-lg-3">
-                <label for="department_id" class="form-label small mb-1">Departemen tujuan</label>
+                <label for="department_id" class="form-label small mb-1">Bidang/UPT tujuan</label>
                 <select name="department_id" id="department_id" class="form-select">
-                    <option value="">Semua departemen</option>
+                    <option value="">Semua Bidang/UPT</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department->id }}" @selected((int) ($filters['department_id'] ?? 0) === $department->id)>
                             {{ $department->name }}{{ $locations->count() > 1 ? ' — '.$department->location->name : '' }}
@@ -111,7 +111,7 @@
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
                         <th class="border-gray-200">Kategori</th>
-                        <th class="border-gray-200">Departemen tujuan</th>
+                        <th class="border-gray-200">Bidang/UPT tujuan</th>
                         <th class="border-gray-200">Lokasi</th>
                         <th class="border-gray-200">Jam datang</th>
                         <th class="border-gray-200">Status</th>
@@ -127,7 +127,7 @@
                             <td data-label="Instansi">{{ $visit->organization }}</td>
                             <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
                             <td data-label="Kategori">{{ $visit->purpose_category_name }}</td>
-                            <td data-label="Departemen">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
+                            <td data-label="Bidang/UPT">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
                             <td data-label="Lokasi">{{ $visit->location->name }}</td>
                             <td data-label="Jam datang">{{ $visit->check_in_at->format('H:i') }}</td>
                             <td data-label="Status"><span class="badge bg-{{ $visit->display_status['badge'] }}">{{ $visit->display_status['label'] }}</span></td>

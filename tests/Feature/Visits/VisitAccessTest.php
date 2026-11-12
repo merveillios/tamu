@@ -249,7 +249,7 @@ class VisitAccessTest extends TestCase
         $this->flushSession();
         $this->actingAs($this->createUser(UserRole::Pic))->get('/admin/penugasan')
             ->assertOk()
-            ->assertSee('Akun ini belum dihubungkan ke departemen.');
+            ->assertSee('Akun ini belum dihubungkan ke Bidang/UPT.');
 
         $this->as('picA')->get('/admin/penugasan')->assertSee('data-assignment-badge', false);
     }

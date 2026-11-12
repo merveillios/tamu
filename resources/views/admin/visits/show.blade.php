@@ -62,8 +62,8 @@
                 <dl class="row small mb-0">
                     <dt class="col-5 text-gray-600 fw-normal">Lokasi</dt><dd class="col-7">{{ $visit->location->name }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">QR</dt><dd class="col-7">{{ $visit->qrCode->label ?? 'QR #'.$visit->qr_code_id }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Saran departemen</dt><dd class="col-7">{{ $visit->suggestedDepartment?->name ?? '–' }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Departemen tujuan</dt><dd class="col-7">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>
+                    <dt class="col-5 text-gray-600 fw-normal">Saran Bidang/UPT</dt><dd class="col-7">{{ $visit->suggestedDepartment?->name ?? '–' }}</dd>
+                    <dt class="col-5 text-gray-600 fw-normal">Bidang/UPT tujuan</dt><dd class="col-7">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Diterima PIC</dt>
                     <dd class="col-7">{{ $visit->processedBy ? $visit->processedBy->name.' · '.$datetime($visit->processed_at) : '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Selesai</dt><dd class="col-7">{{ $datetime($visit->completed_at) }}</dd>
@@ -86,7 +86,7 @@
                 <thead>
                     <tr>
                         <th class="border-gray-200">Waktu</th>
-                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Bidang/UPT</th>
                         <th class="border-gray-200">Orang yang ditemui</th>
                         <th class="border-gray-200">Oleh akun</th>
                     </tr>
@@ -95,7 +95,7 @@
                     @forelse ($visit->assignments as $assignment)
                         <tr>
                             <td data-label="Waktu">{{ $datetime($assignment->assigned_at) }}</td>
-                            <td data-label="Departemen">{{ $assignment->department->name }}</td>
+                            <td data-label="Bidang/UPT">{{ $assignment->department->name }}</td>
                             <td data-label="Ditemui">{{ $assignment->staffMember->name }}</td>
                             <td data-label="Oleh">{{ $assignment->assignedBy?->name ?? '–' }}</td>
                         </tr>

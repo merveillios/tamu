@@ -1,6 +1,6 @@
 # SiTamu — Sistem Informasi Buku Tamu
 
-Buku tamu digital berbasis QR Code untuk Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur. Tamu mengisi formulir lewat ponsel, resepsionis menugaskan kunjungan ke departemen, PIC melayani dan menulis hasil, lalu hasil tampil di riwayat tamu.
+Buku tamu digital berbasis QR Code untuk Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur. Tamu mengisi formulir lewat ponsel, resepsionis menugaskan kunjungan ke Bidang/UPT, PIC melayani dan menulis hasil, lalu hasil tampil di riwayat tamu.
 
 Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -41,7 +41,7 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
    php artisan sitamu:create-superadmin
    ```
 
-   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, departemen, petugas, kategori, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
+   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, Bidang/UPT, petugas, kategori, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
 
    ```bash
    php artisan migrate:fresh --seed
@@ -108,11 +108,11 @@ Setelah instalasi, isi data sesuai urutan PRD Bab 8.1:
 
 1. **Super Admin → Pengguna:** buat akun Admin. Langkah berikutnya dikerjakan Admin; Super Admin hanya dipakai saat darurat.
 2. **Admin → Lokasi:** buat setiap lokasi atau gedung.
-3. **Admin → Lokasi → Departemen:** buat departemen di tiap lokasi.
-4. **Admin → Pengguna:** buat akun Resepsionis per pos jaga dan satu akun PIC per departemen.
+3. **Admin → Lokasi → Bidang/UPT:** buat Bidang/UPT di tiap lokasi.
+4. **Admin → Pengguna:** buat akun Resepsionis per pos jaga dan satu akun PIC per Bidang/UPT.
 5. **Admin → QR Code:** buat QR untuk tiap titik masuk dan pilih akun resepsionisnya, lalu cetak dan tempel.
-6. **Admin → Kategori Keperluan:** isi kategori tiap lokasi beserta saran departemennya. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu kategori aktif.
-7. **Admin → Petugas:** isi orang yang dapat ditemui di tiap departemen. Departemen baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
+6. **Admin → Pertanyaan (kategori keperluan):** isi kategori tiap lokasi beserta saran Bidang/UPT-nya. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu kategori aktif.
+7. **Admin → Petugas:** isi orang yang dapat ditemui di tiap Bidang/UPT. Bidang/UPT baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
 
 ## Backup dan pemulihan
 
@@ -266,8 +266,8 @@ kembali di riwayat tamu.
 
 ### Alur Utama Kunjungan
 
-1. **Admin menyiapkan data awal** — membuat lokasi, departemen di tiap
-   lokasi, akun Resepsionis dan satu akun PIC per departemen, kategori
+1. **Admin menyiapkan data awal** — membuat lokasi, Bidang/UPT di tiap
+   lokasi, akun Resepsionis dan satu akun PIC per Bidang/UPT, kategori
    keperluan, petugas yang dapat ditemui, dan QR Code untuk tiap titik masuk.
    Akun Admin sendiri dibuat oleh Super Admin.
 2. **Tamu memindai QR Code** yang terpasang di titik masuk. Token QR menentukan
@@ -279,7 +279,7 @@ kembali di riwayat tamu.
 5. **Sistem memberi nomor urut** dan jam kedatangan dari server. Kunjungan
    berstatus **Menunggu** dan langsung muncul di daftar Tamu Aktif resepsionis.
 6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan kategori
-   keperluan, sistem menampilkan bidang/departemen terkait, dan resepsionis
+   keperluan, sistem menampilkan Bidang/UPT terkait, dan resepsionis
    memilih PIC yang bertugas — setelah memastikan PIC tersebut sedang tersedia.
 7. **PIC menerima penugasan.** Status kunjungan berubah otomatis menjadi
    **Diproses** (bukan diubah manual oleh resepsionis).
@@ -339,7 +339,7 @@ Fitur:
   di pos/lokasinya.
 - **Detail Kunjungan**: data tamu, keperluan dan rinciannya, bidang terkait
   (hanya terlihat petugas, tidak terlihat tamu), dan tanda tangan tamu.
-- **Tugaskan PIC**: memilih PIC sesuai bidang/departemen dari kategori
+- **Tugaskan PIC**: memilih PIC sesuai Bidang/UPT dari kategori
   keperluan tamu, setelah memastikan PIC sedang tersedia.
 - **Tugaskan Ulang**: bila PIC ternyata tidak tersedia, penugasan dipindah ke
   PIC lain — PIC diganti, status kembali Menunggu, alasan pengalihan wajib
@@ -353,13 +353,13 @@ Alur: kunjungan baru masuk (Menunggu) → tinjau detail → cek PIC tersedia →
 Tugaskan PIC → kunjungan tampil sampai status Diproses → setelah PIC menyimpan
 hasil, kunjungan selesai dan keluar dari Tamu Aktif.
 
-### 3. PIC (penanggung jawab pelayanan per departemen)
+### 3. PIC (penanggung jawab pelayanan per Bidang/UPT)
 
 Fitur:
 
-- Dashboard penugasan: daftar kunjungan yang ditugaskan ke departemennya.
-  **Setiap departemen memiliki 1 akun PIC yang digunakan oleh banyak PIC**
-  (petugas di departemen tersebut secara bergantian).
+- Dashboard penugasan: daftar kunjungan yang ditugaskan ke Bidang/UPT-nya.
+  **Setiap Bidang/UPT memiliki 1 akun PIC yang digunakan oleh banyak PIC**
+  (petugas di Bidang/UPT tersebut secara bergantian).
 - **Terima penugasan** — status kunjungan otomatis menjadi Diproses. Tidak ada
   opsi menolak penugasan; ketersediaan PIC dipastikan resepsionis sebelum
   menugaskan.
@@ -367,7 +367,7 @@ Fitur:
 - **Isi hasil/solusi pelayanan** (wajib) — menyimpan hasil otomatis
   menyelesaikan kunjungan (status Selesai).
 - **Riwayat pelayanan**: arsip kunjungan yang sudah pernah dilayani
-  departemennya.
+  Bidang/UPT-nya.
 
 Alur: menerima penugasan (Menunggu) → Terima (Diproses) → layani tamu →
 tulis hasil/solusi → Simpan (Selesai, otomatis).
@@ -384,7 +384,7 @@ Fitur:
   menyelesaikannya; status Selesai hanya terjadi saat PIC menyimpan hasil.
 - **Buka kembali (reopen) kunjungan** yang sudah Selesai/Dibatalkan bila ada
   koreksi. Hanya Admin yang memiliki fitur ini.
-- **Kelola Lokasi dan Departemen** di semua lokasi.
+- **Kelola Lokasi dan Bidang/UPT** di semua lokasi.
 - **Kelola QR Code**: membuat QR untuk tiap titik masuk, memilih akun
   resepsionisnya, mengaktifkan/menonaktifkan, regenerate, mengunduh, dan
   mencetak poster QR.

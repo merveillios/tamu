@@ -2,7 +2,7 @@
 
 Oct 14, 2026 · @ahmad
 
-SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi formulir, resepsionis menugaskan ke departemen, PIC melayani dan menulis hasil, lalu hasil kembali ke riwayat tamu.
+SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi formulir, resepsionis menugaskan ke Bidang/UPT, PIC melayani dan menulis hasil, lalu hasil kembali ke riwayat tamu.
 
 **STATUS: DRAFT v0.11 — disiapkan untuk implementasi oleh AI coding agent (framework Laravel)**
 
@@ -19,8 +19,8 @@ SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi fo
 
 | Versi | Tanggal | Perubahan |
 | --- | --- | --- |
-| v0.11 | 26 Okt 2026 | Bagian "Selesai hari ini" di halaman Penugasan PIC (PIC-7). Bagian "Ditutup hari ini" di Tamu Aktif Resepsionis (RSP-10). Dropdown formulir tamu dapat dicari dan selalu bertema terang (RSP-9, TAM-3). Pencarian pada pilihan departemen dan orang yang ditemui di modal Tugaskan (RSP-9). Atas permintaan klien, **Admin menjadi pengelola harian untuk semua lokasi** dan Super Admin dipakai hanya untuk keadaan darurat. Admin tidak lagi dibatasi lokasi (ADM-5): pemantauan, History, ekspor, dan dashboard mencakup semua lokasi. Admin kini mengelola lokasi (LOK-1–3), departemen (DEP-1–3), QR Code (QR-2–6), serta akun Resepsionis dan PIC (USR-1, USR-6, AUTH-4), dan dapat melihat audit log (AUD-2). Akun Admin dan Super Admin tetap hanya dikelola Super Admin (USR-6). **Dihapus**: penugasan lokasi Admin (USR-2); tabel `user_locations` dibiarkan tanpa dipakai. |
-| v0.10 | 14 Okt 2026 | **Model peran diubah menjadi 5 peran**: Super Admin, Admin, Resepsionis, PIC, dan Tamu (Bab 3). Ditambah: penugasan kunjungan ke departemen oleh resepsionis (RSP-1–8), penerimaan, penulisan hasil, dan penyelesaian oleh PIC (PIC-1–6), riwayat kunjungan untuk tamu (TAM-17), deteksi tamu lama dan pengisian otomatis data diri (TAM-15, TAM-16), kategori keperluan dengan saran departemen (KAT-1–3), kelompok rentan, master departemen (DEP-1–3), dan daftar petugas departemen (PTG-1–2). Satu QR terhubung ke tepat satu akun resepsionis (QR-6). Akun resepsionis dan PIC adalah akun bersama yang dipakai bergantian. QR hanya dikelola Super Admin. Buka kembali kunjungan dipindah dari Super Admin ke Admin (ADM-3). Instansi/perusahaan menjadi wajib. Orang yang ditemui tidak lagi diisi tamu; nilainya dipilih resepsionis saat menugaskan; PIC adalah satu akun bersama per departemen yang mereview tamu. Ganti password kini mengakhiri semua sesi akun (USR-3). Label Diproses diganti "Sedang direview" (PIC mereview keperluan tamu yang diarahkan resepsionis); History dan ekspor dapat memuat kunjungan Sedang direview. Admin mengelola kategori keperluan dan daftar petugas untuk semua lokasi. Desain antarmuka memakai template Volt Bootstrap 5 Dashboard (Bab 5.6). **Dihapus**: QR Darurat (VIS-11, TAM-13, tabel `emergency_passes`, kolom `email_source` dan `email_authorized_by`), status Draf, dan penolakan penugasan oleh PIC. `LocationScope` diganti `AccessScope` (Bab 12.2). Skema, route, validasi, ekspor, UI, milestone, dan keputusan tertunda disusun ulang. |
+| v0.11 | 26 Okt 2026 | Bagian "Selesai hari ini" di halaman Penugasan PIC (PIC-7). Bagian "Ditutup hari ini" di Tamu Aktif Resepsionis (RSP-10). Dropdown formulir tamu dapat dicari dan selalu bertema terang (RSP-9, TAM-3). Pencarian pada pilihan Bidang/UPT dan orang yang ditemui di modal Tugaskan (RSP-9). Atas permintaan klien, **Admin menjadi pengelola harian untuk semua lokasi** dan Super Admin dipakai hanya untuk keadaan darurat. Admin tidak lagi dibatasi lokasi (ADM-5): pemantauan, History, ekspor, dan dashboard mencakup semua lokasi. Admin kini mengelola lokasi (LOK-1–3), Bidang/UPT (DEP-1–3), QR Code (QR-2–6), serta akun Resepsionis dan PIC (USR-1, USR-6, AUTH-4), dan dapat melihat audit log (AUD-2). Akun Admin dan Super Admin tetap hanya dikelola Super Admin (USR-6). **Dihapus**: penugasan lokasi Admin (USR-2); tabel `user_locations` dibiarkan tanpa dipakai. |
+| v0.10 | 14 Okt 2026 | **Model peran diubah menjadi 5 peran**: Super Admin, Admin, Resepsionis, PIC, dan Tamu (Bab 3). Ditambah: penugasan kunjungan ke Bidang/UPT oleh resepsionis (RSP-1–8), penerimaan, penulisan hasil, dan penyelesaian oleh PIC (PIC-1–6), riwayat kunjungan untuk tamu (TAM-17), deteksi tamu lama dan pengisian otomatis data diri (TAM-15, TAM-16), kategori keperluan dengan saran Bidang/UPT (KAT-1–3), kelompok rentan, master Bidang/UPT (DEP-1–3), dan daftar petugas Bidang/UPT (PTG-1–2). Satu QR terhubung ke tepat satu akun resepsionis (QR-6). Akun resepsionis dan PIC adalah akun bersama yang dipakai bergantian. QR hanya dikelola Super Admin. Buka kembali kunjungan dipindah dari Super Admin ke Admin (ADM-3). Instansi/perusahaan menjadi wajib. Orang yang ditemui tidak lagi diisi tamu; nilainya dipilih resepsionis saat menugaskan; PIC adalah satu akun bersama per Bidang/UPT yang mereview tamu. Ganti password kini mengakhiri semua sesi akun (USR-3). Label Diproses diganti "Sedang direview" (PIC mereview keperluan tamu yang diarahkan resepsionis); History dan ekspor dapat memuat kunjungan Sedang direview. Admin mengelola kategori keperluan dan daftar petugas untuk semua lokasi. Desain antarmuka memakai template Volt Bootstrap 5 Dashboard (Bab 5.6). **Dihapus**: QR Darurat (VIS-11, TAM-13, tabel `emergency_passes`, kolom `email_source` dan `email_authorized_by`), status Draf, dan penolakan penugasan oleh PIC. `LocationScope` diganti `AccessScope` (Bab 12.2). Skema, route, validasi, ekspor, UI, milestone, dan keputusan tertunda disusun ulang. |
 | v0.9 | 6 Okt 2026 | Implementasi dipindah dari PHP native ke framework Laravel: migrasi, Eloquent, Form Request, `RateLimiter`, guard `web`, `Http` facade, perintah artisan, aturan A-14 dan A-15. Tidak ada perubahan kebutuhan fungsional. |
 | v0.8 | 5 Okt 2026 | Ekspor History tiga format (CSV, Excel, PDF); Excel dan PDF memuat gambar tanda tangan. |
 | v0.7 | 5 Okt 2026 | Aturan A-13 (standar kerapian kode). |
@@ -56,7 +56,7 @@ SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi fo
 | A-3 | **JANGAN** menambah dependency Composer selain yang tercantum di Bab 5.1 (beserta turunan otomatisnya). Dilarang memasang starter kit, paket autentikasi/otorisasi, wrapper PDF/Excel, dan paket komunitas lain (misalnya Breeze, Jetstream, Fortify, Sanctum, Livewire, Inertia, Telescope, Debugbar, `spatie/*`, `maatwebsite/excel`, `barryvdh/*`). Tidak ada dependency npm. Jika benar-benar perlu, tanyakan dulu beserta alasannya. |
 | A-4 | **JANGAN** menulis password, kredensial database, `APP_KEY`, atau secret apa pun di kode. Semua konfigurasi dibaca dari `.env` lewat file `config/`. `env()` **hanya** dipanggil di dalam `config/*.php`; kode lain memakai `config('...')`. `.env.example` memuat semua key Bab 5.4 tanpa nilai rahasia. `.env` masuk `.gitignore`. |
 | A-5 | Semua akses database WAJIB memakai Eloquent, Query Builder, atau prepared statement dengan binding parameter. `DB::raw`, `whereRaw`, `selectRaw`, `orderByRaw`, dan `DB::statement` hanya boleh dipakai dengan binding; dilarang menyambung input pengguna ke string SQL. |
-| A-6 | \[DIUBAH v0.10\] Semua query staf ke data kunjungan, QR, lokasi, departemen, kategori keperluan, dan petugas **WAJIB** melewati satu titik pusat pembatas akses: service `AccessScope` dan trait model `LimitedByAccess` (local scope `forUser()`), lihat Bab 12.2. Cakupan ditentukan oleh peran: lokasi (Admin), QR (Resepsionis), atau departemen (PIC). Jangan menulis filter `location_id`, `qr_code_id`, atau `assigned_department_id` secara manual di controller atau service lain. Implicit route model binding untuk model yang dibatasi akses dilarang. Satu-satunya pengecualian adalah pembacaan data tamu lama berdasarkan email terverifikasi di `ReturningGuestService` (Bab 9.4). |
+| A-6 | \[DIUBAH v0.10\] Semua query staf ke data kunjungan, QR, lokasi, Bidang/UPT, kategori keperluan, dan petugas **WAJIB** melewati satu titik pusat pembatas akses: service `AccessScope` dan trait model `LimitedByAccess` (local scope `forUser()`), lihat Bab 12.2. Cakupan ditentukan oleh peran: lokasi (Admin), QR (Resepsionis), atau Bidang/UPT (PIC). Jangan menulis filter `location_id`, `qr_code_id`, atau `assigned_department_id` secara manual di controller atau service lain. Implicit route model binding untuk model yang dibatasi akses dilarang. Satu-satunya pengecualian adalah pembacaan data tamu lama berdasarkan email terverifikasi di `ReturningGuestService` (Bab 9.4). |
 | A-7 | Semua output ke HTML **WAJIB** di-escape: pakai `{{ }}` di Blade. `{!! !!}` dilarang, kecuali untuk konten buatan server sendiri yang tepercaya (misalnya SVG QR dari library) dan wajib diberi komentar alasannya. |
 | A-8 | Jika menemukan hal ambigu yang tidak dijawab dokumen ini, pilih opsi yang paling aman dan paling sederhana, lalu catat di `docs/DECISIONS.md` (format: tanggal, konteks, keputusan, alasan). |
 | A-9 | Dokumen terkait hanya dipakai jika tersedia di repositori pada folder `docs/`. Jika tidak ada, **jangan** mengarang isinya; ikuti dokumen ini. Jika dokumen Use Case & User Flow bertentangan dengan PRD ini, **PRD ini yang berlaku**. |
@@ -65,7 +65,7 @@ SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi fo
 | A-12 | Seluruh pesan commit **WAJIB** berbahasa Indonesia dengan format `[ID] Kata kerja + ringkasan`. `ID` adalah ID kebutuhan (misalnya `RSP-2`) atau kode milestone (misalnya `M0`). |
 | A-13 | Kode **WAJIB** ditulis seperti programmer manusia yang rapi. Setiap class dan method publik memiliki docblock Bahasa Indonesia. Komentar inline hanya untuk hal yang tidak jelas dari kode dan menjelaskan *mengapa*, bukan mengulang *apa*. Ikuti PSR-12 (Laravel Pint, preset `psr12`: `vendor/bin/pint --test`) dan konvensi Bab 0.4. Satu fungsi = satu tanggung jawab, pendek, early return. Hapus kode mati, import/variabel tak terpakai, dan blok kode yang dikomentari. Tanpa abstraksi yang belum dibutuhkan nyata. |
 | A-14 | **Utamakan fitur bawaan Laravel.** **JANGAN** menulis ulang router, session, CSRF, validator, hashing, rate limiter, pemuat `.env`, runner migrasi, atau helper escape. Ikuti konvensi resmi Laravel dan baca dokumentasi resmi versi yang dipakai sebelum membuat solusi sendiri. |
-| A-15 | \[DIUBAH v0.10\] Tulis tes otomatis (PHPUnit) untuk area berisiko: `AccessScope` untuk keempat peran staf (IDOR antar lokasi, antar QR, dan antar departemen), transisi status dan respons 409, penugasan dan penugasan ulang, penerimaan oleh PIC, nomor urut, email terverifikasi di session, data diri tamu lama yang diambil dari database (bukan dari input), isolasi riwayat tamu per email, token sekali pakai TAM-14, ekspor yang dibatasi cakupan, dan penguncian akun. Tes memakai database MySQL/MariaDB terpisah (`.env.testing`), bukan SQLite. Verifikasi Google dites dengan `Http::fake()`. `php artisan test` harus hijau saat agent berhenti di akhir milestone. |
+| A-15 | \[DIUBAH v0.10\] Tulis tes otomatis (PHPUnit) untuk area berisiko: `AccessScope` untuk keempat peran staf (IDOR antar lokasi, antar QR, dan antar Bidang/UPT), transisi status dan respons 409, penugasan dan penugasan ulang, penerimaan oleh PIC, nomor urut, email terverifikasi di session, data diri tamu lama yang diambil dari database (bukan dari input), isolasi riwayat tamu per email, token sekali pakai TAM-14, ekspor yang dibatasi cakupan, dan penguncian akun. Tes memakai database MySQL/MariaDB terpisah (`.env.testing`), bukan SQLite. Verifikasi Google dites dengan `Http::fake()`. `php artisan test` harus hijau saat agent berhenti di akhir milestone. |
 
 ## 0.4 Konvensi
 
@@ -127,14 +127,14 @@ Badan pesan (opsional): alasan perubahan, dalam bahasa Indonesia.
 
 # 1. Ringkasan Produk (Overview)
 
-SiTamu adalah sistem informasi web (Laravel + MySQL/MariaDB) yang mencatat tamu lewat QR Code dan meneruskan setiap kunjungan ke departemen yang tepat sampai hasil pelayanannya tercatat.
+SiTamu adalah sistem informasi web (Laravel + MySQL/MariaDB) yang mencatat tamu lewat QR Code dan meneruskan setiap kunjungan ke Bidang/UPT yang tepat sampai hasil pelayanannya tercatat.
 
-Instansi menerima tamu di banyak titik masuk dan gedung. Pencatatan manual menyulitkan pencarian data, tidak menunjukkan tamu mana yang masih menunggu, tidak mencatat ke departemen mana tamu diteruskan, dan tidak menyimpan hasil pelayanan.
+Instansi menerima tamu di banyak titik masuk dan gedung. Pencatatan manual menyulitkan pencarian data, tidak menunjukkan tamu mana yang masih menunggu, tidak mencatat ke Bidang/UPT mana tamu diteruskan, dan tidak menyimpan hasil pelayanan.
 
 Sistem terdiri dari dua bagian:
 
 1. **Halaman tamu** tanpa akun, dibuka lewat QR Code. Tamu memverifikasi email dengan akun Google, mengisi formulir (atau melihat riwayat bila pernah berkunjung), dan menerima nomor urut.
-2. **Panel staf** dengan empat peran: Resepsionis menugaskan kunjungan ke departemen, PIC melayani dan menulis hasil, Admin memantau semua lokasi serta mengelola master data dan akun Resepsionis/PIC, Super Admin menjadi akun cadangan darurat.
+2. **Panel staf** dengan empat peran: Resepsionis menugaskan kunjungan ke Bidang/UPT, PIC melayani dan menulis hasil, Admin memantau semua lokasi serta mengelola master data dan akun Resepsionis/PIC, Super Admin menjadi akun cadangan darurat.
 
 Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga lokasi kunjungan dan resepsionis yang bertanggung jawab ditentukan otomatis. Siklus yang ditangani: pendaftaran → penugasan → pelayanan dan penulisan hasil → riwayat.
 
@@ -142,7 +142,7 @@ Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga loka
 
 - Mengganti pencatatan tamu manual dengan pencatatan digital yang terpusat dan mudah dicari.
 - Memastikan setiap kunjungan tercatat pada lokasi dan titik masuk yang benar, tanpa input lokasi oleh tamu.
-- &#91;BARU v0.10\] Meneruskan setiap kunjungan ke departemen yang tepat dan mencatat orang yang ditemui (petugas yang mereview tamu).
+- &#91;BARU v0.10\] Meneruskan setiap kunjungan ke Bidang/UPT yang tepat dan mencatat orang yang ditemui (petugas yang mereview tamu).
 - &#91;BARU v0.10\] Mencatat hasil pelayanan dan menampilkannya kembali kepada tamu lewat riwayat kunjungannya.
 - &#91;BARU v0.10\] Mempercepat pengisian bagi tamu yang pernah berkunjung dengan data diri yang terisi otomatis.
 - Membatasi akses data sehingga setiap staf hanya melihat dan mengelola data dalam cakupan perannya.
@@ -152,7 +152,7 @@ Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga loka
 **Indikator keberhasilan MVP:**
 
 - Tamu baru dapat menyelesaikan verifikasi email dan pengisian formulir, termasuk tanda tangan, dari ponsel dalam waktu kurang dari 2 menit.
-- Resepsionis dapat menugaskan kunjungan dengan 1 aksi (pilih departemen dan orang yang ditemui, lalu Tugaskan).
+- Resepsionis dapat menugaskan kunjungan dengan 1 aksi (pilih Bidang/UPT dan orang yang ditemui, lalu Tugaskan).
 - PIC dapat menerima penugasan dengan 1 klik (Terima).
 - Tidak ada satu pun data di luar cakupan peran yang dapat diakses staf, walaupun URL, ID, atau parameter dimanipulasi.
 
@@ -161,9 +161,9 @@ Setiap QR Code terhubung ke satu lokasi dan satu akun resepsionis, sehingga loka
 Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; cakupan data setiap peran staf berbeda.
 
 - **Super Admin:** \[DIUBAH v0.11\] akun cadangan untuk keadaan darurat. Memiliki semua hak Admin kecuali membuka kembali kunjungan \[DEFAULT\], ditambah satu hak yang tidak dimiliki Admin: mengelola akun Admin dan Super Admin (USR-6). Dalam operasional harian tidak perlu dipakai.
-- **Admin:** \[DIUBAH v0.11\] pengelola harian untuk **semua lokasi**, tanpa penugasan lokasi (ADM-5). Memantau tamu aktif, membatalkan dan membuka kembali kunjungan, melihat dan mengekspor History, mengelola lokasi, departemen, QR Code, kategori keperluan, daftar petugas, serta akun Resepsionis dan PIC, dan melihat audit log. Admin tidak menugaskan kunjungan dan tidak mengelola akun Admin maupun Super Admin (USR-6).
-- **Resepsionis:** akun bersama per pos penerimaan tamu (misalnya "Resepsionis Pintu Timur"), dipakai bergantian oleh petugas yang sedang jaga. Cakupannya adalah QR yang terhubung ke akunnya. Melihat tamu aktif dari QR tersebut, menugaskan dan menugaskan ulang kunjungan ke departemen sekaligus memilih orang yang ditemui (petugas yang akan mereview tamu), serta membatalkan kunjungan.
-- **PIC:** akun bersama per departemen (misalnya "PIC Bidang Perdagangan Dalam Negeri"), satu akun per departemen yang dipakai beberapa orang secara bergantian. Cakupannya adalah kunjungan yang ditugaskan ke departemennya. Menerima penugasan, lalu orang yang ditemui yang dipilih resepsionis mereview keperluan tamu lewat akun ini, menulis hasil, dan menyelesaikan kunjungan.
+- **Admin:** \[DIUBAH v0.11\] pengelola harian untuk **semua lokasi**, tanpa penugasan lokasi (ADM-5). Memantau tamu aktif, membatalkan dan membuka kembali kunjungan, melihat dan mengekspor History, mengelola lokasi, Bidang/UPT, QR Code, kategori keperluan, daftar petugas, serta akun Resepsionis dan PIC, dan melihat audit log. Admin tidak menugaskan kunjungan dan tidak mengelola akun Admin maupun Super Admin (USR-6).
+- **Resepsionis:** akun bersama per pos penerimaan tamu (misalnya "Resepsionis Pintu Timur"), dipakai bergantian oleh petugas yang sedang jaga. Cakupannya adalah QR yang terhubung ke akunnya. Melihat tamu aktif dari QR tersebut, menugaskan dan menugaskan ulang kunjungan ke Bidang/UPT sekaligus memilih orang yang ditemui (petugas yang akan mereview tamu), serta membatalkan kunjungan.
+- **PIC:** akun bersama per Bidang/UPT (misalnya "PIC Bidang Perdagangan Dalam Negeri"), satu akun per Bidang/UPT yang dipakai beberapa orang secara bergantian. Cakupannya adalah kunjungan yang ditugaskan ke Bidang/UPT-nya. Menerima penugasan, lalu orang yang ditemui yang dipilih resepsionis mereview keperluan tamu lewat akun ini, menulis hasil, dan menyelesaikan kunjungan.
 - **Tamu:** tidak memiliki akun. Memindai QR, memverifikasi email lewat akun Google, mengisi formulir dan membubuhkan tanda tangan, menerima nomor urut, dan melihat riwayat kunjungannya sendiri beserta hasil dari PIC.
 
 ## 3.1 Matriks hak akses
@@ -172,19 +172,19 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | --- | --- | --- | --- | --- | --- |
 | Isi formulir buku tamu via QR | – | – | – | – | Ya |
 | Lihat riwayat kunjungan sendiri | – | – | – | – | Ya |
-| Dashboard | Semua lokasi | Semua lokasi | QR miliknya | Departemennya | – |
+| Dashboard | Semua lokasi | Semua lokasi | QR miliknya | Bidang/UPT-nya | – |
 | Tamu Aktif: lihat, cari, filter | Semua lokasi | Semua lokasi | QR miliknya | – | – |
-| Tugaskan / tugaskan ulang (departemen dan orang yang ditemui) | Tidak | Tidak | QR miliknya | – | – |
-| Daftar penugasan: terima, tulis hasil, selesaikan | Tidak | Tidak | Tidak | Departemennya | – |
+| Tugaskan / tugaskan ulang (Bidang/UPT dan orang yang ditemui) | Tidak | Tidak | QR miliknya | – | – |
+| Daftar penugasan: terima, tulis hasil, selesaikan | Tidak | Tidak | Tidak | Bidang/UPT-nya | – |
 | Batalkan kunjungan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
 | Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Semua lokasi | Tidak | Tidak | – |
-| Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Departemennya | – |
+| Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Bidang/UPT-nya | – |
 | Gambar tanda tangan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
 | History: lihat, cari, filter, ekspor CSV/Excel/PDF | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola kategori keperluan | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
-| Kelola daftar petugas departemen | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
+| Kelola daftar petugas Bidang/UPT | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola lokasi | Ya | Ya | Tidak | Tidak | – |
-| Kelola departemen | Ya | Ya | Tidak | Tidak | – |
+| Kelola Bidang/UPT | Ya | Ya | Tidak | Tidak | – |
 | Kelola QR Code dan akun resepsionisnya | Ya | Ya | Tidak | Tidak | – |
 | Kelola akun Resepsionis dan PIC | Ya | Ya | Tidak | Tidak | – |
 | Kelola akun Admin dan Super Admin | Ya | Tidak | Tidak | Tidak | – |
@@ -192,7 +192,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | Lihat audit log | Ya | Ya | Tidak | Tidak | – |
 | Ganti password sendiri | Ya | Ya | Ya | Ya | – |
 
-**Catatan:** "QR miliknya" berarti QR yang kolom `receptionist_id`-nya menunjuk akun resepsionis tersebut, apa pun status QR-nya, agar kunjungan aktif dari QR yang baru dinonaktifkan tetap bisa diselesaikan. "Departemennya" berarti kunjungan dengan `assigned_department_id` sama dengan `department_id` akun PIC.
+**Catatan:** "QR miliknya" berarti QR yang kolom `receptionist_id`-nya menunjuk akun resepsionis tersebut, apa pun status QR-nya, agar kunjungan aktif dari QR yang baru dinonaktifkan tetap bisa diselesaikan. "Bidang/UPT-nya" berarti kunjungan dengan `assigned_department_id` sama dengan `department_id` akun PIC.
 
 # 4. Ruang Lingkup (Scope)
 
@@ -200,11 +200,11 @@ MVP mencakup seluruh siklus kunjungan dari pemindaian QR sampai hasil tampil di 
 
 ## 4.1 Termasuk (MVP)
 
-- Manajemen lokasi, departemen, dan QR Code per titik masuk (buat, aktif/nonaktif, regenerate, unduh PNG/SVG, cetak), dengan satu akun resepsionis per QR.
+- Manajemen lokasi, Bidang/UPT, dan QR Code per titik masuk (buat, aktif/nonaktif, regenerate, unduh PNG/SVG, cetak), dengan satu akun resepsionis per QR.
 - Halaman tamu mobile-first: verifikasi email Google, deteksi tamu lama, riwayat kunjungan tamu, formulir dengan kategori keperluan dan kelompok rentan, nomor urut otomatis, jam datang otomatis, dan tanda tangan digital.
 - Pengisian otomatis data diri tamu lama dari kunjungan terakhirnya.
-- Manajemen akun staf empat peran dan pengaitan akun PIC ke departemen.
-- Kategori keperluan per lokasi dengan saran departemen, dan daftar petugas per departemen.
+- Manajemen akun staf empat peran dan pengaitan akun PIC ke Bidang/UPT.
+- Kategori keperluan per lokasi dengan saran Bidang/UPT, dan daftar petugas per Bidang/UPT.
 - Tamu Aktif untuk Resepsionis (dengan penugasan), Admin, dan Super Admin; daftar Penugasan untuk PIC (terima, tulis hasil, selesaikan).
 - Pembatalan kunjungan dengan alasan dan buka kembali oleh Admin.
 - History Kunjungan dengan pencarian, filter, dan ekspor CSV, Excel, dan PDF.
@@ -214,7 +214,7 @@ MVP mencakup seluruh siklus kunjungan dari pemindaian QR sampai hasil tampil di 
 
 - Semua fitur di Bab 16.
 - &#91;DIHAPUS v0.10\] QR Darurat dan jalur pencatatan apa pun bagi tamu yang tidak dapat login Google. Penanganan tamu tersebut berada di luar sistem.
-- &#91;DIHAPUS v0.10\] Penolakan penugasan oleh PIC. Kesalahan departemen diperbaiki resepsionis lewat penugasan ulang selama PIC belum menerima.
+- &#91;DIHAPUS v0.10\] Penolakan penugasan oleh PIC. Kesalahan Bidang/UPT diperbaiki resepsionis lewat penugasan ulang selama PIC belum menerima.
 - &#91;DIHAPUS v0.10\] Status Draf atau status apa pun selain empat status di Bab 0.4.
 - Notifikasi WhatsApp, SMS, atau email kepada tamu maupun staf. Jika PIC tidak merespons, resepsionis menghubunginya secara manual di luar sistem.
 - Pengiriman kode verifikasi (OTP) lewat SMS/WhatsApp. Riwayat tamu hanya dibuka lewat verifikasi Google.
@@ -349,7 +349,7 @@ Tidak ada password default. Super Admin pertama dibuat lewat `php artisan sitamu
 - Data isian tamu, nomor urut, jam datang, dan tanda tangan **tidak dapat diedit atau dihapus** lewat aplikasi. Staf hanya mengubah status, penugasan, dan hasil sesuai Bab 7.
 - &#91;BARU v0.10\] Setiap QR terhubung ke tepat satu akun resepsionis. Satu akun resepsionis boleh terhubung ke lebih dari satu QR \[DEFAULT\].
 - &#91;BARU v0.10\] Akun resepsionis dan PIC adalah akun bersama yang dipakai bergantian. Audit log mencatat akun; orang yang ditemui dicatat saat resepsionis menugaskan (RSP-2).
-- &#91;BARU v0.10\] Setiap departemen memiliki tepat satu akun PIC aktif \[DEFAULT\]. Departemen tanpa akun PIC aktif tidak muncul di pilihan penugasan.
+- &#91;BARU v0.10\] Setiap Bidang/UPT memiliki tepat satu akun PIC aktif \[DEFAULT\]. Bidang/UPT tanpa akun PIC aktif tidak muncul di pilihan penugasan.
 - &#91;BARU v0.10\] Tamu lama dikenali dari email Google terverifikasi yang sama, lintas semua lokasi \[DEFAULT\]. Data diri tamu lama diambil dari kunjungan terakhirnya.
 - &#91;BARU v0.10\] Seluruh tamu yang tercatat memiliki email terverifikasi Google. Tamu yang tidak dapat login Google tidak tercatat di sistem.
 - Tanda tangan adalah gambar goresan tangan sebagai bukti kehadiran, **bukan** Tanda Tangan Elektronik tersertifikasi.
@@ -380,7 +380,7 @@ Panel staf memakai template [Volt Bootstrap 5 Dashboard](https://github.com/them
 | Sign in | Login staf |
 | Dashboard (overview) | Dashboard Admin dan Super Admin: kartu angka, grafik, tabel ringkas |
 | Transactions (tabel, filter, paginasi) | Tamu Aktif, Penugasan PIC, History, Audit log, Pengguna |
-| Settings (form) | Form master data (lokasi, departemen, QR, kategori keperluan, petugas, pengguna) dan Ganti Password |
+| Settings (form) | Form master data (lokasi, Bidang/UPT, QR, kategori keperluan, petugas, pengguna) dan Ganti Password |
 | Sidebar dan top navbar | Layout staf dengan menu per peran (Bab 13.2) |
 | 404 dan 500 | Halaman error kustom berbahasa Indonesia (Bab 10.9) |
 | Komponen modal, notifikasi/toast, badge, dropdown | Modal Tugaskan, Terima, Selesai, Batal, Buka Kembali; toast setelah aksi; badge status; dropdown Ekspor |
@@ -404,17 +404,17 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | --- | --- | --- | --- |
 | LOK-1 | Super Admin dapat menambah dan mengubah lokasi (nama, deskripsi). | Wajib | Nama wajib, 2–100 karakter, unik (tidak peka huruf besar/kecil, termasuk yang sudah di-soft delete). Duplikat ditolak: "Nama lokasi sudah digunakan". Tercatat di audit log. |
 | LOK-2 | Super Admin dapat menonaktifkan dan mengaktifkan kembali lokasi. | Wajib | Saat lokasi nonaktif, semua QR-nya menampilkan halaman TAM-6. Kunjungan aktif lokasi itu tetap dapat diselesaikan. Jika lokasi masih punya kunjungan aktif, sistem meminta konfirmasi. Tercatat di audit log. |
-| LOK-3 | Lokasi yang sudah memiliki data (kunjungan, departemen, atau QR) tidak dapat dihapus, hanya dinonaktifkan. | Wajib | Tombol Hapus hanya muncul jika lokasi belum punya data tersebut. Hapus = soft delete. Server tetap menolak walau request dikirim manual. |
+| LOK-3 | Lokasi yang sudah memiliki data (kunjungan, Bidang/UPT, atau QR) tidak dapat dihapus, hanya dinonaktifkan. | Wajib | Tombol Hapus hanya muncul jika lokasi belum punya data tersebut. Hapus = soft delete. Server tetap menolak walau request dikirim manual. |
 
-## 6.2 Admin dan Super Admin — Manajemen Departemen \[DIUBAH v0.11\]
+## 6.2 Admin dan Super Admin — Manajemen Bidang/UPT \[DIUBAH v0.11\]
 
 \[DIUBAH v0.11\] Setiap "Super Admin" pada tabel di bawah berarti **Admin dan Super Admin**, untuk semua lokasi.
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| DEP-1 | Super Admin dapat menambah dan mengubah departemen per lokasi. | Wajib | Nama wajib, 2–100 karakter, unik per lokasi. Lokasi departemen tidak dapat diubah setelah dibuat. Tercatat di audit log. |
-| DEP-2 | Super Admin dapat menonaktifkan dan mengaktifkan kembali departemen. | Wajib | Departemen nonaktif tidak muncul di pilihan penugasan, saran departemen kategori, maupun pilihan departemen akun PIC. Penugasan yang sudah ada tetap berjalan. |
-| DEP-3 | Departemen tidak dapat dihapus. | Wajib | Tidak ada tombol Hapus; hanya aktif/nonaktif. |
+| DEP-1 | Super Admin dapat menambah dan mengubah Bidang/UPT per lokasi. | Wajib | Nama wajib, 2–100 karakter, unik per lokasi. Lokasi Bidang/UPT tidak dapat diubah setelah dibuat. Tercatat di audit log. |
+| DEP-2 | Super Admin dapat menonaktifkan dan mengaktifkan kembali Bidang/UPT. | Wajib | Bidang/UPT nonaktif tidak muncul di pilihan penugasan, saran Bidang/UPT kategori, maupun pilihan Bidang/UPT akun PIC. Penugasan yang sudah ada tetap berjalan. |
+| DEP-3 | Bidang/UPT tidak dapat dihapus. | Wajib | Tidak ada tombol Hapus; hanya aktif/nonaktif. |
 
 ## 6.3 Admin dan Super Admin — Manajemen QR Code \[DIUBAH v0.11\]
 
@@ -423,7 +423,7 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
 | QR-1 | Sistem membuat QR Code dengan token acak unik dan URL `{APP_URL}/tamu/{token}`. | Wajib | Token = `bin2hex(random_bytes(32))` (64 karakter hex). Token tidak diturunkan dari ID apa pun. |
-| QR-2 | \[DIUBAH v0.10\] Satu lokasi dapat memiliki satu atau lebih QR Code; setiap QR wajib terhubung ke tepat satu akun resepsionis. | Wajib | Form buat QR berisi pilihan lokasi (wajib), label opsional (misalnya "Pintu Timur"), dan pilihan akun resepsionis aktif (wajib). QR tidak dihubungkan ke departemen. Bila lokasi terpilih belum punya departemen aktif atau kategori keperluan aktif, form menampilkan peringatan bahwa QR belum dapat dipakai tamu (TAM-6); QR tetap boleh dibuat. Lihat DECISIONS 2026-11-05. |
+| QR-2 | \[DIUBAH v0.10\] Satu lokasi dapat memiliki satu atau lebih QR Code; setiap QR wajib terhubung ke tepat satu akun resepsionis. | Wajib | Form buat QR berisi pilihan lokasi (wajib), label opsional (misalnya "Pintu Timur"), dan pilihan akun resepsionis aktif (wajib). QR tidak dihubungkan ke Bidang/UPT. Bila lokasi terpilih belum punya Bidang/UPT aktif atau kategori keperluan aktif, form menampilkan peringatan bahwa QR belum dapat dipakai tamu (TAM-6); QR tetap boleh dibuat. Lihat DECISIONS 2026-11-05. |
 | QR-3 | Super Admin dapat mengaktifkan dan menonaktifkan QR Code. | Wajib | QR `inactive` menampilkan halaman TAM-6. QR `revoked` tidak bisa diaktifkan kembali (tombol tidak muncul dan server menolak). Di daftar QR, QR `active` yang belum dapat dipakai tamu karena syarat TAM-6 (lokasi nonaktif atau tanpa kategori aktif) ditampilkan "Belum siap" beserta alasannya, bukan "Aktif". Kolom status di database tetap tidak diubah. |
 | QR-4 | \[DIUBAH v0.10\] Super Admin dapat me-regenerate QR Code. | Wajib | Regenerate = membuat baris QR baru (token baru, lokasi, label, dan akun resepsionis sama, status `active`) dan mengubah QR lama menjadi `revoked` dengan `revoked_at` terisi, dalam satu transaksi. Wajib konfirmasi: "QR lama yang sudah dicetak tidak akan berfungsi lagi." |
 | QR-5 | Super Admin dapat mengunduh QR (PNG/SVG) dan membuka halaman cetak. | Wajib | PNG minimal 600×600 px. Halaman cetak A4 berisi logo, nama instansi, nama lokasi, label QR, QR, dan instruksi "Pindai untuk mengisi buku tamu". Unduhan tercatat di audit log. |
@@ -433,15 +433,15 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| KAT-1 | Admin dan Super Admin (semua lokasi) dapat menambah dan mengubah kategori keperluan per lokasi. | Wajib | Field: nama (2–100 karakter, unik per lokasi), saran departemen (opsional, hanya departemen aktif di lokasi yang sama), dan urutan tampil (angka). Kategori tampil di formulir tamu sesuai urutan, lalu nama. Tercatat di audit log. |
+| KAT-1 | Admin dan Super Admin (semua lokasi) dapat menambah dan mengubah kategori keperluan per lokasi. | Wajib | Field: nama (2–100 karakter, unik per lokasi), saran Bidang/UPT (opsional, hanya Bidang/UPT aktif di lokasi yang sama), dan urutan tampil (angka). Kategori tampil di formulir tamu sesuai urutan, lalu nama. Tercatat di audit log. |
 | KAT-2 | Admin dan Super Admin dapat menonaktifkan dan mengaktifkan kembali kategori. | Wajib | Kategori nonaktif tidak tampil di formulir. Kunjungan lama tetap menampilkan nama kategori saat kunjungan dibuat (disimpan sebagai salinan di `guest_visits.purpose_category_name`). |
 | KAT-3 | Kategori tidak dapat dihapus. | Wajib | Hanya aktif/nonaktif. |
 
-## 6.5 Admin — Daftar Petugas Departemen \[BARU v0.10\]
+## 6.5 Admin — Daftar Petugas Bidang/UPT \[BARU v0.10\]
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| PTG-1 | Admin dan Super Admin (semua lokasi) dapat menambah, mengubah, menonaktifkan, dan mengaktifkan kembali petugas per departemen, yaitu orang yang dapat ditemui tamu. | Wajib | Field: nama petugas (2–100 karakter, unik per departemen). Petugas nonaktif tidak muncul di pilihan orang yang ditemui (RSP-2). Tercatat di audit log. |
+| PTG-1 | Admin dan Super Admin (semua lokasi) dapat menambah, mengubah, menonaktifkan, dan mengaktifkan kembali petugas per Bidang/UPT, yaitu orang yang dapat ditemui tamu. | Wajib | Field: nama petugas (2–100 karakter, unik per Bidang/UPT). Petugas nonaktif tidak muncul di pilihan orang yang ditemui (RSP-2). Tercatat di audit log. |
 | PTG-2 | Petugas tidak dapat dihapus. | Wajib | Hanya aktif/nonaktif, agar nama petugas pada kunjungan lama tetap terbaca. |
 
 ## 6.6 Tamu — Buku Tamu dan Riwayat
@@ -450,8 +450,8 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | --- | --- | --- | --- |
 | TAM-1 | \[DIUBAH v0.10\] Tamu membuka `/tamu/{token}` tanpa login; sistem memvalidasi token, status QR, status lokasi, dan ketersediaan kategori. | Wajib | Halaman hanya tampil jika token ada, QR `active`, lokasi aktif dan belum dihapus, serta lokasi memiliki minimal satu kategori keperluan aktif. Selain itu halaman TAM-6. |
 | TAM-2 | Nama lokasi tampil sebagai informasi read-only; tidak ada input lokasi. | Wajib | Tidak ada field lokasi (termasuk hidden field). Lokasi dan QR saat menyimpan selalu diambil dari token di URL. |
-| TAM-3 | \[DIUBAH v0.10\] Tamu mengisi Kategori keperluan, Rincian keperluan, Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, Alamat, dan Tanda tangan (wajib). Orang yang ditemui tidak diisi tamu; nilainya dipilih resepsionis saat menugaskan (RSP-2). Email berasal dari verifikasi Google dan tampil read-only di bagian atas. | Wajib | Urutan field mengikuti Bab 11. Field Rincian keperluan baru muncul setelah kategori dipilih. Saran departemen dari kategori **tidak** ditampilkan kepada tamu. Jika validasi gagal, formulir tampil ulang dengan isian teks sebelumnya, pesan per field, dan kotak tanda tangan kosong disertai pesan "Silakan bubuhkan tanda tangan kembali." |
-| TAM-4 | \[DIUBAH v0.10\] Sistem menyimpan kunjungan dengan status `waiting`, `check_in_at` dari server, nomor urut, dan tanda tangan. | Wajib | Satu transaksi, berurutan: (1) ambil nomor urut (TAM-10), (2) insert `guest_visits` termasuk `email`, `email_verified_at`, salinan nama kategori, dan saran departemen dari kategori, (3) insert `visit_signatures`, (4) insert `visit_status_logs` (`from_status` NULL → `waiting`, `changed_by` NULL), (5) update `qr_codes.last_used_at`. Jika satu langkah gagal, seluruh transaksi dibatalkan dan nomor urut tidak terpakai. Token QR, email di session, dan kategori divalidasi ulang saat POST. |
+| TAM-3 | \[DIUBAH v0.10\] Tamu mengisi Kategori keperluan, Rincian keperluan, Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, Alamat, dan Tanda tangan (wajib). Orang yang ditemui tidak diisi tamu; nilainya dipilih resepsionis saat menugaskan (RSP-2). Email berasal dari verifikasi Google dan tampil read-only di bagian atas. | Wajib | Urutan field mengikuti Bab 11. Field Rincian keperluan baru muncul setelah kategori dipilih. Saran Bidang/UPT dari kategori **tidak** ditampilkan kepada tamu. Jika validasi gagal, formulir tampil ulang dengan isian teks sebelumnya, pesan per field, dan kotak tanda tangan kosong disertai pesan "Silakan bubuhkan tanda tangan kembali." |
+| TAM-4 | \[DIUBAH v0.10\] Sistem menyimpan kunjungan dengan status `waiting`, `check_in_at` dari server, nomor urut, dan tanda tangan. | Wajib | Satu transaksi, berurutan: (1) ambil nomor urut (TAM-10), (2) insert `guest_visits` termasuk `email`, `email_verified_at`, salinan nama kategori, dan saran Bidang/UPT dari kategori, (3) insert `visit_signatures`, (4) insert `visit_status_logs` (`from_status` NULL → `waiting`, `changed_by` NULL), (5) update `qr_codes.last_used_at`. Jika satu langkah gagal, seluruh transaksi dibatalkan dan nomor urut tidak terpakai. Token QR, email di session, dan kategori divalidasi ulang saat POST. |
 | TAM-5 | Tamu menerima halaman konfirmasi setelah data tersimpan. | Wajib | Post/Redirect/Get: redirect 303 ke `/tamu/{token}/terima-kasih`. Halaman menampilkan nama tamu, lokasi, nomor urut, dan jam datang dari flash session; tanpa flash session, redirect ke `/tamu/{token}`. Refresh tidak menyimpan data ganda. Tersedia tautan "Lihat riwayat kunjungan". |
 | TAM-6 | Token tidak valid, dicabut, nonaktif, lokasi nonaktif, atau lokasi tanpa kategori aktif menampilkan pesan seragam. | Wajib | HTTP 404 dengan teks identik: "QR Code ini tidak aktif. Silakan hubungi petugas di lokasi." |
 | TAM-7 | Formulir memuat pernyataan persetujuan pemrosesan data pribadi. | Wajib | Checkbox wajib dicentang setiap kunjungan, termasuk tamu lama. Teks dari `config/consent.php`. Waktu persetujuan disimpan di `consent_at`. |
@@ -464,7 +464,7 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | TAM-14 | Sistem mencegah penyimpanan ganda akibat kiriman berulang. | Wajib | Setiap render formulir menyertakan token sekali pakai di session (terpisah dari CSRF, acak per render, dihapus saat dipakai dengan `session()->pull()`). Kiriman dengan token terpakai ditolak tanpa menyimpan data dan diarahkan ke halaman konfirmasi. |
 | TAM-15 | \[BARU v0.10\] Setelah verifikasi email, sistem otomatis menentukan tamu baru atau tamu lama. | Wajib | Pengecekan dilakukan server, bukan pilihan tamu: tamu lama = ada minimal satu `guest_visits` dengan `email` yang sama, di lokasi mana pun \[DEFAULT\]. Tamu baru diarahkan ke `/tamu/{token}/formulir` (formulir kosong). Tamu lama diarahkan ke `/tamu/{token}/riwayat` yang memuat tombol "Isi formulir lagi". |
 | TAM-16 | \[BARU v0.10\] Formulir tamu lama menampilkan data diri yang terisi otomatis dan terkunci. | Wajib | Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, dan Alamat diisi dari kunjungan terakhir dengan email yang sama (`check_in_at` terbaru) dan tampil read-only. Saat POST, server mengambil kelima nilai itu dari database lewat `ReturningGuestService`, bukan dari input browser. Kategori, Rincian keperluan, Tanda tangan, dan persetujuan diisi ulang. Kategori yang pernah dilaporkan tetap dapat dipilih \[DEFAULT\]. |
-| TAM-17 | \[BARU v0.10\] Tamu dapat melihat riwayat kunjungannya sendiri. | Wajib | `/tamu/{token}/riwayat` hanya dapat dibuka dengan email terverifikasi di session dan hanya menampilkan kunjungan dengan `email` yang sama, urut terbaru, paginasi `GUEST_HISTORY_PER_PAGE`. Per kunjungan tampil: tanggal dan jam datang, lokasi, kategori dan rincian keperluan, label status, departemen tujuan, orang yang ditemui, dan hasil (hanya bila Selesai). Nomor telepon, alamat, tanda tangan, dan alasan batal tidak ditampilkan. Tersedia tombol "Isi formulir lagi" dan "Ganti akun". |
+| TAM-17 | \[BARU v0.10\] Tamu dapat melihat riwayat kunjungannya sendiri. | Wajib | `/tamu/{token}/riwayat` hanya dapat dibuka dengan email terverifikasi di session dan hanya menampilkan kunjungan dengan `email` yang sama, urut terbaru, paginasi `GUEST_HISTORY_PER_PAGE`. Per kunjungan tampil: tanggal dan jam datang, lokasi, kategori dan rincian keperluan, label status, Bidang/UPT tujuan, orang yang ditemui, dan hasil (hanya bila Selesai). Nomor telepon, alamat, tanda tangan, dan alasan batal tidak ditampilkan. Tersedia tombol "Isi formulir lagi" dan "Ganti akun". |
 
 ### 6.6.1 Data yang dicatat per kunjungan \[DIUBAH v0.10\]
 
@@ -483,34 +483,34 @@ Kolom **Kriteria Penerimaan** adalah syarat agar kebutuhan dianggap selesai dan 
 | 11 | Jam datang | Otomatis dari waktu server | – | `check_in_at` |
 | 12 | Tanda tangan | Digambar tamu setiap kunjungan (TAM-9) | Ya | `visit_signatures.image` |
 
-Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi dan QR (dari token), saran departemen (dari kategori), departemen tujuan dan riwayat penugasan, akun PIC yang menerima, hasil, status dan waktu-waktu perubahannya, waktu persetujuan, dan alamat IP. Data lain **JANGAN** ditambahkan ke formulir.
+Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi dan QR (dari token), saran Bidang/UPT (dari kategori), Bidang/UPT tujuan dan riwayat penugasan, akun PIC yang menerima, hasil, status dan waktu-waktu perubahannya, waktu persetujuan, dan alamat IP. Data lain **JANGAN** ditambahkan ke formulir.
 
 ## 6.7 Resepsionis — Tamu Aktif dan Penugasan \[BARU v0.10\]
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| RSP-1 | `/admin/tamu` untuk Resepsionis menampilkan kunjungan `waiting` dan `processing` dari QR miliknya, urut dari yang datang paling awal. | Wajib | Urutan `check_in_at ASC`. Kunjungan dari hari sebelumnya tetap tampil. Paginasi 25 baris. Kolom: nomor urut, nama, instansi, kelompok rentan, kategori keperluan, saran departemen, departemen dan orang yang ditemui, jam datang, lama menunggu, label status, tombol aksi. Akun tanpa QR melihat pesan "Akun ini belum dihubungkan ke QR mana pun." |
-| RSP-2 | Resepsionis menugaskan kunjungan ke departemen dan memilih orang yang ditemui. | Wajib | Tombol "Tugaskan" pada kunjungan `waiting` membuka modal pilihan departemen: hanya departemen aktif di lokasi kunjungan yang memiliki akun PIC aktif; saran departemen dari kategori terpilih otomatis bila memenuhi syarat. Setelah departemen dipilih, resepsionis wajib memilih orang yang ditemui dari daftar petugas aktif departemen tersebut (PTG-1); departemen tanpa petugas aktif tidak dapat dipilih. Menyimpan `assigned_department_id`, `assigned_at`, `assigned_by`, served\_by\_staff\_id (orang yang ditemui), dan satu baris `visit_assignments`. Status tetap `waiting`, label menjadi "Menunggu PIC". |
-| RSP-3 | Resepsionis dapat menugaskan ulang selama PIC belum menerima. | Wajib | Tombol berubah menjadi "Tugaskan ulang" untuk kunjungan "Menunggu PIC". Penugasan ulang dapat mengganti departemen, orang yang ditemui, atau keduanya. Penugasan lama tetap tercatat di `visit_assignments`. Jika kunjungan sudah diterima PIC: HTTP 409 "Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang." |
+| RSP-1 | `/admin/tamu` untuk Resepsionis menampilkan kunjungan `waiting` dan `processing` dari QR miliknya, urut dari yang datang paling awal. | Wajib | Urutan `check_in_at ASC`. Kunjungan dari hari sebelumnya tetap tampil. Paginasi 25 baris. Kolom: nomor urut, nama, instansi, kelompok rentan, kategori keperluan, saran Bidang/UPT, Bidang/UPT dan orang yang ditemui, jam datang, lama menunggu, label status, tombol aksi. Akun tanpa QR melihat pesan "Akun ini belum dihubungkan ke QR mana pun." |
+| RSP-2 | Resepsionis menugaskan kunjungan ke Bidang/UPT dan memilih orang yang ditemui. | Wajib | Tombol "Tugaskan" pada kunjungan `waiting` membuka modal pilihan Bidang/UPT: hanya Bidang/UPT aktif di lokasi kunjungan yang memiliki akun PIC aktif; saran Bidang/UPT dari kategori terpilih otomatis bila memenuhi syarat. Setelah Bidang/UPT dipilih, resepsionis wajib memilih orang yang ditemui dari daftar petugas aktif Bidang/UPT tersebut (PTG-1); Bidang/UPT tanpa petugas aktif tidak dapat dipilih. Menyimpan `assigned_department_id`, `assigned_at`, `assigned_by`, served\_by\_staff\_id (orang yang ditemui), dan satu baris `visit_assignments`. Status tetap `waiting`, label menjadi "Menunggu PIC". |
+| RSP-3 | Resepsionis dapat menugaskan ulang selama PIC belum menerima. | Wajib | Tombol berubah menjadi "Tugaskan ulang" untuk kunjungan "Menunggu PIC". Penugasan ulang dapat mengganti Bidang/UPT, orang yang ditemui, atau keduanya. Penugasan lama tetap tercatat di `visit_assignments`. Jika kunjungan sudah diterima PIC: HTTP 409 "Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang." |
 | RSP-4 | Resepsionis membatalkan kunjungan dengan alasan. | Wajib | Untuk status `waiting` dan `processing`. Alasan wajib dipilih: "Tamu tidak hadir/pergi", "Salah lokasi", "Data ganda", atau "Lainnya" (wajib diisi teks, maks. 255 karakter). Mengisi `cancelled_at`, `cancel_reason`, `closed_by`. |
 | RSP-5 | Aksi dilakukan langsung dari daftar tanpa pindah halaman. | Wajib | Tombol memanggil endpoint AJAX (Bab 10); baris diperbarui tanpa reload; tombol dinonaktifkan selama request berjalan. |
 | RSP-6 | Resepsionis dapat mencari dan memfilter. | Wajib | Pencarian pada nama, nomor telepon, dan instansi. Filter label status: Menunggu, Menunggu PIC, Sedang direview. |
 | RSP-7 | Daftar diperbarui otomatis. | Penting | Polling setiap `POLL_INTERVAL_SECONDS` dengan filter aktif. Berhenti saat tab tidak terlihat dan langsung berjalan saat tab aktif lagi. Kunjungan baru disorot sebentar. |
 | RSP-8 | Kunjungan yang menunggu lama ditandai. | Penting | Kunjungan `waiting` (dengan atau tanpa penugasan) yang menunggu > `WAITING_ALERT_MINUTES` diberi highlight dan badge "Menunggu lama". Setiap baris menampilkan lama menunggu, misalnya "12 mnt". |
-| RSP-9 | \[BARU v0.11\] Pilihan departemen tujuan dan orang yang ditemui di modal Tugaskan dapat dicari. | Penting | Kedua pilihan berupa dropdown yang bisa diketik: tanpa ketikan menampilkan semua pilihan, dengan ketikan menyaring nama yang memuat teks tersebut (tidak peka huruf besar/kecil). Tidak ada hasil → "Tidak ada hasil". Saran departemen tetap terpilih otomatis (RSP-2); mengganti departemen mengosongkan orang yang ditemui. Dapat dipakai dengan keyboard (↑ ↓ Enter Esc) dan layar sentuh. Tanpa library tambahan (A-3). Komponen yang sama dipakai untuk Keperluan (dikelompokkan per departemen; ketikan nama departemen menampilkan semua keperluannya) dan Kelompok rentan di formulir tamu (TAM-3). Daftar selalu bertema terang walau HP memakai tema gelap. |
-| RSP-10 | \[BARU v0.11\] Resepsionis melihat kunjungan dari QR miliknya yang ditutup hari ini. | Penting | Bagian "Ditutup hari ini" di bawah daftar Tamu Aktif, hanya untuk Resepsionis, tertutup secara default dan ikut polling RSP-7. Isi: kunjungan `completed` dengan `completed_at` hari ini dan `cancelled` dengan `cancelled_at` hari ini (zona `APP_TIMEZONE`), urut terbaru ditutup; pencarian teks RSP-6 ikut berlaku. Kolom: nomor urut, nama, instansi, keperluan, departemen dan orang yang ditemui, label status, jam ditutup, alasan batal, tombol Detail. Tidak memuat isi hasil PIC, nomor telepon, alamat, atau email. Admin dan Super Admin memakai History. |
+| RSP-9 | \[BARU v0.11\] Pilihan Bidang/UPT tujuan dan orang yang ditemui di modal Tugaskan dapat dicari. | Penting | Kedua pilihan berupa dropdown yang bisa diketik: tanpa ketikan menampilkan semua pilihan, dengan ketikan menyaring nama yang memuat teks tersebut (tidak peka huruf besar/kecil). Tidak ada hasil → "Tidak ada hasil". Saran Bidang/UPT tetap terpilih otomatis (RSP-2); mengganti Bidang/UPT mengosongkan orang yang ditemui. Dapat dipakai dengan keyboard (↑ ↓ Enter Esc) dan layar sentuh. Tanpa library tambahan (A-3). Komponen yang sama dipakai untuk Keperluan (dikelompokkan per Bidang/UPT; ketikan nama Bidang/UPT menampilkan semua keperluannya) dan Kelompok rentan di formulir tamu (TAM-3). Daftar selalu bertema terang walau HP memakai tema gelap. |
+| RSP-10 | \[BARU v0.11\] Resepsionis melihat kunjungan dari QR miliknya yang ditutup hari ini. | Penting | Bagian "Ditutup hari ini" di bawah daftar Tamu Aktif, hanya untuk Resepsionis, tertutup secara default dan ikut polling RSP-7. Isi: kunjungan `completed` dengan `completed_at` hari ini dan `cancelled` dengan `cancelled_at` hari ini (zona `APP_TIMEZONE`), urut terbaru ditutup; pencarian teks RSP-6 ikut berlaku. Kolom: nomor urut, nama, instansi, keperluan, Bidang/UPT dan orang yang ditemui, label status, jam ditutup, alasan batal, tombol Detail. Tidak memuat isi hasil PIC, nomor telepon, alamat, atau email. Admin dan Super Admin memakai History. |
 
 ## 6.8 PIC — Penugasan dan Hasil \[BARU v0.10\]
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| PIC-1 | `/admin/penugasan` menampilkan kunjungan yang ditugaskan ke departemen akun PIC dengan status `waiting` dan `processing`. | Wajib | Urutan `check_in_at ASC`. Dua kelompok: "Penugasan baru" (`waiting`) dan "Sedang direview" (`processing`). Kolom: nomor urut, nama, instansi, kelompok rentan, kategori dan rincian keperluan, orang yang ditemui, lokasi, jam datang, lama menunggu, tombol aksi. Akun tanpa departemen melihat pesan "Akun ini belum dihubungkan ke departemen." |
-| PIC-2 | PIC menerima penugasan. | Wajib | Tombol "Terima" langsung menerima penugasan, tanpa memilih petugas karena orang yang ditemui sudah dipilih resepsionis. Transisi `waiting` → `processing`; mengisi `processed_at`, `processed_by` (akun)`.` Jika kunjungan sudah dialihkan ke departemen lain: HTTP 409 "Kunjungan ini sudah dialihkan. Daftar akan dimuat ulang." |
+| PIC-1 | `/admin/penugasan` menampilkan kunjungan yang ditugaskan ke Bidang/UPT akun PIC dengan status `waiting` dan `processing`. | Wajib | Urutan `check_in_at ASC`. Dua kelompok: "Penugasan baru" (`waiting`) dan "Sedang direview" (`processing`). Kolom: nomor urut, nama, instansi, kelompok rentan, kategori dan rincian keperluan, orang yang ditemui, lokasi, jam datang, lama menunggu, tombol aksi. Akun tanpa Bidang/UPT melihat pesan "Akun ini belum dihubungkan ke Bidang/UPT." |
+| PIC-2 | PIC menerima penugasan. | Wajib | Tombol "Terima" langsung menerima penugasan, tanpa memilih petugas karena orang yang ditemui sudah dipilih resepsionis. Transisi `waiting` → `processing`; mengisi `processed_at`, `processed_by` (akun)`.` Jika kunjungan sudah dialihkan ke Bidang/UPT lain: HTTP 409 "Kunjungan ini sudah dialihkan. Daftar akan dimuat ulang." |
 | PIC-3 | PIC menulis hasil dan menyelesaikan kunjungan. | Wajib | Tombol "Selesai" pada kunjungan `processing` membuka modal isian Hasil (wajib, 5–2000 karakter, dengan keterangan "Hasil ini akan terlihat oleh tamu."). Transisi `processing` → `completed`; mengisi `result`, `completed_at`, `closed_by`. Hasil langsung tampil di riwayat tamu (TAM-17). |
 | PIC-4 | PIC mengetahui penugasan baru tanpa memuat ulang halaman. | Wajib | Polling setiap `POLL_INTERVAL_SECONDS`. Penugasan baru disorot, jumlahnya tampil di badge menu dan judul tab browser, misalnya "(2) Penugasan". BOLEH: bunyi notifikasi singkat setelah PIC mengaktifkannya lewat tombol di halaman. |
 | PIC-5 | PIC melihat detail kunjungan dan riwayat statusnya. | Wajib | Sesuai Bab 13, tanpa gambar tanda tangan. |
 | PIC-6 | PIC tidak dapat membatalkan, menolak, atau menugaskan ulang kunjungan. | Wajib | Tidak ada tombol dan server menolak dengan HTTP 403. |
-| PIC-7 | \[BARU v0.11\] PIC melihat kunjungan departemennya yang diselesaikan hari ini. | Penting | Bagian ketiga "Selesai hari ini" di `/admin/penugasan`, tertutup secara default, ikut polling PIC-4. Isi: kunjungan `completed` dengan `completed_at` hari ini (zona `APP_TIMEZONE`) di departemen akun PIC, urut terbaru selesai. Kolom: nomor urut, nama, instansi, keperluan, orang yang ditemui, jam selesai, cuplikan hasil (maks. 120 karakter), tombol Detail. Hanya lihat; tidak memuat nomor telepon, alamat, atau email. Kunjungan hari sebelumnya tidak tampil (minimalisasi data, akun PIC dipakai bersama); riwayat lengkap tetap di History Admin. |
+| PIC-7 | \[BARU v0.11\] PIC melihat kunjungan Bidang/UPT-nya yang diselesaikan hari ini. | Penting | Bagian ketiga "Selesai hari ini" di `/admin/penugasan`, tertutup secara default, ikut polling PIC-4. Isi: kunjungan `completed` dengan `completed_at` hari ini (zona `APP_TIMEZONE`) di Bidang/UPT akun PIC, urut terbaru selesai. Kolom: nomor urut, nama, instansi, keperluan, orang yang ditemui, jam selesai, cuplikan hasil (maks. 120 karakter), tombol Detail. Hanya lihat; tidak memuat nomor telepon, alamat, atau email. Kunjungan hari sebelumnya tidak tampil (minimalisasi data, akun PIC dipakai bersama); riwayat lengkap tetap di History Admin. |
 
 ## 6.9 Admin dan Super Admin — Pemantauan, Pembatalan, Buka Kembali \[DIUBAH v0.10\]
 
@@ -520,14 +520,14 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 | ADM-2 | Admin dan Super Admin dapat membatalkan kunjungan. | Wajib | Aturan sama dengan RSP-4. |
 | ADM-3 | \[DIUBAH v0.11\] Hanya Admin yang dapat membuka kembali kunjungan Selesai atau Dibatalkan, di lokasi mana pun. | Penting | Tombol "Buka Kembali" di detail kunjungan History. Alasan wajib (maks. 255 karakter). Aturan di Bab 7.3. Tercatat di `visit_status_logs` dan audit log (`visit.reopen`). Super Admin tidak memiliki tombol ini \[DEFAULT\]. |
 | ADM-5 | \[BARU v0.11\] Admin tidak dibatasi lokasi. | Wajib | `AccessScope` memperlakukan Admin seperti Super Admin untuk data kunjungan dan master data (Bab 12.2). Tidak ada penugasan lokasi Admin (USR-2 dihapus). |
-| ADM-4 | Admin dan Super Admin melihat detail lengkap kunjungan. | Wajib | 12 data Bab 6.6.1 termasuk gambar tanda tangan, lokasi, QR, saran departemen, departemen tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status. |
+| ADM-4 | Admin dan Super Admin melihat detail lengkap kunjungan. | Wajib | 12 data Bab 6.6.1 termasuk gambar tanda tangan, lokasi, QR, saran Bidang/UPT, Bidang/UPT tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status. |
 
 ## 6.10 Admin dan Super Admin — History Kunjungan
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
 | HIS-1 | `/admin/history` menampilkan kunjungan `completed` dan `cancelled` di cakupannya. | Wajib | Urutan default `check_in_at DESC`. Paginasi 25 baris. \[DIUBAH v0.10\] Filter status berisi Selesai, Dibatalkan, dan Sedang direview; pilihan Sedang direview menampilkan kunjungan processing (yang tetap tampil juga di Tamu Aktif) agar dapat dicari dan diekspor. |
-| HIS-2 | \[DIUBAH v0.10\] Admin dapat mencari dan memfilter. | Wajib | Pencarian teks pada nama, instansi, dan rincian keperluan. Filter: rentang tanggal `check_in_at`, preset periode (Hari ini, 7 hari terakhir, Bulan ini), status, lokasi, kategori keperluan, departemen tujuan, dan kelompok rentan. Filter tersimpan di query string. |
+| HIS-2 | \[DIUBAH v0.10\] Admin dapat mencari dan memfilter. | Wajib | Pencarian teks pada nama, instansi, dan rincian keperluan. Filter: rentang tanggal `check_in_at`, preset periode (Hari ini, 7 hari terakhir, Bulan ini), status, lokasi, kategori keperluan, Bidang/UPT tujuan, dan kelompok rentan. Filter tersimpan di query string. |
 | HIS-3 | \[DIUBAH v0.10\] Filter kategori keperluan memakai dropdown kategori di lokasi dalam cakupan, termasuk kategori nonaktif. | Wajib | Menggantikan pencarian `LIKE` pada keperluan di v0.9. |
 | HIS-4 | Admin dapat melihat detail kunjungan dan mengekspor data sesuai cakupan. | Wajib | Ekspor mengikuti filter aktif dan cakupan. Spesifikasi di Bab 12.4. Setiap ekspor tercatat di audit log beserta format, filter, dan jumlah baris. |
 | HIS-5 | Tombol **Ekspor** berupa dropdown: CSV, Excel (.xlsx), dan PDF. | Wajib | Parameter `format` hanya menerima `csv`, `xlsx`, `pdf`. Excel dan PDF ditolak bila baris melebihi `EXPORT_RICH_MAX_ROWS`; CSV tidak dibatasi. |
@@ -536,7 +536,7 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| DSH-1 | \[DIUBAH v0.11\] Dashboard Admin menampilkan 5 kartu angka untuk semua lokasi. | Wajib | **Belum Ditugaskan** = `waiting` tanpa departemen; **Menunggu PIC** = `waiting` dengan departemen; **Sedang Direview** = `processing`; **Selesai Hari Ini** = `completed_at` hari ini; **Total Kunjungan Hari Ini** = `check_in_at` hari ini. Hitungan `waiting` mencakup semua tanggal. |
+| DSH-1 | \[DIUBAH v0.11\] Dashboard Admin menampilkan 5 kartu angka untuk semua lokasi. | Wajib | **Belum Ditugaskan** = `waiting` tanpa Bidang/UPT; **Menunggu PIC** = `waiting` dengan Bidang/UPT; **Sedang Direview** = `processing`; **Selesai Hari Ini** = `completed_at` hari ini; **Total Kunjungan Hari Ini** = `check_in_at` hari ini. Hitungan `waiting` mencakup semua tanggal. |
 | DSH-2 | Dashboard Admin menampilkan daftar Tamu Aktif ringkas. | Wajib | Maksimal 10 baris teratas dengan tombol Batal seperti ADM-2 dan tautan "Lihat semua". |
 | DSH-3 | Dashboard Super Admin menampilkan ringkasan seluruh lokasi. | Wajib | Kartu: Total Kunjungan (semua waktu), Lokasi Aktif, Kunjungan Hari Ini, Tamu Menunggu. Tabel per lokasi: belum ditugaskan, menunggu PIC, sedang direview, selesai hari ini, total hari ini. Grafik batang kunjungan per hari 14 hari terakhir. Daftar 10 kunjungan terbaru. |
 | DSH-4 | Seluruh angka bersumber dari database dan mengikuti cakupan peran. | Wajib | Semua query dashboard melewati `AccessScope` (A-6). |
@@ -546,11 +546,11 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 | ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
 | --- | --- | --- | --- |
-| USR-1 | \[DIUBAH v0.11\] Super Admin dapat membuat, mengubah, dan menonaktifkan akun staf empat peran, termasuk mengatur ulang password. Admin dapat melakukan hal yang sama untuk akun Resepsionis dan PIC (USR-6). | Wajib | Reset password mengakhiri semua sesi akun tersebut. Field umum: nama akun, email (unik, huruf kecil), peran, password (minimal 8 karakter). Field per peran: Admin → tanpa lokasi (ADM-5); PIC → satu departemen (wajib); Resepsionis → tanpa lokasi (dihubungkan lewat QR-2/QR-6). Akun nonaktif langsung ditolak pada request berikutnya (`EnsureUserIsActive`). |
+| USR-1 | \[DIUBAH v0.11\] Super Admin dapat membuat, mengubah, dan menonaktifkan akun staf empat peran, termasuk mengatur ulang password. Admin dapat melakukan hal yang sama untuk akun Resepsionis dan PIC (USR-6). | Wajib | Reset password mengakhiri semua sesi akun tersebut. Field umum: nama akun, email (unik, huruf kecil), peran, password (minimal 8 karakter). Field per peran: Admin → tanpa lokasi (ADM-5); PIC → satu Bidang/UPT (wajib); Resepsionis → tanpa lokasi (dihubungkan lewat QR-2/QR-6). Akun nonaktif langsung ditolak pada request berikutnya (`EnsureUserIsActive`). |
 | USR-2 | \[DIHAPUS v0.11\] Penugasan lokasi Admin. | – | Tidak diimplementasikan lagi; Admin mencakup semua lokasi (ADM-5). |
 | USR-3 | Setiap staf dapat mengganti password sendiri. | Penting | Wajib memasukkan password lama. \[DIUBAH v0.10\] Setelah berhasil, semua sesi akun tersebut diakhiri, termasuk sesi yang sedang dipakai; pengguna diarahkan ke halaman login dengan pesan "Password berhasil diganti. Silakan login kembali." Di perangkat lain, sesi akun itu ditolak pada request berikutnya dan diarahkan ke login. |
 | USR-4 | Sistem mencegah hilangnya akses Super Admin. | Wajib | Super Admin tidak dapat menonaktifkan atau menurunkan peran dirinya sendiri; sistem menolak perubahan yang membuat jumlah Super Admin aktif menjadi nol. |
-| USR-5 | \[BARU v0.10\] Sistem menjaga keterhubungan akun resepsionis dan PIC. | Wajib | Menonaktifkan atau mengubah peran akun resepsionis yang masih terhubung ke QR berstatus `active` atau `inactive` ditolak: "Pindahkan QR ke akun resepsionis lain terlebih dahulu." Satu departemen hanya boleh memiliki satu akun PIC aktif \[DEFAULT\]; akun PIC kedua yang aktif untuk departemen yang sama ditolak: "Departemen ini sudah memiliki akun PIC aktif." |
+| USR-5 | \[BARU v0.10\] Sistem menjaga keterhubungan akun resepsionis dan PIC. | Wajib | Menonaktifkan atau mengubah peran akun resepsionis yang masih terhubung ke QR berstatus `active` atau `inactive` ditolak: "Pindahkan QR ke akun resepsionis lain terlebih dahulu." Satu Bidang/UPT hanya boleh memiliki satu akun PIC aktif \[DEFAULT\]; akun PIC kedua yang aktif untuk Bidang/UPT yang sama ditolak: "Bidang/UPT ini sudah memiliki akun PIC aktif." |
 | USR-6 | \[BARU v0.11\] Admin hanya mengelola akun Resepsionis dan PIC. | Wajib | Pilihan peran di form akun Admin hanya Resepsionis dan PIC; server menolak peran lain (422). Ubah, aktif/nonaktif, reset password, dan buka kunci pada akun Admin atau Super Admin oleh Admin ditolak HTTP 403; akun itu tetap tampil di daftar tanpa tombol aksi. Admin tidak dapat mengubah akunnya sendiri lewat menu Pengguna (ganti password sendiri tetap lewat USR-3). |
 | AUTH-1 | Login dengan email dan password; akun dikunci sementara setelah beberapa kali gagal. | Wajib | Setelah `LOGIN_MAX_ATTEMPTS` gagal berturut-turut, `locked_until` = sekarang + `LOGIN_LOCK_MINUTES`. Pesan gagal selalu "Email atau password salah." Login sukses mereset `failed_logins` dan meregenerasi ID sesi. |
 | AUTH-2 | \[DIUBAH v0.10\] Setiap request staf divalidasi di server berdasarkan cakupan perannya. | Wajib | Lihat Bab 12.2. Berlaku untuk halaman, AJAX, gambar tanda tangan, dan ekspor. |
@@ -561,7 +561,7 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 
 # 7. Aturan Status Kunjungan (State Machine) \[DIUBAH v0.10\]
 
-Empat status database tetap sama dengan v0.9; penugasan ke departemen dicatat sebagai data tambahan pada status `waiting`, bukan status baru.
+Empat status database tetap sama dengan v0.9; penugasan ke Bidang/UPT dicatat sebagai data tambahan pada status `waiting`, bukan status baru.
 
 ## 7.1 Transisi yang diizinkan
 
@@ -569,8 +569,8 @@ Empat status database tetap sama dengan v0.9; penugasan ke departemen dicatat se
 | --- | --- | --- | --- | --- |
 | (baru) | `waiting` | Kirim formulir | Tamu | `check_in_at`, `visit_date`, `daily_number`, `consent_at`, `email`, `email_verified_at` |
 | `waiting` | `waiting` (penugasan) | Tugaskan / Tugaskan ulang | Resepsionis pemilik QR | `assigned_department_id`, `assigned_at`, `assigned_by`, served\_by\_staff\_id (orang yang ditemui), + satu baris `visit_assignments`. Bukan perubahan status: tidak dicatat di `visit_status_logs`. |
-| `waiting` (sudah ditugaskan) | `processing` | Terima | PIC departemen yang ditugaskan | `processed_at`, `processed_by` |
-| `processing` | `completed` | Selesai (hasil wajib) | PIC departemen yang ditugaskan | `result`, `completed_at`, `closed_by` |
+| `waiting` (sudah ditugaskan) | `processing` | Terima | PIC Bidang/UPT yang ditugaskan | `processed_at`, `processed_by` |
+| `processing` | `completed` | Selesai (hasil wajib) | PIC Bidang/UPT yang ditugaskan | `result`, `completed_at`, `closed_by` |
 | `waiting` | `cancelled` | Batal | Resepsionis pemilik QR, Admin, Super Admin | `cancelled_at`, `cancel_reason`, `closed_by` |
 | `processing` | `cancelled` | Batal | Resepsionis pemilik QR, Admin, Super Admin | `cancelled_at`, `cancel_reason`, `closed_by` |
 | `completed` / `cancelled` | status sebelum ditutup | Buka Kembali | Hanya Admin | Lihat 7.3 |
@@ -590,9 +590,9 @@ Semua perubahan status dan penugasan dijalankan oleh method di `VisitService`, m
    - Terima: `where('status', 'waiting')->where('assigned_department_id', $user->department_id)`.
    - Selesai: `where('status', 'processing')->where('assigned_department_id', $user->department_id)`.
 2. Jika baris terpengaruh = 0: batalkan transaksi, lalu tentukan penyebabnya.
-   - Kunjungan tidak ada di cakupan pengguna dan tidak pernah ditugaskan ke departemen PIC tersebut → HTTP 404 dan audit `access.denied`.
+   - Kunjungan tidak ada di cakupan pengguna dan tidak pernah ditugaskan ke Bidang/UPT PIC tersebut → HTTP 404 dan audit `access.denied`.
    - Kunjungan ada di cakupan tetapi statusnya sudah berubah → HTTP 409 "Status tamu ini sudah diubah oleh petugas lain. Daftar akan dimuat ulang."
-   - Khusus PIC: kunjungan pernah ditugaskan ke departemennya (ada di `visit_assignments`) tetapi sudah dialihkan → HTTP 409 sesuai PIC-2, tanpa audit `access.denied`.
+   - Khusus PIC: kunjungan pernah ditugaskan ke Bidang/UPT-nya (ada di `visit_assignments`) tetapi sudah dialihkan → HTTP 409 sesuai PIC-2, tanpa audit `access.denied`.
 3. Jika berhasil: insert `visit_status_logs` (`from_status`, `to_status`, `changed_by`, `staff_member_id` untuk aksi PIC, `note`) atau `visit_assignments` untuk penugasan, lalu commit.
 
 Pola ini mencegah dua petugas memproses kunjungan yang sama secara bersamaan.
@@ -611,10 +611,10 @@ Satu kunjungan berjalan melalui tujuh tahap: persiapan, pindai QR, verifikasi Go
 ## 8.1 Tahap 0 — Persiapan (Super Admin dan Admin)
 
 1. Super Admin membuat akun Admin. \[DIUBAH v0.11\] Langkah berikutnya dikerjakan Admin; Super Admin hanya turun tangan saat darurat.
-2. Admin membuat lokasi, misalnya "Kantor Dinas Jl. Ahmad Yani", lalu departemen di lokasi itu.
-3. Admin membuat akun resepsionis per pos dan akun PIC per departemen.
+2. Admin membuat lokasi, misalnya "Kantor Dinas Jl. Ahmad Yani", lalu Bidang/UPT di lokasi itu.
+3. Admin membuat akun resepsionis per pos dan akun PIC per Bidang/UPT.
 4. Admin membuat QR untuk tiap titik masuk dan memilih akun resepsionis pemiliknya, lalu mencetak QR dan menempelnya di titik masuk.
-5. Admin mengisi kategori keperluan (dengan saran departemen) dan daftar petugas setiap departemen di semua lokasi.
+5. Admin mengisi kategori keperluan (dengan saran Bidang/UPT) dan daftar petugas setiap Bidang/UPT di semua lokasi.
 
 ## 8.2 Tahap 1–4 — Tamu mendaftar
 
@@ -633,24 +633,24 @@ Satu kunjungan berjalan melalui tujuh tahap: persiapan, pindai QR, verifikasi Go
 ## 8.3 Tahap 5 — Resepsionis menugaskan
 
 1. Resepsionis melihat kunjungan baru di Tamu Aktif beserta lama menunggunya.
-2. Resepsionis menekan "Tugaskan", meninjau saran departemen dari kategori, memilih departemen dan orang yang ditemui (petugas yang akan mereview tamu), lalu menekan "Tugaskan".
-3. Label kunjungan berubah menjadi **Menunggu PIC**, dan penugasan muncul di daftar Penugasan PIC departemen tersebut.
+2. Resepsionis menekan "Tugaskan", meninjau saran Bidang/UPT dari kategori, memilih Bidang/UPT dan orang yang ditemui (petugas yang akan mereview tamu), lalu menekan "Tugaskan".
+3. Label kunjungan berubah menjadi **Menunggu PIC**, dan penugasan muncul di daftar Penugasan PIC Bidang/UPT tersebut.
 
 ## 8.4 Tahap 6 — PIC melayani
 
 1. PIC melihat penugasan baru yang disorot di daftar Penugasan.
 2. PIC menekan "Terima"**; status menjadi Sedang direview**.
-3. Orang yang ditemui mereview dan menangani keperluan tamu, memakai akun PIC departemennya.
+3. Orang yang ditemui mereview dan menangani keperluan tamu, memakai akun PIC Bidang/UPT-nya.
 4. PIC menekan "Selesai", menulis hasil, lalu menyimpan; status menjadi **Selesai** dan kunjungan pindah ke History.
 
 ## 8.5 Tahap 7 — Hasil kembali ke tamu
 
 1. Kapan pun tamu memindai QR lagi dan login dengan akun Google yang sama, sistem mengarahkannya ke riwayat kunjungan.
-2. Riwayat menampilkan hasil yang ditulis PIC beserta departemen dan orang yang ditemui.
+2. Riwayat menampilkan hasil yang ditulis PIC beserta Bidang/UPT dan orang yang ditemui.
 
 ## 8.6 Jalur samping
 
-- **PIC tidak merespons:** resepsionis menghubungi PIC lewat WhatsApp secara manual di luar sistem, lalu dapat menugaskan ulang ke departemen lain selama PIC belum menerima (RSP-3).
+- **PIC tidak merespons:** resepsionis menghubungi PIC lewat WhatsApp secara manual di luar sistem, lalu dapat menugaskan ulang ke Bidang/UPT lain selama PIC belum menerima (RSP-3).
 - **Pembatalan:** resepsionis pemilik QR, Admin, atau Super Admin menekan "Batal", memilih alasan, dan kunjungan menjadi **Dibatalkan** lalu masuk History.
 - **Buka kembali:** Admin membuka detail kunjungan di History, menekan "Buka Kembali", dan menulis alasan; kunjungan kembali ke status sebelum ditutup.
 - **Percobaan akses di luar cakupan:** staf yang mengubah ID atau parameter di URL/request ke data di luar cakupannya menerima HTTP 404 tanpa data apa pun, dan sistem mencatat `access.denied` di audit log.
@@ -665,9 +665,9 @@ Skema v0.10 menambah empat tabel (`departments`, `purpose_categories`, `staff_me
 - \[DIHAPUS v0.11\] `users` (peran `admin`) N—N `locations` melalui `user_locations`. Tabel tetap ada tetapi tidak dipakai aplikasi (lihat `docs/DECISIONS.md`).
 - `users` (peran `pic`) N—1 `departments` melalui `users.department_id`.
 - `users` (peran `receptionist`) 1—N `qr_codes` melalui `qr_codes.receptionist_id`.
-- `departments` 1—N `staff_members`; `departments` 0..1—N `purpose_categories` (saran departemen).
+- `departments` 1—N `staff_members`; `departments` 0..1—N `purpose_categories` (saran Bidang/UPT).
 - `qr_codes` 1—N `guest_visits`; `purpose_categories` 1—N `guest_visits`.
-- `guest_visits` N—0..1 `departments` (departemen tujuan); `guest_visits` N—0..1 `staff_members` (orang yang ditemui, dipilih resepsionis).
+- `guest_visits` N—0..1 `departments` (Bidang/UPT tujuan); `guest_visits` N—0..1 `staff_members` (orang yang ditemui, dipilih resepsionis).
 - `guest_visits` 1—N `visit_assignments`, 1—N `visit_status_logs`, 1—1 `visit_signatures`.
 - `users` 1—N `audit_logs`.
 - Model Eloquent: `User`, `Location`, `Department`, `QrCode`, `PurposeCategory`, `StaffMember`, `GuestVisit`, `VisitAssignment`, `VisitStatusLog`, `VisitSignature`, `AuditLog`. `user_locations` adalah pivot (`belongsToMany` dengan `withPivot('assigned_by', 'assigned_at')`). `visit_counters` tanpa model (diakses lewat `DB` di `VisitService`). `Location` memakai `SoftDeletes`.
@@ -770,7 +770,7 @@ CREATE TABLE purpose_categories (          -- [BARU v0.10]
   CONSTRAINT fk_pc_department FOREIGN KEY (suggested_department_id) REFERENCES departments(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE staff_members (               -- [BARU v0.10] daftar petugas per departemen
+CREATE TABLE staff_members (               -- [BARU v0.10] daftar petugas per Bidang/UPT
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   department_id BIGINT UNSIGNED NOT NULL,
   name VARCHAR(100) NOT NULL,
@@ -802,7 +802,7 @@ CREATE TABLE guest_visits (
   address VARCHAR(255) NOT NULL,
   status ENUM('waiting','processing','completed','cancelled') NOT NULL DEFAULT 'waiting',
   check_in_at DATETIME NOT NULL,
-  assigned_department_id BIGINT UNSIGNED NULL,       -- [BARU v0.10] departemen tujuan saat ini
+  assigned_department_id BIGINT UNSIGNED NULL,       -- [BARU v0.10] Bidang/UPT tujuan saat ini
   assigned_at DATETIME NULL,
   assigned_by BIGINT UNSIGNED NULL,
   processed_at DATETIME NULL,
@@ -854,7 +854,7 @@ CREATE TABLE visit_signatures (
   CONSTRAINT fk_sig_visit FOREIGN KEY (visit_id) REFERENCES guest_visits(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE visit_assignments (           -- [BARU v0.10] riwayat penugasan (departemen dan orang yang ditemui)
+CREATE TABLE visit_assignments (           -- [BARU v0.10] riwayat penugasan (Bidang/UPT dan orang yang ditemui)
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   visit_id BIGINT UNSIGNED NOT NULL,
   department_id BIGINT UNSIGNED NOT NULL,
@@ -936,7 +936,7 @@ Jalankan dengan `DB::insert()` dan `DB::selectOne('SELECT LAST_INSERT_ID() AS n'
 
 - `isReturning(email)`: `GuestVisit::where('email', $email)->exists()`.
 - `latestProfile(email)`: kunjungan dengan `check_in_at` terbaru, hanya kolom `vulnerable_group`, `name`, `organization`, `phone`, `address`.
-- `history(email)`: daftar kunjungan untuk TAM-17 dengan eager loading lokasi, departemen tujuan, dan petugas, tanpa kolom telepon, alamat, dan alasan batal.
+- `history(email)`: daftar kunjungan untuk TAM-17 dengan eager loading lokasi, Bidang/UPT tujuan, dan petugas, tanpa kolom telepon, alamat, dan alasan batal.
 
 Email **selalu** berasal dari session (TAM-11), tidak pernah dari parameter request.
 
@@ -985,14 +985,14 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 
 | Method | Path | Keterangan |
 | --- | --- | --- |
-| GET | `/admin/kunjungan/{id}/departemen` | \[BARU v0.10\] AJAX: daftar departemen yang dapat dipilih untuk kunjungan ini beserta saran departemen dan daftar petugas aktif tiap departemen. |
+| GET | `/admin/kunjungan/{id}/departemen` | \[BARU v0.10\] AJAX: daftar Bidang/UPT yang dapat dipilih untuk kunjungan ini beserta saran Bidang/UPT dan daftar petugas aktif tiap Bidang/UPT. |
 | POST | `/admin/kunjungan/{id}/tugaskan` | \[BARU v0.10\] AJAX: tugaskan atau tugaskan ulang. Body: `department_id`, staff\_member\_id (orang yang ditemui). |
 
 ## 10.5 PIC (`role:pic`)
 
 | Method | Path | Keterangan |
 | --- | --- | --- |
-| GET | `/admin/penugasan` | \[BARU v0.10\] Daftar penugasan departemen (PIC-1). |
+| GET | `/admin/penugasan` | \[BARU v0.10\] Daftar penugasan Bidang/UPT (PIC-1). |
 | GET | `/admin/penugasan/data` | \[BARU v0.10\] JSON untuk polling, berisi daftar, jumlah penugasan baru, dan `server_time`. |
 | POST | `/admin/kunjungan/{id}/terima` | \[BARU v0.10\] AJAX: `waiting` → `processing`. `Tanpa body`. |
 | POST | `/admin/kunjungan/{id}/selesai` | \[DIUBAH v0.10\] AJAX: `processing` → `completed`. Body: `result`. |
@@ -1010,7 +1010,7 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET / POST | `/admin/kategori-keperluan/tambah` | \[BARU v0.10\] Form dan simpan kategori. |
 | GET / POST | `/admin/kategori-keperluan/{id}/ubah` | \[BARU v0.10\] Form dan simpan perubahan. |
 | POST | `/admin/kategori-keperluan/{id}/status` | \[BARU v0.10\] Aktifkan/nonaktifkan. |
-| GET | `/admin/petugas` | \[BARU v0.10\] Daftar petugas per departemen. Query: `department_id`. |
+| GET | `/admin/petugas` | \[BARU v0.10\] Daftar petugas per Bidang/UPT. Query: `department_id`. |
 | GET / POST | `/admin/petugas/tambah` | \[BARU v0.10\] Form dan simpan petugas. |
 | GET / POST | `/admin/petugas/{id}/ubah` | \[BARU v0.10\] Form dan simpan perubahan. |
 | POST | `/admin/petugas/{id}/status` | \[BARU v0.10\] Aktifkan/nonaktifkan. |
@@ -1030,10 +1030,10 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET / POST | `/admin/lokasi/{id}/ubah` | Form dan simpan perubahan lokasi. |
 | POST | `/admin/lokasi/{id}/status` | Aktifkan/nonaktifkan lokasi. |
 | POST | `/admin/lokasi/{id}/hapus` | Soft delete (ditolak jika lokasi punya data, LOK-3). |
-| GET | `/admin/lokasi/{id}/departemen` | \[BARU v0.10\] Daftar departemen lokasi. |
-| POST | `/admin/lokasi/{id}/departemen` | \[BARU v0.10\] Tambah departemen. Body: `name`. |
-| POST | `/admin/departemen/{id}/ubah` | \[BARU v0.10\] Ubah nama departemen. |
-| POST | `/admin/departemen/{id}/status` | \[BARU v0.10\] Aktifkan/nonaktifkan departemen. |
+| GET | `/admin/lokasi/{id}/departemen` | \[BARU v0.10\] Daftar Bidang/UPT lokasi. |
+| POST | `/admin/lokasi/{id}/departemen` | \[BARU v0.10\] Tambah Bidang/UPT. Body: `name`. |
+| POST | `/admin/departemen/{id}/ubah` | \[BARU v0.10\] Ubah nama Bidang/UPT. |
+| POST | `/admin/departemen/{id}/status` | \[BARU v0.10\] Aktifkan/nonaktifkan Bidang/UPT. |
 | GET | `/admin/lokasi/{id}/qr` | Daftar QR lokasi. |
 | POST | `/admin/lokasi/{id}/qr` | \[DIUBAH v0.10\] Buat QR baru. Body: `label`, `receptionist_id`. |
 | POST | `/admin/qr/{id}/resepsionis` | \[BARU v0.10\] Ganti akun resepsionis QR (QR-6). Body: `receptionist_id`. |
@@ -1043,7 +1043,7 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET | `/admin/qr/{id}/cetak` | Halaman cetak QR. |
 | GET | `/admin/pengguna` | Daftar akun staf. |
 | GET / POST | `/admin/pengguna/tambah` | Form dan simpan akun baru. |
-| GET / POST | `/admin/pengguna/{id}/ubah` | Ubah data, peran, lokasi (Admin), departemen (PIC), dan password. |
+| GET / POST | `/admin/pengguna/{id}/ubah` | Ubah data, peran, lokasi (Admin), Bidang/UPT (PIC), dan password. |
 | POST | `/admin/pengguna/{id}/status` | Aktifkan/nonaktifkan akun (USR-4, USR-5). |
 | POST | `/admin/pengguna/{id}/buka-kunci` | Buka kunci akun (AUTH-4). |
 | GET | `/admin/audit-log` | Daftar audit log. |
@@ -1092,8 +1092,8 @@ Untuk tamu lama, Form Request **mengabaikan** input `vulnerable_group`, `name`, 
 
 | Field (label UI) | Dipakai di | Aturan | Pesan error |
 | --- | --- | --- | --- |
-| `department_id` (Departemen tujuan) | Tugaskan (RSP-2, RSP-3) | Wajib; departemen aktif di lokasi kunjungan dan memiliki akun PIC aktif. | "Pilih departemen tujuan." |
-| `staff_member_id` (Orang yang ditemui) | Tugaskan (RSP-2, RSP-3) | Wajib; petugas aktif di departemen yang dipilih. | "Pilih orang yang ditemui." |
+| `department_id` (Bidang/UPT tujuan) | Tugaskan (RSP-2, RSP-3) | Wajib; Bidang/UPT aktif di lokasi kunjungan dan memiliki akun PIC aktif. | "Pilih Bidang/UPT tujuan." |
+| `staff_member_id` (Orang yang ditemui) | Tugaskan (RSP-2, RSP-3) | Wajib; petugas aktif di Bidang/UPT yang dipilih. | "Pilih orang yang ditemui." |
 | `result` (Hasil) | Selesai (PIC-3) | Wajib; 5–2000 karakter setelah trim. | "Hasil wajib diisi (5–2000 karakter)." |
 | `reason` (Alasan batal) | Batal (RSP-4, ADM-2) | Wajib; salah satu: `not_present`, `wrong_location`, `duplicate`, `other`. | "Pilih alasan pembatalan." |
 | `reason_text` (Keterangan) | Batal | Wajib jika `reason` = `other`; maks. 255 karakter. | "Tulis alasan pembatalan (maks. 255 karakter)." |
@@ -1103,8 +1103,8 @@ Untuk tamu lama, Form Request **mengabaikan** input `vulnerable_group`, `name`, 
 
 | Field | Dipakai di | Aturan |
 | --- | --- | --- |
-| `name` | Lokasi, departemen, kategori, petugas | Wajib, 2–100 karakter; unik sesuai cakupannya (lokasi: global; departemen dan kategori: per lokasi; petugas: per departemen), tidak peka huruf besar/kecil. |
-| `suggested_department_id` | Kategori | Opsional; departemen aktif di lokasi yang sama. |
+| `name` | Lokasi, Bidang/UPT, kategori, petugas | Wajib, 2–100 karakter; unik sesuai cakupannya (lokasi: global; Bidang/UPT dan kategori: per lokasi; petugas: per Bidang/UPT), tidak peka huruf besar/kecil. |
+| `suggested_department_id` | Kategori | Opsional; Bidang/UPT aktif di lokasi yang sama. |
 | `sort_order` | Kategori | Angka 0–999; default 0. |
 | `receptionist_id` | QR | Wajib; akun aktif berperan `receptionist`. |
 | `label` | QR | Opsional, maks. 100 karakter. |
@@ -1137,7 +1137,7 @@ AccessScope::locationIds(user):
     super_admin   → NULL (tanpa batas)
     admin         → NULL (tanpa batas, ADM-5)
     receptionist  → location_id distinct dari qr_codes milik user
-    pic           → [location_id departemen user]
+    pic           → [location_id Bidang/UPT user]
     (hasil disimpan di memori selama satu request)
 
 AccessScope::applyToVisits(query, user):
@@ -1147,7 +1147,7 @@ AccessScope::applyToVisits(query, user):
     pic           → where(assigned_department_id, user.department_id)
     daftar id kosong → query menghasilkan 0 baris
 
-AccessScope::applyToMaster(query, user, kolomLokasi):   // QR, departemen, kategori, petugas
+AccessScope::applyToMaster(query, user, kolomLokasi):   // QR, Bidang/UPT, kategori, petugas
     super_admin   → tanpa filter
     admin         → tanpa filter (ADM-5)
     peran lain    → 0 baris (tidak punya akses master data)
@@ -1164,7 +1164,7 @@ Aturan:
 - Setiap parameter `location_id`, `department_id`, `purpose_category_id`, `staff_member_id`, dan `receptionist_id` dari request **wajib** dicek terhadap cakupan. Di luar cakupan diperlakukan sebagai akses ditolak.
 - Pembatasan peran per route (`role:`) adalah lapis pertama; `AccessScope` adalah lapis kedua dan tetap wajib walau route sudah dibatasi peran.
 - Pengecualian tunggal: `ReturningGuestService` (Bab 9.4).
-- Tes otomatis (A-15) wajib membuktikan: \[DIUBAH v0.11\] Resepsionis QR A, dan PIC departemen A mendapat 404 dan audit `access.denied` pada setiap route berparameter ID yang menyentuh data lokasi B, QR B, atau departemen B; serta ekspor tidak memuat data di luar cakupan.
+- Tes otomatis (A-15) wajib membuktikan: \[DIUBAH v0.11\] Resepsionis QR A, dan PIC Bidang/UPT A mendapat 404 dan audit `access.denied` pada setiap route berparameter ID yang menyentuh data lokasi B, QR B, atau Bidang/UPT B; serta ekspor tidak memuat data di luar cakupan.
 
 ## 12.3 Audit log \[DIUBAH v0.10\]
 
@@ -1172,7 +1172,7 @@ Aturan:
 | --- | --- |
 | Autentikasi | `auth.login_success`, `auth.login_failed`, `auth.locked`, `auth.logout`, `auth.password_changed` |
 | Lokasi | `location.create`, `location.update`, `location.activate`, `location.deactivate`, `location.delete` |
-| Departemen \[BARU v0.10\] | `department.create`, `department.update`, `department.activate`, `department.deactivate` |
+| Bidang/UPT \[BARU v0.10\] | `department.create`, `department.update`, `department.activate`, `department.deactivate` |
 | QR Code | `qr.create`, `qr.activate`, `qr.deactivate`, `qr.regenerate`, `qr.download`, `qr.change_receptionist` \[BARU v0.10\] |
 | Kategori keperluan \[BARU v0.10\] | `purpose_category.create`, `purpose_category.update`, `purpose_category.activate`, `purpose_category.deactivate` |
 | Petugas \[BARU v0.10\] | `staff.create`, `staff.update`, `staff.activate`, `staff.deactivate` |
@@ -1187,7 +1187,7 @@ Aturan:
 **Umum**
 
 - Tombol **Ekspor** di History berupa dropdown CSV, Excel (.xlsx), dan PDF; ketiganya mengikuti filter aktif dan cakupan.
-- Kolom sama untuk ketiga format (15 kolom): No. Urut, Waktu Datang (`dd/mm/yyyy HH:mm`), Lokasi, Nama Tamu, Instansi/Perusahaan, Kelompok Rentan, Kategori Keperluan, Rincian Keperluan, No. Telepon, Alamat, Email, Departemen Tujuan, Orang yang Ditemui (dipilih resepsionis), Status (Selesai, Dibatalkan, atau Sedang direview), Hasil (kosong bila belum Selesai).
+- Kolom sama untuk ketiga format (15 kolom): No. Urut, Waktu Datang (`dd/mm/yyyy HH:mm`), Lokasi, Nama Tamu, Instansi/Perusahaan, Kelompok Rentan, Kategori Keperluan, Rincian Keperluan, No. Telepon, Alamat, Email, Bidang/UPT Tujuan, Orang yang Ditemui (dipilih resepsionis), Status (Selesai, Dibatalkan, atau Sedang direview), Hasil (kosong bila belum Selesai).
 - **Excel dan PDF menambah kolom terakhir Tanda Tangan** berupa gambar (16 kolom). CSV tidak memuat tanda tangan.
 - Nama file: `sitamu_{nama-lokasi atau semua}_{YYYYMMDD-HHmm}.{csv|xlsx|pdf}`.
 - Header respons: `Content-Type` sesuai format, `Content-Disposition: attachment`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`.
@@ -1228,7 +1228,7 @@ Aturan:
 
 # 13. Rincian Halaman UI \[DIUBAH v0.10\]
 
-Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertambah halaman Penugasan PIC, kategori keperluan, petugas, dan departemen.
+Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertambah halaman Penugasan PIC, kategori keperluan, petugas, dan Bidang/UPT.
 
 ## 13.1 Halaman tamu
 
@@ -1236,7 +1236,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Langkah 1: verifikasi email | Logo dan nama instansi, badge nama lokasi, satu kalimat petunjuk, tombol "Pilih akun Google" lebar penuh, tautan kecil "Tidak bisa login Google?". Tidak ada elemen lain. |
 | Bantuan login Google | "Coba buka halaman ini di Chrome atau Safari. Jika masih belum bisa, silakan hubungi petugas." dan tombol "Coba lagi". |
-| Riwayat kunjungan \[BARU v0.10\] | Logo, badge lokasi, email terverifikasi dengan tombol "Ganti akun", tombol utama "Isi formulir lagi". Daftar kartu kunjungan (terbaru di atas): tanggal dan jam, lokasi, kategori dan rincian keperluan, badge status, departemen tujuan, orang yang ditemui, dan kotak Hasil (bila Selesai). Paginasi sederhana "Sebelumnya / Berikutnya". |
+| Riwayat kunjungan \[BARU v0.10\] | Logo, badge lokasi, email terverifikasi dengan tombol "Ganti akun", tombol utama "Isi formulir lagi". Daftar kartu kunjungan (terbaru di atas): tanggal dan jam, lokasi, kategori dan rincian keperluan, badge status, Bidang/UPT tujuan, orang yang ditemui, dan kotak Hasil (bila Selesai). Paginasi sederhana "Sebelumnya / Berikutnya". |
 | Formulir tamu baru | Logo dan nama instansi, badge lokasi, blok Email read-only dengan tombol "Ganti akun", teks "Jam datang dicatat otomatis saat formulir dikirim.", lalu field sesuai urutan Bab 11.1: Keperluan (dropdown) → Rincian keperluan (muncul setelah kategori dipilih) → Kelompok rentan → Nama lengkap → Instansi/perusahaan → Nomor telepon/WhatsApp → Alamat → kotak tanda tangan (lebar penuh, tinggi sekitar 180 px, tombol "Hapus Tanda Tangan", halaman tidak bergulir saat menggambar) → checkbox persetujuan → tombol "Kirim Formulir" lebar penuh, dinonaktifkan setelah diklik. |
 | Formulir tamu lama \[BARU v0.10\] | Sama dengan formulir tamu baru, tetapi Kelompok rentan, Nama lengkap, Instansi/perusahaan, Nomor telepon/WhatsApp, dan Alamat tampil terisi dan read-only (`disabled`), dengan keterangan "Data diri diambil dari kunjungan terakhir Anda." |
 | Terima kasih | Ikon sukses, nomor urut berukuran besar, lalu "Terima kasih, {nama}. Kunjungan Anda di {lokasi} tercatat dengan No. {nomor urut} pada pukul {HH:mm}. Silakan menunggu petugas." dan tautan "Lihat riwayat kunjungan". |
@@ -1248,20 +1248,20 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Login | Email, password, pesan error seragam. |
 | Layout staf | Sidebar di desktop, offcanvas di ponsel. Menu sesuai peran (di bawah). Nama akun, peran, dan tombol logout di pojok kanan atas. |
-| Menu per peran | **Resepsionis:** Tamu Aktif, Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin:** Dashboard, Tamu Aktif, History, Kategori Keperluan, Petugas, Ganti Password. **Super Admin:** Dashboard, Tamu Aktif, History, Lokasi (dengan Departemen dan QR), Kategori Keperluan, Petugas, Pengguna, Audit Log, Ganti Password. |
+| Menu per peran | **Resepsionis:** Tamu Aktif, Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin:** Dashboard, Tamu Aktif, History, Kategori Keperluan, Petugas, Ganti Password. **Super Admin:** Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT dan QR), Kategori Keperluan, Petugas, Pengguna, Audit Log, Ganti Password. |
 | Dashboard (Admin, Super Admin) | Kartu angka (DSH-1/DSH-3), Tamu Aktif ringkas, grafik 14 hari (Super Admin). |
-| Tamu Aktif — Resepsionis | Kotak pencarian dan filter label status; tabel/kartu: nomor urut, nama, instansi, kelompok rentan, kategori keperluan, saran departemen, departemen dan orang yang ditemui, jam datang, lama menunggu, badge status, tombol aksi. Tombol per kondisi: Menunggu → Tugaskan, Batal; Menunggu PIC → Tugaskan ulang, Batal; Sedang direview → Batal. Modal Tugaskan berisi pilihan departemen (saran terpilih otomatis), lalu pilihan orang yang ditemui dari daftar petugas departemen tersebut. Modal alasan batal. Toast setelah aksi. |
+| Tamu Aktif — Resepsionis | Kotak pencarian dan filter label status; tabel/kartu: nomor urut, nama, instansi, kelompok rentan, kategori keperluan, saran Bidang/UPT, Bidang/UPT dan orang yang ditemui, jam datang, lama menunggu, badge status, tombol aksi. Tombol per kondisi: Menunggu → Tugaskan, Batal; Menunggu PIC → Tugaskan ulang, Batal; Sedang direview → Batal. Modal Tugaskan berisi pilihan Bidang/UPT (saran terpilih otomatis), lalu pilihan orang yang ditemui dari daftar petugas Bidang/UPT tersebut. Modal alasan batal. Toast setelah aksi. |
 | Tamu Aktif — Admin, Super Admin | Sama dengan versi Resepsionis ditambah kolom lokasi dan QR serta filter lokasi; tombol hanya Batal dan Detail. |
 | Penugasan — PIC \[BARU v0.10\] | Dua bagian: "Penugasan baru" dan "Sedang direview". Kartu/baris: nomor urut, nama, instansi, kelompok rentan, kategori dan rincian keperluan, orang yang ditemui, lokasi, jam datang, lama menunggu. Tombol: Terima pada penugasan baru; Selesai (modal isian Hasil dengan keterangan "Hasil ini akan terlihat oleh tamu.") pada yang sedang direview. Tombol "Aktifkan bunyi notifikasi" (opsional, PIC-4). |
-| Detail kunjungan | Admin dan Super Admin: 12 data Bab 6.6.1 (tanda tangan dari route tanda tangan, `loading="lazy"`), lokasi, QR, saran departemen, departemen tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status (waktu, dari → ke, oleh akun, catatan); tombol Buka Kembali hanya untuk Admin pada kunjungan Selesai/Dibatalkan. Resepsionis: sama, termasuk tanda tangan, tanpa tombol Buka Kembali. PIC: sama, tanpa tanda tangan dan tanpa tombol Buka Kembali. |
-| History | Panel filter (Bab 6.10), tabel berpaginasi (tanggal, nomor urut, nama, instansi, kelompok rentan, kategori, departemen tujuan, lokasi, jam datang, status), tombol Ekspor berupa dropdown (CSV, Excel, PDF). |
-| Lokasi | Tabel lokasi (nama, jumlah departemen, jumlah QR aktif, status), tombol tambah, ubah, aktif/nonaktif, hapus (bila memenuhi syarat), tautan Departemen dan QR. |
-| Departemen per lokasi \[BARU v0.10\] | Tabel departemen (nama, akun PIC, jumlah petugas aktif, status), tombol tambah, ubah nama, aktif/nonaktif. |
+| Detail kunjungan | Admin dan Super Admin: 12 data Bab 6.6.1 (tanda tangan dari route tanda tangan, `loading="lazy"`), lokasi, QR, saran Bidang/UPT, Bidang/UPT tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status (waktu, dari → ke, oleh akun, catatan); tombol Buka Kembali hanya untuk Admin pada kunjungan Selesai/Dibatalkan. Resepsionis: sama, termasuk tanda tangan, tanpa tombol Buka Kembali. PIC: sama, tanpa tanda tangan dan tanpa tombol Buka Kembali. |
+| History | Panel filter (Bab 6.10), tabel berpaginasi (tanggal, nomor urut, nama, instansi, kelompok rentan, kategori, Bidang/UPT tujuan, lokasi, jam datang, status), tombol Ekspor berupa dropdown (CSV, Excel, PDF). |
+| Lokasi | Tabel lokasi (nama, jumlah Bidang/UPT, jumlah QR aktif, status), tombol tambah, ubah, aktif/nonaktif, hapus (bila memenuhi syarat), tautan Bidang/UPT dan QR. |
+| Bidang/UPT per lokasi \[BARU v0.10\] | Tabel Bidang/UPT (nama, akun PIC, jumlah petugas aktif, status), tombol tambah, ubah nama, aktif/nonaktif. |
 | QR per lokasi | Tabel QR (label, akun resepsionis, status, dibuat, terakhir dipakai) dengan tombol ganti resepsionis, aktif/nonaktif, regenerate, unduh PNG/SVG, cetak. Form buat QR berisi label dan pilihan akun resepsionis. |
 | Cetak QR | Layout A4 bersih tanpa navigasi: logo, nama instansi, lokasi, label QR, QR, instruksi; siap `window.print()`. |
-| Kategori keperluan \[BARU v0.10\] | Pilihan lokasi (bila lebih dari satu), tabel kategori (urutan, nama, saran departemen, status), tombol tambah, ubah, aktif/nonaktif. |
-| Petugas \[BARU v0.10\] | Pilihan lokasi dan departemen, tabel petugas (nama, status), tombol tambah, ubah, aktif/nonaktif. |
-| Pengguna | Tabel akun (nama, email, peran, lokasi/departemen/QR terkait, status, login terakhir) dengan pencarian dan filter peran serta status; form dengan field yang berubah sesuai peran (USR-1); tombol Buka kunci. |
+| Kategori keperluan \[BARU v0.10\] | Pilihan lokasi (bila lebih dari satu), tabel kategori (urutan, nama, saran Bidang/UPT, status), tombol tambah, ubah, aktif/nonaktif. |
+| Petugas \[BARU v0.10\] | Pilihan lokasi dan Bidang/UPT, tabel petugas (nama, status), tombol tambah, ubah, aktif/nonaktif. |
+| Pengguna | Tabel akun (nama, email, peran, lokasi, Bidang/UPT, atau QR terkait, status, login terakhir) dengan pencarian dan filter peran serta status; form dengan field yang berubah sesuai peran (USR-1); tombol Buka kunci. |
 | Audit log | Tabel dengan filter tanggal, akun, dan aksi. |
 
 Identitas visual: tampilan mengikuti template Volt (Bab 5.6); logo di `public/assets/img/logo.png` (placeholder sampai klien memberikan logo resmi) dan warna utama sebagai variabel CSS di satu file.
@@ -1278,7 +1278,7 @@ Delapan milestone dikerjakan berurutan; satu milestone selesai jika seluruh Defi
 | --- | --- | --- |
 | M0 — Fondasi | Skeleton Laravel (`composer.lock` di-commit), pembersihan Vite/Node dan route contoh, `.env.example` lengkap (Bab 5.4), `config/sitamu.php` dan `config/consent.php`, locale `id`, zona waktu, `DB_TIMEZONE`, enum (`VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup`), middleware `SecurityHeaders`, `EnsureUserIsActive`, `EnsureRole` (multi-peran), semua migrasi Bab 9.2 beserta model dan relasinya, `php artisan sitamu:create-superadmin`, layout Blade dasar berbasis Volt (Bab 5.6), halaman error kustom, `README.md`. | `php artisan migrate` berjalan di database kosong; Super Admin dapat dibuat lewat artisan; halaman ber-layout tampil; `php artisan test` hijau; `vendor/bin/pint --test` bersih; tidak ada secret di repositori. |
 | M1 — Autentikasi, Akun & AccessScope | Login/logout, penguncian akun, batas sesi, middleware `active` dan `role`, `AccessScope` dan trait `LimitedByAccess` untuk empat peran, `AuditService`, CRUD akun staf empat peran dengan field per peran (USR-1, USR-5), penugasan lokasi Admin, buka kunci, ganti password, halaman audit log, menu per peran. | AUTH-1–4, USR-1–5, AUD-1–2 terpenuhi. Setiap peran mendapat 403 pada route peran lain. Setelah ganti password, semua sesi akun itu berakhir dan pengguna diarahkan ke login. Tes otomatis untuk penguncian akun, akun nonaktif, 403 per peran, dan `AccessScope` keempat peran lulus. |
-| M2 — Master Data | CRUD lokasi, departemen, QR (dengan akun resepsionis, ganti resepsionis, regenerate, unduh, cetak), kategori keperluan, dan petugas. | LOK-1–3, DEP-1–3, QR-1–6, KAT-1–3, PTG-1–2 terpenuhi. QR yang diunduh dapat dipindai ponsel dan membuka URL yang benar. Admin dapat mengelola kategori dan petugas di semua lokasi. |
+| M2 — Master Data | CRUD lokasi, Bidang/UPT, QR (dengan akun resepsionis, ganti resepsionis, regenerate, unduh, cetak), kategori keperluan, dan petugas. | LOK-1–3, DEP-1–3, QR-1–6, KAT-1–3, PTG-1–2 terpenuhi. QR yang diunduh dapat dipindai ponsel dan membuka URL yang benar. Admin dapat mengelola kategori dan petugas di semua lokasi. |
 | M3 — Halaman Tamu | Langkah 1 verifikasi Google (`GoogleTokenVerifier`, `guest-google.js`, pengecualian CSP), halaman bantuan, deteksi tamu lama, riwayat tamu, formulir tamu baru dan lama (`ReturningGuestService`), kotak tanda tangan, `SignatureService`, nomor urut, penyimpanan, persetujuan, rate limiter bernama, honeypot, token sekali pakai, halaman terima kasih. | TAM-1–12 dan TAM-14–17 terpenuhi. Refresh halaman terima kasih tidak menyimpan data ganda. Dua kiriman bersamaan di lokasi yang sama mendapat nomor urut berbeda. Email dan data diri tamu lama tidak dapat diubah dari DevTools. Riwayat hanya menampilkan kunjungan email tersebut. Tanda tangan dan verifikasi Google diuji di Chrome Android dan Safari iOS. Tes otomatis untuk nomor urut, email dari session, data diri tamu lama dari database, isolasi riwayat, token TAM-14, dan rate limit lulus (Google di-fake dengan `Http::fake()`). |
 | M4 — Resepsionis & PIC | Tamu Aktif (versi Resepsionis dan Admin), penugasan dan penugasan ulang, pemilihan orang yang ditemui saat menugaskan, Penugasan PIC, terima, hasil dan selesai, batal, buka kembali oleh Admin, detail kunjungan per peran, route tanda tangan, timeline status dan penugasan, polling dan penanda menunggu lama. | RSP-1–8, PIC-1–6, ADM-1–4 terpenuhi. Kunjungan dari QR A hanya muncul di resepsionis QR A. Setelah QR-6, kunjungan aktif pindah ke resepsionis baru. Penugasan ulang setelah PIC menerima mendapat 409. PIC yang menerima kunjungan yang baru saja dialihkan mendapat 409. Dua PIC tidak dapat menerima kunjungan yang sama. Tes otomatis untuk semua transisi Bab 7, respons 409/422, dan penugasan lulus. |
 | M5 — History & Ekspor | Halaman History dengan filter baru, dropdown Ekspor (CSV, Excel, PDF) dengan 15/16 kolom, batas baris Excel/PDF. | HIS-1–5 terpenuhi. CSV terbuka rapi di Excel; Excel menampilkan gambar tanda tangan; PDF terbaca dengan header berulang; ketiganya hanya berisi data dalam cakupan. Ekspor di atas batas ditolak dengan pesan jelas. Tercatat di audit log. Tes otomatis cakupan ekspor lulus. |
@@ -1287,7 +1287,7 @@ Delapan milestone dikerjakan berurutan; satu milestone selesai jika seluruh Defi
 
 # 16. Fitur Usulan / Fase Lanjutan (JANGAN diimplementasikan di MVP)
 
-- **Statistik durasi layanan:** rata-rata lama menunggu penugasan, lama menunggu PIC, dan lama layanan per departemen dari `check_in_at`, `assigned_at`, `processed_at`, dan `completed_at`.
+- **Statistik durasi layanan:** rata-rata lama menunggu penugasan, lama menunggu PIC, dan lama layanan per Bidang/UPT dari `check_in_at`, `assigned_at`, `processed_at`, dan `completed_at`.
 - **Laporan kelompok rentan:** rekap kunjungan per kelompok rentan per periode untuk laporan pelayanan publik.
 - **Tabel `guests` terpisah:** profil tamu yang dapat diperbarui tamu sendiri, menggantikan pengambilan data dari kunjungan terakhir.
 - **Notifikasi WhatsApp ke PIC:** pemberitahuan otomatis saat ada penugasan baru, menggantikan kontak manual.
@@ -1310,7 +1310,7 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 | 6 | Nomor urut reset harian per lokasi? | Ya. | Kecil: kunci `visit_counters` dan unique key. |
 | 7 | Kebijakan retensi data dan teks persetujuan resmi? | Tanpa penghapusan otomatis; teks sementara di bawah. | Kecil: `config/consent.php`; retensi otomatis menjadi fitur baru. |
 | 8 | Nama resmi, logo, dan warna identitas? | Nama Disperindag Jatim, logo placeholder, warna biru netral. | Kecil: `.env`, file logo, variabel CSS. |
-| 9 | Data awal: lokasi, departemen, akun, QR, kategori, petugas? | Diinput manual oleh Super Admin dan Admin setelah instalasi. | Tidak ada perubahan kode. |
+| 9 | Data awal: lokasi, Bidang/UPT, akun, QR, kategori, petugas? | Diinput manual oleh Super Admin dan Admin setelah instalasi. | Tidak ada perubahan kode. |
 | 10 | Versi Laravel dan PHP server? | Laravel mayor stabil terbaru yang kompatibel dengan PHP server; dicatat di `docs/DECISIONS.md`. Versi PHP WAJIB dikonfirmasi sebelum M0. | Sedang: pemilihan versi Laravel. |
 | 11 | Jenis hosting dan domain? | Apache dengan `.htaccess`, document root `public/`, domain lewat `APP_URL`. | Kecil sampai sedang: konfigurasi server. |
 | 12 | Build frontend (Node/Vite)? | Tidak. | Sedang: layout dan mesin build. |
@@ -1327,7 +1327,7 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 | 23 | \[BARU v0.10\] Daftar pilihan kelompok rentan? | Bukan kelompok rentan, Lansia, Penyandang disabilitas, Ibu hamil, Tidak ingin menyebutkan. | Kecil: enum `VulnerableGroup`, ekspor, filter. |
 | 24 | \[BARU v0.10\] Kategori keperluan per lokasi atau berlaku untuk semua lokasi? | Per lokasi. | Sedang: skema `purpose_categories` dan `AccessScope`. |
 | 25 | \[BARU v0.10\] Satu akun resepsionis boleh memegang lebih dari satu QR? | Ya. | Kecil: validasi QR-2/QR-6. |
-| 26 | \[BARU v0.10\] Satu departemen tepat satu akun PIC aktif? | Ya. | Kecil: validasi USR-5. |
+| 26 | \[BARU v0.10\] Satu Bidang/UPT tepat satu akun PIC aktif? | Ya. | Kecil: validasi USR-5. |
 | 27 | \[BARU v0.10\] Siapa yang mengelola kategori keperluan dan daftar petugas? | Admin dan Super Admin, untuk semua lokasi. | Kecil: route dan matriks akses. |
 | 28 | \[BARU v0.10\] Tamu lama dikenali lintas semua lokasi atau per lokasi? | Lintas semua lokasi. | Kecil: query `ReturningGuestService`. |
 | 29 | \[BARU v0.10\] Data diri tamu lama dikunci atau boleh diubah tamu? | Dikunci; diambil dari kunjungan terakhir. | Sedang: formulir, Form Request, `ReturningGuestService`. |
@@ -1346,15 +1346,15 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 
 - **QR Code:** kode dua dimensi yang dipindai untuk membuka halaman buku tamu suatu titik masuk.
 - **Token:** kode acak unik pada URL QR yang mengidentifikasi satu QR, lokasinya, dan akun resepsionisnya.
-- **Lokasi:** gedung atau kantor tempat tamu diterima; satu lokasi dapat memiliki beberapa QR dan departemen.
-- **Departemen:** bidang atau unit kerja di suatu lokasi yang melayani tamu; dilayani oleh satu akun PIC.
-- **Resepsionis:** akun bersama per pos penerimaan tamu yang menugaskan kunjungan ke departemen.
-- **PIC (Person in Charge):** akun bersama per departemen yang menerima penugasan, melayani tamu, dan menulis hasil.
-- **Orang yang ditemui:** pegawai yang mereview tamu memakai akun PIC departemennya; dipilih resepsionis dari daftar petugas saat menugaskan.
+- **Lokasi:** gedung atau kantor tempat tamu diterima; satu lokasi dapat memiliki beberapa QR dan Bidang/UPT.
+- **Bidang/UPT:** bidang atau unit kerja di suatu lokasi yang melayani tamu; dilayani oleh satu akun PIC.
+- **Resepsionis:** akun bersama per pos penerimaan tamu yang menugaskan kunjungan ke Bidang/UPT.
+- **PIC (Person in Charge):** akun bersama per Bidang/UPT yang menerima penugasan, melayani tamu, dan menulis hasil.
+- **Orang yang ditemui:** pegawai yang mereview tamu memakai akun PIC Bidang/UPT-nya; dipilih resepsionis dari daftar petugas saat menugaskan.
 - **Akun bersama:** satu akun login yang dipakai bergantian oleh beberapa petugas.
-- **Penugasan:** penentuan departemen tujuan dan orang yang ditemui oleh resepsionis; dapat diulang selama PIC belum menerima.
-- **Kategori keperluan:** pilihan jenis keperluan pada formulir tamu, masing-masing dapat memiliki saran departemen.
-- **Saran departemen:** departemen yang otomatis diusulkan kepada resepsionis berdasarkan kategori keperluan; tidak terlihat oleh tamu.
+- **Penugasan:** penentuan Bidang/UPT tujuan dan orang yang ditemui oleh resepsionis; dapat diulang selama PIC belum menerima.
+- **Kategori keperluan:** pilihan jenis keperluan pada formulir tamu, masing-masing dapat memiliki saran Bidang/UPT.
+- **Saran Bidang/UPT:** Bidang/UPT yang otomatis diusulkan kepada resepsionis berdasarkan kategori keperluan; tidak terlihat oleh tamu.
 - **Kelompok rentan:** kategori tamu yang mungkin membutuhkan perhatian khusus dalam pelayanan, misalnya lansia atau penyandang disabilitas.
 - **Hasil:** tanggapan atau jawaban PIC atas keperluan tamu, ditampilkan di riwayat tamu.
 - **Tamu lama:** tamu yang email Google-nya sudah pernah tercatat pada kunjungan sebelumnya.
@@ -1364,7 +1364,7 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 - **Tamu Aktif:** kunjungan berstatus Menunggu, Menunggu PIC, atau Sedang direview.
 - **History:** kunjungan berstatus Selesai atau Dibatalkan.
 - **Regenerate:** membuat QR baru dan mencabut QR lama secara permanen.
-- **Cakupan (scope):** batas data yang boleh diakses seorang staf: lokasi (Admin), QR (Resepsionis), atau departemen (PIC).
+- **Cakupan (scope):** batas data yang boleh diakses seorang staf: lokasi (Admin), QR (Resepsionis), atau Bidang/UPT (PIC).
 - **AccessScope:** service pusat yang menerapkan cakupan setiap peran pada semua query staf.
 - **IDOR:** celah mengakses data milik pihak lain dengan mengubah ID atau parameter; dicegah dengan `AccessScope` di server.
 - **CSRF:** serangan yang memaksa pengguna yang sedang login mengirim aksi tanpa sadar.

@@ -57,10 +57,10 @@
                     </div>
 
                     <div class="mb-3" data-role-section="{{ UserRole::Pic->value }}">
-                        <label for="department_id" class="form-label">Departemen</label>
+                        <label for="department_id" class="form-label">Bidang/UPT</label>
                         <select name="department_id" id="department_id" class="form-select @error('department_id') is-invalid @enderror"
                                 aria-describedby="department_id_error">
-                            <option value="">Pilih departemen</option>
+                            <option value="">Pilih Bidang/UPT</option>
                             @foreach ($departments as $locationName => $group)
                                 <optgroup label="{{ $locationName }}">
                                     @foreach ($group as $department)

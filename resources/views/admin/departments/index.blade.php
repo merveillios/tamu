@@ -1,6 +1,6 @@
 @extends('layouts.staff')
 
-@section('title', 'Departemen')
+@section('title', 'Bidang/UPT')
 
 @section('content')
     <nav aria-label="breadcrumb" class="mb-3">
@@ -16,7 +16,7 @@
 
     <form method="POST" action="{{ route('admin.departments.store', $location->id) }}" class="card card-body border-0 shadow mb-3">
         @csrf
-        <label for="new_department" class="form-label">Tambah departemen di {{ $location->name }}</label>
+        <label for="new_department" class="form-label">Tambah Bidang/UPT di {{ $location->name }}</label>
         <div class="input-group">
             <input type="text" name="name" id="new_department" class="form-control" maxlength="100" required
                    placeholder="Contoh: Bidang Perdagangan Dalam Negeri">
@@ -54,7 +54,7 @@
                                     <form method="POST" action="{{ route('admin.departments.status', $department->id) }}">
                                         @csrf
                                         <button type="submit" class="btn btn-sm {{ $department->is_active ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                                @if ($department->is_active) data-deactivate-message="Nonaktifkan departemen {{ $department->name }}? Departemen tidak lagi muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
+                                                @if ($department->is_active) data-deactivate-message="Nonaktifkan Bidang/UPT {{ $department->name }}? Bidang/UPT tidak lagi muncul di pilihan penugasan sampai diaktifkan kembali." @endif>
                                             {{ $department->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                         </button>
                                     </form>
@@ -74,7 +74,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-gray-600 py-4">Belum ada departemen di lokasi ini.</td>
+                            <td colspan="5" class="text-center text-gray-600 py-4">Belum ada Bidang/UPT di lokasi ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

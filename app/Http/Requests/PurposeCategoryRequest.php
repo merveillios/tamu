@@ -62,7 +62,7 @@ class PurposeCategoryRequest extends FormRequest
         return [
             'name.unique' => 'Pertanyaan ini sudah ada di lokasi ini.',
             'name.*' => 'Pertanyaan wajib diisi (2–150 karakter).',
-            'suggested_department_id.*' => 'Pilih departemen yang aktif di lokasi ini.',
+            'suggested_department_id.*' => 'Pilih Bidang/UPT yang aktif di lokasi ini.',
             'sort_order.*' => 'Urutan tampil berupa angka 0–999.',
         ];
     }

@@ -38,7 +38,7 @@ class StaffMemberTest extends TestCase
         StaffMember::create(['department_id' => $department->id, 'name' => 'Budi Santoso']);
 
         $this->actingAs($admin)->post("/admin/petugas/tambah?department_id={$department->id}", ['name' => 'budi santoso'])
-            ->assertSessionHasErrors(['name' => 'Nama petugas sudah ada di departemen ini.']);
+            ->assertSessionHasErrors(['name' => 'Nama petugas sudah ada di Bidang/UPT ini.']);
         $this->actingAs($admin)->post("/admin/petugas/tambah?department_id={$other->id}", ['name' => 'Budi Santoso'])
             ->assertSessionHasNoErrors();
     }

@@ -27,7 +27,7 @@
                     <dd class="col-7 mb-1">{{ $visit->purpose_category_name }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Rincian</dt>
                     <dd class="col-7 mb-1 text-break">{{ $visit->purpose }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Departemen tujuan</dt>
+                    <dt class="col-5 text-gray-600 fw-normal">Bidang/UPT tujuan</dt>
                     <dd class="col-7 mb-1">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Orang yang ditemui</dt>
                     <dd class="col-7 mb-1">{{ $visit->servedBy?->name ?? '–' }}</dd>

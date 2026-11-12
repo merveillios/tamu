@@ -338,7 +338,7 @@ class VisitService
         $department = $this->assignableDepartments($visit)->firstWhere('id', $departmentId);
 
         if ($department === null) {
-            throw ValidationException::withMessages(['department_id' => 'Pilih departemen tujuan.']);
+            throw ValidationException::withMessages(['department_id' => 'Pilih Bidang/UPT tujuan.']);
         }
 
         if (! $department->staffMembers->contains(fn (StaffMember $staff) => $staff->id === $staffMemberId)) {

@@ -100,7 +100,7 @@
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
         tr.appendChild(cell('Keperluan', row.category));
-        tr.appendChild(cell('Departemen', row.suggested_department));
+        tr.appendChild(cell('Bidang/UPT', row.suggested_department));
         tr.appendChild(cell('Nama PIC', assigned));
 
         if (showLocation) {
@@ -128,7 +128,7 @@
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Keperluan', row.category));
-        tr.appendChild(cell('Departemen', assigned));
+        tr.appendChild(cell('Bidang/UPT', assigned));
         tr.appendChild(cell('Status', badge));
         tr.appendChild(cell('Jam ditutup', row.closed_at));
         tr.appendChild(cell('Alasan batal', row.cancel_reason, 'small text-break'));
@@ -309,7 +309,7 @@
             var data = result.body.data;
             departments = data.departments;
             departmentSelect.textContent = '';
-            departmentSelect.appendChild(new Option('Pilih departemen', ''));
+            departmentSelect.appendChild(new Option('Pilih Bidang/UPT', ''));
             departments.forEach(function (department) {
                 departmentSelect.appendChild(new Option(department.name, department.id, false, department.id === data.selected_department_id));
             });
@@ -318,7 +318,7 @@
             var suggestion = departments.find(function (item) { return item.id === data.suggested_department_id; });
             assignForm.querySelector('[data-assign-suggestion]').textContent = suggestion
                 ? 'Saran dari kategori: ' + suggestion.name
-                : (departments.length === 0 ? 'Belum ada departemen yang memiliki akun PIC dan petugas aktif.' : '');
+                : (departments.length === 0 ? 'Belum ada Bidang/UPT yang memiliki akun PIC dan petugas aktif.' : '');
 
             fillStaff(data.selected_staff_member_id);
             bootstrap.Modal.getOrCreateInstance(assignModalElement).show();

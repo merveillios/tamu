@@ -197,7 +197,7 @@ class UserAccountService
             ->exists();
 
         if ($taken) {
-            throw ValidationException::withMessages(['department_id' => 'Departemen ini sudah memiliki akun PIC aktif.']);
+            throw ValidationException::withMessages(['department_id' => 'Bidang/UPT ini sudah memiliki akun PIC aktif.']);
         }
     }
 

@@ -48,7 +48,7 @@ class DepartmentController extends Controller
         $location = $this->scope->findOrDeny(Location::class, $locationId, $request->user());
         $department = $departments->create($location, $request->validated('name'), $request->user());
 
-        return back()->with('success', "Departemen {$department->name} berhasil ditambahkan.");
+        return back()->with('success', "Bidang/UPT {$department->name} berhasil ditambahkan.");
     }
 
     /**
@@ -59,7 +59,7 @@ class DepartmentController extends Controller
         $department = $this->scope->findOrDeny(Department::class, $id, $request->user());
         $departments->rename($department, $request->validated('name'), $request->user());
 
-        return back()->with('success', "Departemen {$department->name} berhasil diperbarui.");
+        return back()->with('success', "Bidang/UPT {$department->name} berhasil diperbarui.");
     }
 
     /**
@@ -70,7 +70,7 @@ class DepartmentController extends Controller
         $department = $this->scope->findOrDeny(Department::class, $id, $request->user());
         $departments->setActive($department, ! $department->is_active, $request->user());
 
-        $message = $department->is_active ? "Departemen {$department->name} diaktifkan." : "Departemen {$department->name} dinonaktifkan.";
+        $message = $department->is_active ? "Bidang/UPT {$department->name} diaktifkan." : "Bidang/UPT {$department->name} dinonaktifkan.";
 
         return back()->with('success', $message);
     }

@@ -74,7 +74,7 @@ class StaffMemberService
             ->exists();
 
         if ($taken) {
-            throw ValidationException::withMessages(['name' => 'Nama petugas sudah ada di departemen ini.']);
+            throw ValidationException::withMessages(['name' => 'Nama petugas sudah ada di Bidang/UPT ini.']);
         }
     }
 }

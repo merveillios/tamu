@@ -8,13 +8,13 @@
     @endif
 
     @if ($department === null)
-        <div class="alert alert-info" role="alert">Belum ada departemen. Super Admin perlu membuat departemen di menu Lokasi.</div>
+        <div class="alert alert-info" role="alert">Belum ada Bidang/UPT. Super Admin perlu membuat Bidang/UPT di menu Lokasi.</div>
     @else
         <div class="card card-body border-0 shadow mb-3">
             <div class="row g-2 align-items-end">
                 <form method="GET" action="{{ route('admin.staff.index') }}" class="col-12 col-md-8 d-flex gap-2 align-items-end">
                     <div class="flex-grow-1">
-                        <label for="department_id" class="form-label small mb-1">Departemen</label>
+                        <label for="department_id" class="form-label small mb-1">Bidang/UPT</label>
                         <select name="department_id" id="department_id" class="form-select">
                             @foreach ($departments as $locationName => $group)
                                 <optgroup label="{{ $locationName }}">
@@ -68,7 +68,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center text-gray-600 py-4">Belum ada petugas di departemen ini.</td>
+                                <td colspan="3" class="text-center text-gray-600 py-4">Belum ada petugas di Bidang/UPT ini.</td>
                             </tr>
                         @endforelse
                     </tbody>

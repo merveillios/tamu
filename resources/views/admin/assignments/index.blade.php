@@ -4,7 +4,7 @@
 
 @section('content')
     @if ($picWithoutDepartment)
-        <div class="alert alert-warning" role="alert">Akun ini belum dihubungkan ke departemen.</div>
+        <div class="alert alert-warning" role="alert">Akun ini belum dihubungkan ke Bidang/UPT.</div>
     @endif
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 small">

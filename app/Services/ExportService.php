@@ -31,7 +31,7 @@ class ExportService
      */
     public const COLUMNS = [
         'No. Urut', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
-        'Kategori Keperluan', 'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Departemen Tujuan',
+        'Kategori Keperluan', 'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Bidang/UPT Tujuan',
         'Orang yang Ditemui', 'Status', 'Hasil',
     ];
 

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="d-flex justify-content-between flex-wrap align-items-center mb-3 gap-2">
-        <p class="mb-0 text-gray-600">Kelola lokasi, departemen, dan QR Code setiap titik masuk.</p>
+        <p class="mb-0 text-gray-600">Kelola lokasi, Bidang/UPT, dan QR Code setiap titik masuk.</p>
         <a href="{{ route('admin.locations.create') }}" class="btn btn-primary btn-sm">Tambah Lokasi</a>
     </div>
 
@@ -18,7 +18,7 @@
                 <thead>
                     <tr>
                         <th class="border-gray-200">Nama</th>
-                        <th class="border-gray-200">Departemen</th>
+                        <th class="border-gray-200">Bidang/UPT</th>
                         <th class="border-gray-200">QR aktif</th>
                         <th class="border-gray-200">Status</th>
                         <th class="border-gray-200">Aksi</th>
@@ -46,7 +46,7 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-wrap gap-1">
-                                    <a href="{{ route('admin.departments.index', $location->id) }}" class="btn btn-sm btn-gray-800">Departemen</a>
+                                    <a href="{{ route('admin.departments.index', $location->id) }}" class="btn btn-sm btn-gray-800">Bidang/UPT</a>
                                     <a href="{{ route('admin.qr.index', ['lokasi' => $location->id]) }}" class="btn btn-sm btn-gray-800">QR</a>
                                     <a href="{{ route('admin.locations.edit', $location->id) }}" class="btn btn-sm btn-outline-primary">Ubah</a>
                                     <form method="POST" action="{{ route('admin.locations.status', $location->id) }}">

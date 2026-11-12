@@ -52,7 +52,7 @@ class PurposeCategoryTest extends TestCase
 
         $this->actingAs($admin)
             ->post("/admin/kategori-keperluan/tambah?location_id={$location->id}", ['name' => 'Tanpa departemen'])
-            ->assertSessionHasErrors(['suggested_department_id' => 'Pilih departemen yang aktif di lokasi ini.']);
+            ->assertSessionHasErrors(['suggested_department_id' => 'Pilih Bidang/UPT yang aktif di lokasi ini.']);
 
         $this->assertDatabaseCount('purpose_categories', 0);
     }
@@ -99,7 +99,7 @@ class PurposeCategoryTest extends TestCase
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
             ->assertOk()
-            ->assertSeeInOrder(['Bidang Industri Agro', 'Bidang Kosong', 'Sekretariat', 'Umum (tanpa departemen)'])
+            ->assertSeeInOrder(['Bidang Industri Agro', 'Bidang Kosong', 'Sekretariat', 'Umum (tanpa Bidang/UPT)'])
             ->assertSee(route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $industry->id]))
             ->assertSee('Lihat pertanyaan')
             ->assertDontSee('Bidang Lama')
@@ -125,11 +125,11 @@ class PurposeCategoryTest extends TestCase
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen={$empty->id}")
             ->assertOk()
-            ->assertSee('Belum ada pertanyaan di departemen ini.');
+            ->assertSee('Belum ada pertanyaan di Bidang/UPT ini.');
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}&departemen=umum")
             ->assertOk()
-            ->assertSeeInOrder(['Umum (tanpa departemen)', 'Pertanyaan lama', 'Departemen Bidang Lama nonaktif'])
+            ->assertSeeInOrder(['Umum (tanpa Bidang/UPT)', 'Pertanyaan lama', 'Bidang/UPT Bidang Lama nonaktif'])
             ->assertDontSee('Bagaimana cara mengurus izin usaha?')
             ->assertDontSee('Tambah Pertanyaan');
     }
@@ -142,7 +142,7 @@ class PurposeCategoryTest extends TestCase
 
         $this->actingAs($admin)->get("/admin/kategori-keperluan?location_id={$location->id}")
             ->assertOk()
-            ->assertDontSee('Umum (tanpa departemen)');
+            ->assertDontSee('Umum (tanpa Bidang/UPT)');
     }
 
     public function test_create_locks_department_and_saving_returns_to_its_page(): void

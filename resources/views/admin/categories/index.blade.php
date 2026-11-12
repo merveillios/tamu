@@ -42,7 +42,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
-                                <th class="border-gray-200">Departemen</th>
+                                <th class="border-gray-200">Bidang/UPT</th>
                                 <th class="border-gray-200">Jumlah pertanyaan</th>
                                 <th class="border-gray-200">Aksi</th>
                             </tr>
@@ -50,7 +50,7 @@
                         <tbody>
                             @foreach ($sections as $item)
                                 <tr>
-                                    <td class="fw-bold">{{ $item['department']?->name ?? 'Umum (tanpa departemen)' }}</td>
+                                    <td class="fw-bold">{{ $item['department']?->name ?? 'Umum (tanpa Bidang/UPT)' }}</td>
                                     <td>{{ $item['categories']->count() }}</td>
                                     <td>
                                         <a href="{{ route('admin.categories.index', ['location_id' => $location->id, 'departemen' => $item['key']]) }}" class="btn btn-sm btn-outline-primary">
@@ -68,7 +68,7 @@
                 <div class="row g-2 align-items-center">
                     <div class="col-12 col-md-8">
                         <p class="small text-gray-600 mb-1">Lokasi: {{ $location->name }}</p>
-                        <h2 class="h5 mb-0">{{ $section['department']?->name ?? 'Umum (tanpa departemen)' }}</h2>
+                        <h2 class="h5 mb-0">{{ $section['department']?->name ?? 'Umum (tanpa Bidang/UPT)' }}</h2>
                     </div>
                     <div class="col-12 col-md-4 d-flex gap-2">
                         <a href="{{ route('admin.categories.index', ['location_id' => $location->id]) }}" class="btn btn-gray-200 flex-fill">Kembali</a>
@@ -77,7 +77,7 @@
                         @endif
                     </div>
                     @if ($section['department'] === null)
-                        <p class="col-12 small text-gray-600 mb-0">Pertanyaan di sini belum punya departemen aktif. Tekan Ubah untuk memilih departemennya.</p>
+                        <p class="col-12 small text-gray-600 mb-0">Pertanyaan di sini belum punya Bidang/UPT aktif. Tekan Ubah untuk memilih Bidang/UPT-nya.</p>
                     @endif
                 </div>
             </div>
@@ -101,7 +101,7 @@
                                         <span class="fw-bold">{{ $category->name }}</span>
                                         {{-- Di bagian Umum, departemen yang masih tercatat berarti sudah nonaktif. --}}
                                         @if ($section['department'] === null && $category->suggestedDepartment !== null)
-                                            <div class="small text-gray-500">Departemen {{ $category->suggestedDepartment->name }} nonaktif</div>
+                                            <div class="small text-gray-500">Bidang/UPT {{ $category->suggestedDepartment->name }} nonaktif</div>
                                         @endif
                                     </td>
                                     <td>
@@ -122,7 +122,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-gray-600 py-4">Belum ada pertanyaan di departemen ini.</td>
+                                    <td colspan="4" class="text-center text-gray-600 py-4">Belum ada pertanyaan di Bidang/UPT ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

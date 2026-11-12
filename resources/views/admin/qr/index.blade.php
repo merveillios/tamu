@@ -8,7 +8,7 @@
     @endif
 
     @if ($locations->isEmpty())
-        <div class="alert alert-info" role="alert">Belum ada lokasi. Buat lokasi dan departemennya dulu di menu Lokasi.</div>
+        <div class="alert alert-info" role="alert">Belum ada lokasi. Buat lokasi dan Bidang/UPT-nya dulu di menu Lokasi.</div>
     @else
         <form method="POST" action="{{ route('admin.qr.store') }}" class="card card-body border-0 shadow mb-3" data-qr-form>
             @csrf
@@ -45,7 +45,7 @@
             </div>
             {{-- Peringatan saja: QR tetap boleh dibuat dan dicetak lebih dulu. --}}
             <div class="alert alert-warning small mt-3 mb-0" role="status" data-qr-location-warning hidden>
-                <span data-warning="no-department">Lokasi ini belum punya departemen aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai departemen ditambahkan di menu Lokasi dan kategori keperluan di menu Pertanyaan.</span>
+                <span data-warning="no-department">Lokasi ini belum punya Bidang/UPT aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai Bidang/UPT ditambahkan di menu Lokasi dan kategori keperluan di menu Pertanyaan.</span>
                 <span data-warning="no-category">Lokasi ini belum punya kategori keperluan aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai kategori ditambahkan di menu Pertanyaan.</span>
             </div>
             @if ($receptionists->isEmpty())
