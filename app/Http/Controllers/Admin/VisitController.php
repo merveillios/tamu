@@ -86,7 +86,7 @@ class VisitController extends Controller
         $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $request->user());
 
         if ($visit->status !== VisitStatus::Waiting) {
-            throw VisitActionException::conflict('Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang.');
+            throw VisitActionException::conflict('Kunjungan ini sudah diproses PIC. Daftar akan dimuat ulang.');
         }
 
         $departments = $this->visits->assignableDepartments($visit);

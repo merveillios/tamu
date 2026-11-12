@@ -8,7 +8,7 @@
  *
  * Pemakaian:
  *   php tests/Support/concurrent-worker.php record <waktu_mulai> <qr_id> <email>
- *   php tests/Support/concurrent-worker.php accept <waktu_mulai> <kunjungan_id> <pic_id>
+ *   php tests/Support/concurrent-worker.php complete <waktu_mulai> <kunjungan_id> <pic_id>
  */
 
 use App\Exceptions\VisitActionException;
@@ -60,11 +60,11 @@ if ($mode === 'record') {
     echo $visit->daily_number;
 }
 
-if ($mode === 'accept') {
+if ($mode === 'complete') {
     [, , , $visitId, $picId] = $argv;
 
     try {
-        $visits->accept(GuestVisit::findOrFail($visitId), User::findOrFail($picId));
+        $visits->complete(GuestVisit::findOrFail($visitId), 'Uji simpan hasil bersamaan', User::findOrFail($picId));
         echo 'ok';
     } catch (VisitActionException) {
         echo 'conflict';

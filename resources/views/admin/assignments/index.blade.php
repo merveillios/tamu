@@ -19,7 +19,6 @@
     <div data-assignments
          data-url="{{ route('admin.assignments.data') }}"
          data-poll="{{ config('sitamu.poll_interval_seconds') }}"
-         data-accept-url="{{ url('/admin/kunjungan/__ID__/terima') }}"
          data-complete-url="{{ url('/admin/kunjungan/__ID__/selesai') }}">
         @foreach (['new' => 'Penugasan baru', 'reviewing' => 'Sedang direview'] as $group => $heading)
             <section class="card card-body border-0 shadow mb-4">

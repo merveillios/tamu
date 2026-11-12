@@ -78,63 +78,21 @@ class VisitFlowTest extends TestCase
         $this->assertNull($this->visit()->assigned_department_id);
     }
 
-    public function test_reassignment_is_allowed_until_pic_accepts(): void
+    public function test_reassignment_is_allowed_until_pic_completes(): void
     {
         $this->assign('departmentA', 'staffA')->assertOk();
         $this->assign('departmentB', 'staffB')->assertOk();
         $this->assertDatabaseCount('visit_assignments', 2);
 
-        $this->as('picB')->postJson($this->url('terima'))->assertOk();
+        $this->as('picB')->postJson($this->url('selesai'), ['result' => 'Sudah dilayani Bidang B.'])->assertOk();
 
-        $this->assign('departmentA', 'staffA')
-            ->assertStatus(409)
-            ->assertJsonPath('error.message', 'Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang.');
+        $this->assign('departmentA', 'staffA')->assertStatus(422)->assertJsonPath('error.code', 'INVALID_TRANSITION');
     }
 
-    public function test_pic_accepts_assignment(): void
+    public function test_pic_completes_waiting_assignment_without_accepting_first(): void
     {
         $this->assign('departmentA', 'staffA');
-
-        $this->as('picA')->postJson($this->url('terima'))->assertOk();
-
-        $visit = $this->visit();
-        $this->assertSame(VisitStatus::Processing, $visit->status);
-        $this->assertSame($this->data['picA']->id, $visit->processed_by);
-        $this->assertDatabaseHas('visit_status_logs', [
-            'visit_id' => $visit->id, 'from_status' => 'waiting', 'to_status' => 'processing',
-            'changed_by' => $this->data['picA']->id, 'staff_member_id' => $this->data['staffA']->id,
-        ]);
-    }
-
-    public function test_pic_of_previous_department_gets_409_without_access_denied(): void
-    {
-        $this->assign('departmentA', 'staffA');
-        $this->assign('departmentB', 'staffB');
-
-        $this->as('picA')->postJson($this->url('terima'))
-            ->assertStatus(409)
-            ->assertJsonPath('error.message', 'Kunjungan ini sudah dialihkan. Daftar akan dimuat ulang.');
-
-        $this->assertDatabaseMissing('audit_logs', ['action' => 'access.denied']);
-    }
-
-    public function test_assignment_cannot_be_accepted_twice(): void
-    {
-        $this->assign('departmentA', 'staffA');
-        $this->as('picA')->postJson($this->url('terima'))->assertOk();
-
-        $this->as('picA')->postJson($this->url('terima'))->assertStatus(409);
-    }
-
-    public function test_pic_cannot_accept_unassigned_visit(): void
-    {
-        $this->as('picA')->postJson($this->url('terima'))->assertNotFound();
-    }
-
-    public function test_pic_completes_with_result(): void
-    {
-        $this->assign('departmentA', 'staffA');
-        $this->as('picA')->postJson($this->url('terima'));
+        $this->assertTrue($this->as('picA')->getJson('/admin/penugasan/data')->json('data.new.0.actions.complete'));
 
         $this->as('picA')->postJson($this->url('selesai'), ['result' => '    '])->assertStatus(422);
         $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Izin sudah diproses dan dikirim lewat email.'])->assertOk();
@@ -143,15 +101,46 @@ class VisitFlowTest extends TestCase
         $this->assertSame(VisitStatus::Completed, $visit->status);
         $this->assertSame('Izin sudah diproses dan dikirim lewat email.', $visit->result);
         $this->assertSame($this->data['picA']->id, $visit->closed_by);
+        $this->assertSame($this->data['picA']->id, $visit->processed_by);
         $this->assertNotNull($visit->completed_at);
+        $this->assertDatabaseHas('visit_status_logs', [
+            'visit_id' => $visit->id, 'from_status' => 'waiting', 'to_status' => 'completed',
+            'changed_by' => $this->data['picA']->id, 'staff_member_id' => $this->data['staffA']->id,
+        ]);
     }
 
-    public function test_waiting_visit_cannot_be_completed(): void
+    public function test_accept_endpoint_is_removed(): void
     {
         $this->assign('departmentA', 'staffA');
 
-        $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil langsung'])->assertStatus(409);
+        $this->as('picA')->postJson($this->url('terima'))->assertNotFound();
         $this->assertSame(VisitStatus::Waiting, $this->visit()->status);
+    }
+
+    public function test_pic_of_previous_department_gets_409_without_access_denied(): void
+    {
+        $this->assign('departmentA', 'staffA');
+        $this->assign('departmentB', 'staffB');
+
+        $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil dari bidang lama.'])
+            ->assertStatus(409)
+            ->assertJsonPath('error.message', 'Kunjungan ini sudah dialihkan. Daftar akan dimuat ulang.');
+
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'access.denied']);
+    }
+
+    public function test_assignment_cannot_be_completed_twice(): void
+    {
+        $this->assign('departmentA', 'staffA');
+        $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil pertama.'])->assertOk();
+
+        $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil kedua.'])->assertStatus(422);
+        $this->assertSame('Hasil pertama.', $this->visit()->result);
+    }
+
+    public function test_pic_cannot_complete_unassigned_visit(): void
+    {
+        $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil tanpa penugasan.'])->assertNotFound();
     }
 
     public function test_cancel_requires_reason_and_text_for_other(): void
@@ -166,14 +155,13 @@ class VisitFlowTest extends TestCase
         $this->assertSame($this->data['receptionist']->id, $visit->closed_by);
     }
 
-    public function test_admin_can_cancel_processing_visit(): void
+    public function test_admin_can_cancel_visit_waiting_for_pic(): void
     {
         $this->assign('departmentA', 'staffA');
-        $this->as('picA')->postJson($this->url('terima'));
 
         $this->as('admin')->postJson($this->url('batal'), ['reason' => 'not_present'])->assertOk();
 
-        $this->assertDatabaseHas('visit_status_logs', ['from_status' => 'processing', 'to_status' => 'cancelled']);
+        $this->assertDatabaseHas('visit_status_logs', ['from_status' => 'waiting', 'to_status' => 'cancelled']);
     }
 
     public function test_closed_visit_cannot_be_cancelled_or_assigned_again(): void
@@ -193,13 +181,14 @@ class VisitFlowTest extends TestCase
     public function test_admin_reopens_completed_visit_to_previous_status(): void
     {
         $this->assign('departmentA', 'staffA');
-        $this->as('picA')->postJson($this->url('terima'));
         $this->as('picA')->postJson($this->url('selesai'), ['result' => 'Hasil pertama yang lengkap']);
 
         $this->as('admin')->postJson($this->url('buka-kembali'), ['note' => 'Hasil perlu dilengkapi'])->assertOk();
 
+        // Diselesaikan langsung dari Menunggu PIC, jadi dibuka kembali ke Menunggu PIC dengan Bidang/UPT yang sama.
         $visit = $this->visit();
-        $this->assertSame(VisitStatus::Processing, $visit->status);
+        $this->assertSame(VisitStatus::Waiting, $visit->status);
+        $this->assertSame($this->data['departmentA']->id, $visit->assigned_department_id);
         $this->assertNull($visit->completed_at);
         $this->assertNull($visit->closed_by);
         $this->assertSame('Hasil pertama yang lengkap', $visit->result);

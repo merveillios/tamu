@@ -120,7 +120,7 @@ class VisitService
      */
     public function assign(GuestVisit $visit, int $departmentId, int $staffMemberId, User $receptionist): GuestVisit
     {
-        $this->ensureStatus($visit, VisitStatus::Waiting, 'Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang.');
+        $this->ensureStatus($visit, VisitStatus::Waiting, 'Kunjungan ini sudah diproses PIC. Daftar akan dimuat ulang.');
         $this->ensureAssignable($visit, $departmentId, $staffMemberId);
 
         DB::transaction(function () use ($visit, $departmentId, $staffMemberId, $receptionist) {
@@ -136,7 +136,7 @@ class VisitService
                 ]);
 
             if ($updated === 0) {
-                throw VisitActionException::conflict('Kunjungan ini sudah diterima PIC. Daftar akan dimuat ulang.');
+                throw VisitActionException::conflict('Kunjungan ini sudah diproses PIC. Daftar akan dimuat ulang.');
             }
 
             VisitAssignment::create([
@@ -176,49 +176,32 @@ class VisitService
     }
 
     /**
-     * PIC menerima penugasan: waiting → processing (PIC-2).
-     */
-    public function accept(GuestVisit $visit, User $pic): GuestVisit
-    {
-        $this->ensureStatus($visit, VisitStatus::Waiting);
-
-        DB::transaction(function () use ($visit, $pic) {
-            $updated = GuestVisit::query()->forUser($pic)->whereKey($visit->id)
-                ->where('status', VisitStatus::Waiting)
-                ->where('assigned_department_id', $pic->department_id)
-                ->update([
-                    'status' => VisitStatus::Processing,
-                    'processed_at' => now(),
-                    'processed_by' => $pic->id,
-                ]);
-
-            if ($updated === 0) {
-                throw VisitActionException::conflict();
-            }
-
-            $this->logStatus($visit, VisitStatus::Waiting, VisitStatus::Processing, $pic, $visit->served_by_staff_id);
-        });
-
-        return $visit->refresh();
-    }
-
-    /**
-     * PIC menulis hasil dan menyelesaikan kunjungan: processing → completed (PIC-3).
-     * Bila kunjungan pernah dibuka kembali, hasil lama disimpan di catatan log (Bab 7.3).
+     * PIC menulis hasil dan menyelesaikan kunjungan tanpa langkah Terima (PIC-2, PIC-3):
+     * waiting → completed. Kunjungan processing (dari buka kembali atau sebelum perubahan
+     * ini) juga dapat diselesaikan. Bila kunjungan pernah dibuka kembali, hasil lama
+     * disimpan di catatan log (Bab 7.3).
      */
     public function complete(GuestVisit $visit, string $result, User $pic): GuestVisit
     {
-        $this->ensureStatus($visit, VisitStatus::Processing);
+        if (! $visit->status->isActive()) {
+            throw VisitActionException::invalidTransition();
+        }
 
-        DB::transaction(function () use ($visit, $result, $pic) {
+        $from = $visit->status;
+        $now = now();
+
+        DB::transaction(function () use ($visit, $result, $pic, $from, $now) {
             $updated = GuestVisit::query()->forUser($pic)->whereKey($visit->id)
-                ->where('status', VisitStatus::Processing)
+                ->where('status', $from)
                 ->where('assigned_department_id', $pic->department_id)
                 ->update([
                     'status' => VisitStatus::Completed,
                     'result' => $result,
-                    'completed_at' => now(),
+                    'completed_at' => $now,
                     'closed_by' => $pic->id,
+                    // Tanpa langkah Terima, waktu dan akun PIC yang memproses sama dengan saat selesai.
+                    'processed_at' => $visit->processed_at ?? $now,
+                    'processed_by' => $visit->processed_by ?? $pic->id,
                 ]);
 
             if ($updated === 0) {
@@ -226,7 +209,7 @@ class VisitService
             }
 
             $note = $visit->result !== null && $visit->result !== $result ? 'Hasil sebelumnya: '.$visit->result : null;
-            $this->logStatus($visit, VisitStatus::Processing, VisitStatus::Completed, $pic, $visit->served_by_staff_id, $note);
+            $this->logStatus($visit, $from, VisitStatus::Completed, $pic, $visit->served_by_staff_id, $note);
         });
 
         return $visit->refresh();

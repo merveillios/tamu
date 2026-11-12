@@ -66,7 +66,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     Route::middleware('role:pic')->group(function () {
         Route::get('/penugasan', [AssignmentController::class, 'index'])->name('assignments.index');
         Route::get('/penugasan/data', [AssignmentController::class, 'data'])->name('assignments.data');
-        Route::post('/kunjungan/{id}/terima', [AssignmentController::class, 'accept'])->whereNumber('id')->name('visits.accept');
         Route::post('/kunjungan/{id}/selesai', [AssignmentController::class, 'complete'])->whereNumber('id')->name('visits.complete');
     });
 

@@ -194,7 +194,7 @@ class VisitAccessTest extends TestCase
             'resepsionis menugaskan' => ['receptionistA', 'POST', 'tugaskan'],
             'resepsionis memuat departemen' => ['receptionistA', 'GET', 'departemen'],
             'pic membuka detail' => ['picA', 'GET', 'detail'],
-            'pic menerima' => ['picA', 'POST', 'terima'],
+            'pic menyelesaikan' => ['picA', 'POST', 'selesai'],
             'resepsionis melihat tanda tangan' => ['receptionistA', 'GET', 'tanda-tangan'],
         ];
     }
@@ -206,7 +206,7 @@ class VisitAccessTest extends TestCase
     {
         $id = $this->data['visitB']->id;
         $uri = $action === 'detail' ? "/admin/kunjungan/{$id}" : "/admin/kunjungan/{$id}/{$action}";
-        $payload = ['reason' => 'duplicate', 'department_id' => 1, 'staff_member_id' => 1];
+        $payload = ['reason' => 'duplicate', 'department_id' => 1, 'staff_member_id' => 1, 'result' => 'Hasil di luar cakupan'];
 
         $this->as($actor)->json($method, $uri, $method === 'POST' ? $payload : [])->assertNotFound();
 

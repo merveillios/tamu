@@ -199,8 +199,8 @@ class VisitListService
                 'assign' => $viewer->role === UserRole::Receptionist && $isWaiting,
                 'assign_label' => $visit->assigned_department_id === null ? 'Tugaskan' : 'Tugaskan ulang',
                 'cancel' => $viewer->hasRole(UserRole::Receptionist, UserRole::Admin, UserRole::SuperAdmin),
-                'accept' => $viewer->role === UserRole::Pic && $isWaiting,
-                'complete' => $viewer->role === UserRole::Pic && $visit->status === VisitStatus::Processing,
+                // Daftar PIC hanya berisi kunjungan aktif Bidang/UPT-nya; semuanya langsung bisa diselesaikan.
+                'complete' => $viewer->role === UserRole::Pic,
             ],
         ];
     }

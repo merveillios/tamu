@@ -53,18 +53,7 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Menerima penugasan (PIC-2).
-     */
-    public function accept(Request $request, int $id): JsonResponse
-    {
-        $visit = $this->visits->findForPic($id, $request->user());
-        $this->visits->accept($visit, $request->user());
-
-        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan {$visit->name} diterima."]]);
-    }
-
-    /**
-     * Menulis hasil dan menyelesaikan kunjungan (PIC-3).
+     * Menulis hasil dan menyelesaikan kunjungan langsung, tanpa langkah Terima (PIC-2, PIC-3).
      */
     public function complete(CompleteVisitRequest $request, int $id): JsonResponse
     {

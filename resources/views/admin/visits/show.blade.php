@@ -68,7 +68,7 @@
                         <dt class="col-5 text-gray-600 fw-normal">Saran Bidang/UPT</dt><dd class="col-7">{{ $visit->suggestedDepartment->name }}</dd>
                     @endif
                     <dt class="col-5 text-gray-600 fw-normal">Bidang/UPT tujuan</dt><dd class="col-7">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Diterima PIC</dt>
+                    <dt class="col-5 text-gray-600 fw-normal">Diproses PIC</dt>
                     <dd class="col-7">{{ $visit->processedBy ? $visit->processedBy->name.' · '.$datetime($visit->processed_at) : '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Selesai</dt><dd class="col-7">{{ $datetime($visit->completed_at) }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Dibatalkan</dt>

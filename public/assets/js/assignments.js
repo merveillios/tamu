@@ -1,6 +1,7 @@
 /*
- * Penugasan PIC: polling daftar (PIC-4), tombol Terima (PIC-2), modal Hasil (PIC-3),
- * dan daftar Selesai hari ini yang hanya bisa dilihat (PIC-7).
+ * Penugasan PIC: polling daftar (PIC-4), tombol Selesai yang langsung membuka modal
+ * Rincian keperluan dan Hasil tanpa langkah Terima (PIC-2, PIC-3), dan daftar Selesai
+ * hari ini yang hanya bisa dilihat (PIC-7).
  * Jumlah penugasan baru tampil di judul tab dan badge menu; bunyi singkat diputar bila
  * PIC sudah mengaktifkannya lewat tombol di halaman.
  */
@@ -88,13 +89,6 @@
 
     function actions(row) {
         var wrap = el('div', 'd-flex flex-wrap gap-1 justify-content-end justify-content-md-start');
-
-        if (row.actions.accept) {
-            var accept = el('button', 'btn btn-sm btn-primary', 'Terima');
-            accept.type = 'button';
-            accept.addEventListener('click', function () { acceptVisit(row, accept); });
-            wrap.appendChild(accept);
-        }
 
         if (row.actions.complete) {
             var complete = el('button', 'btn btn-sm btn-success', 'Selesai');
@@ -227,15 +221,6 @@
             startPolling();
         }
     });
-
-    function acceptVisit(row, button) {
-        button.disabled = true;
-
-        SiTamu.request(actionUrl(root.dataset.acceptUrl, row.id), 'POST').then(function (result) {
-            SiTamu.toast(result.body.ok ? result.body.data.message : result.body.error.message, result.body.ok ? 'success' : 'error');
-            load();
-        });
-    }
 
     function showError(message) {
         var box = form.querySelector('[data-modal-error]');

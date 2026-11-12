@@ -75,7 +75,7 @@ class ConcurrencyTest extends TestCase
         $this->assertSame($workers, (int) DB::table('visit_counters')->value('last_number'));
     }
 
-    public function test_same_assignment_cannot_be_accepted_twice_at_the_same_time(): void
+    public function test_same_assignment_cannot_be_completed_twice_at_the_same_time(): void
     {
         $location = $this->createLocation();
         $department = $this->createDepartment($location);
@@ -87,13 +87,13 @@ class ConcurrencyTest extends TestCase
             'served_by_staff_id' => $staff->id,
         ]);
 
-        // Satu akun PIC dipakai beberapa orang; dua orang menekan Terima bersamaan.
-        $results = $this->runTogether(2, fn () => ['accept', (string) $visit->id, (string) $pic->id]);
+        // Satu akun PIC dipakai beberapa orang; dua orang menyimpan hasil bersamaan.
+        $results = $this->runTogether(2, fn () => ['complete', (string) $visit->id, (string) $pic->id]);
 
         sort($results);
         $this->assertSame(['conflict', 'ok'], $results);
-        $this->assertSame(VisitStatus::Processing, $visit->refresh()->status);
-        $this->assertSame(1, DB::table('visit_status_logs')->where('visit_id', $visit->id)->where('to_status', 'processing')->count());
+        $this->assertSame(VisitStatus::Completed, $visit->refresh()->status);
+        $this->assertSame(1, DB::table('visit_status_logs')->where('visit_id', $visit->id)->where('to_status', 'completed')->count());
     }
 
     /**

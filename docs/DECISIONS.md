@@ -2,6 +2,15 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — PIC langsung menyelesaikan tanpa Terima (PIC-2, PIC-3)
+
+- **Konteks:** PIC harus menekan Terima lalu Selesai, padahal yang dibutuhkan hanya membaca rincian keperluan dan menulis hasil.
+- **Keputusan:**
+  - Tombol, route, dan service Terima dihapus. Tombol Selesai tersedia pada setiap kunjungan aktif di Bidang/UPT PIC dan membuka modal berisi Rincian keperluan dan isian Hasil; simpan berarti `waiting` → `completed`. `processed_at` dan `processed_by` diisi saat selesai bila masih kosong.
+  - Status `processing` tidak lagi dibuat oleh PIC; tetap didukung untuk kunjungan lama dan buka kembali kunjungan yang dulu selesai dari `processing`.
+  - Penugasan ulang tetap lewat resepsionis seperti semula, dan kini berlaku sampai kunjungan diselesaikan PIC. Tidak ada tombol Kembalikan maupun status "ditolak".
+- **Alasan:** Alur PIC lebih ringkas tanpa mengubah skema database maupun alur penugasan resepsionis.
+
 ## 2026-11-12 — Kategori keperluan dihapus, tamu hanya mengisi Rincian keperluan (revisi HRD #6 dan #7)
 
 - **Konteks:** "Pertanyaan departemen" yang diminta HRD dihapus ternyata adalah kategori keperluan (menu Pertanyaan) yang dikelompokkan per Bidang/UPT di formulir tamu, sehingga revisi #6 dan #7 dikerjakan bersama.
