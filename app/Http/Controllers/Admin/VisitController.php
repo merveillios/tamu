@@ -141,7 +141,8 @@ class VisitController extends Controller
     }
 
     /**
-     * Gambar tanda tangan untuk Admin dan Super Admin, tidak pernah disajikan dari public/ (TAM-9).
+     * Gambar tanda tangan untuk Admin, Super Admin, dan Resepsionis (QR miliknya), tidak pernah
+     * disajikan dari public/ (TAM-9).
      */
     public function signature(Request $request, int $id): Response
     {

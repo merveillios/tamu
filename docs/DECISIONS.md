@@ -2,6 +2,13 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Resepsionis boleh melihat tanda tangan (TAM-9)
+
+- **Konteks:** Commit `3ddb218` membuka route tanda tangan dan gambar di detail kunjungan untuk Resepsionis, sedangkan PRD (matriks peran, TAM-9, Bab 13) masih menyebut hanya Admin dan Super Admin. Audit keamanan 2026-10-29 mencatat ketidaksesuaian ini.
+- **Keputusan:** PRD disesuaikan dengan kode. Resepsionis boleh melihat tanda tangan kunjungan dari QR miliknya; Admin dan Super Admin di semua lokasi; PIC tetap tidak. Aturan yang sama nantinya berlaku untuk foto KTP dan selfie tamu.
+- **Alasan:** Resepsionis yang memvalidasi tamu di tempat, sehingga perlu mencocokkan tanda tangan (dan nanti KTP serta selfie) dengan orang yang datang.
+- **Catatan:** Cakupan Resepsionis mengikuti kepemilikan QR saat ini. Setelah QR dipindahkan (QR-6), resepsionis baru juga dapat melihat tanda tangan kunjungan lama dari QR tersebut.
+
 ## 2026-11-05 — QR tidak lagi memilih departemen (QR-2)
 
 - **Konteks:** Form buat QR mewajibkan satu departemen, padahal departemen QR hanya dipakai sebagai cadangan saran departemen bila kategori keperluan tidak punya saran. Sejak kategori wajib punya saran departemen, cadangan itu hampir tidak pernah terpakai, sementara admin bisa salah mengira QR hanya untuk satu departemen.
