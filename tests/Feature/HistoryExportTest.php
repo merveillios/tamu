@@ -105,8 +105,8 @@ class HistoryExportTest extends TestCase
     {
         $receptionist = $this->data['receptionistA'];
 
-        $this->actingAs($receptionist)->get('/admin/tamu')->assertOk()->assertSee('Ekspor PDF hari ini');
-        $this->actingAs($this->data['admin'])->get('/admin/tamu')->assertOk()->assertDontSee('Ekspor PDF hari ini');
+        // Ekspor hanya lewat History; Tamu Aktif tidak memuat tombol ekspor.
+        $this->actingAs($receptionist)->get('/admin/tamu')->assertOk()->assertDontSee('/admin/history/export', false);
 
         $this->actingAs($receptionist)->get('/admin/history/export')
             ->assertOk()

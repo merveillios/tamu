@@ -131,6 +131,24 @@ class GuestDocumentTest extends TestCase
         $this->actingAs($pic)->get("/admin/kunjungan/{$visit->id}/foto/ktp")->assertForbidden();
     }
 
+    public function test_active_visits_show_photo_markers_but_not_to_pic(): void
+    {
+        [$qr, $category] = $this->usableQr();
+        $withKtp = $this->createVisit($qr, $category, ['email' => 'lengkap@contoh.test', 'name' => 'Tamu Lengkap']);
+        $this->createVisit($qr, $category, ['email' => 'kosong@contoh.test', 'name' => 'Tamu Kosong']);
+        $this->storeDocument('lengkap@contoh.test', 'ktp');
+        $this->storeDocument('lengkap@contoh.test', 'selfie');
+
+        $rows = collect($this->actingAs($qr->receptionist)->getJson('/admin/tamu/data')->assertOk()->json('data.rows'))->keyBy('name');
+        $this->assertSame(['ktp' => true, 'selfie' => true], $rows['Tamu Lengkap']['documents']);
+        $this->assertSame(['ktp' => false, 'selfie' => false], $rows['Tamu Kosong']['documents']);
+        // Hanya penanda; gambar tidak ikut di data polling.
+        $this->assertStringNotContainsString('/foto/', json_encode($rows->all()));
+
+        $pic = $this->createPic($this->createDepartment($qr->location));
+        $this->assertNull(app(\App\Services\VisitListService::class)->row($withKtp->fresh(), $pic)['documents']);
+    }
+
     /**
      * Foto JPEG polos berukuran tertentu sebagai data URL.
      */

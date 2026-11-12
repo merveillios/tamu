@@ -11,6 +11,7 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
   - Foto disimpan di database (tabel baru `guest_documents`, MEDIUMBLOB) seperti tanda tangan, agar backup tetap cukup satu dump database. Mengganti foto menambah baris baru; foto lama tetap ada sebagai dokumentasi dan yang dipakai selalu yang terbaru.
   - Browser memperkecil foto ke 1600 px sebelum dikirim. Server membaca ulang dengan GD dan menyimpan JPEG baru (metadata EXIF/GPS terbuang, isi selain gambar ditolak), dengan sisi terpendek minimal 300 px agar tulisan KTP terbaca.
   - Hak lihat mengikuti tanda tangan: Admin, Super Admin, dan Resepsionis untuk tamu yang punya kunjungan dari QR miliknya; PIC tidak. Foto tampil di Detail Kunjungan lewat route berbatas peran, dan History memberi penanda "KTP". Setiap pembukaan foto oleh petugas tercatat di audit log karena KTP memuat NIK. Foto tidak ikut ekspor.
+  - Karena Resepsionis yang memastikan syarat identitas terpenuhi, Tamu Aktif menampilkan penanda "KTP ✓", "Selfie ✓", atau "Belum ada KTP" di bawah nama tamu, ikut diperbarui oleh polling. Atas permintaan pemilik proyek, foto tidak ditampilkan di Tamu Aktif maupun modal Tugaskan; untuk melihatnya Resepsionis membuka Detail Kunjungan.
 - **Alasan:** Tamu yang paling tahu datanya sendiri dan cukup mengunggah sekali. Menyimpan di database menjaga satu jalur backup; foto per email kecil (sekitar 150–300 KB per foto) sehingga pertumbuhan database terkendali.
 - **Catatan:** Karena foto tidak dapat dihapus lewat aplikasi, permintaan hapus dari tamu (hak subjek data UU PDP) harus ditangani manual oleh pengelola database.
 
@@ -22,14 +23,14 @@ Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
   - Ekspor selalu mengecualikan Dibatalkan dan diurutkan dari yang datang paling awal seperti menulis di buku. Tidak ada centang "sertakan Dibatalkan"; filter status Dibatalkan menyembunyikan tombol ekspor, dan server menolak request ekspor dengan `status=dibatalkan`.
   - Bawaan halaman History disamakan dengan isi buku tamu: semua kunjungan kecuali Dibatalkan, termasuk Menunggu dan Sedang direview. Filter status menjadi Menunggu, Sedang direview, Selesai, dan Dibatalkan, sehingga kunjungan Dibatalkan tetap bisa dicari. Dengan begitu jumlah di halaman History sama dengan jumlah baris PDF.
   - Kepala PDF berjudul "BUKU TAMU" dan menampilkan filter dalam kalimat (Periode, Tanggal, Status, Bidang/UPT, Kelompok rentan, Pencarian), bukan kode seperti `department_id = 3`.
-  - Ekspor Resepsionis (T7) ikut memakai template ini; tombol "Ekspor PDF hari ini" di Tamu Aktif kini juga memuat tamu yang masih Menunggu.
+  - Ekspor Resepsionis (T7) ikut memakai template ini.
 - **Alasan:** Buku tamu mencatat siapa saja yang datang, sedangkan kunjungan yang dibatalkan dianggap tidak jadi bertamu. Menyamakan bawaan History dengan ekspor mencegah selisih antara yang terlihat di layar dan isi file.
 
 ## 2026-11-12 — Resepsionis dapat membuka History dan mengekspor PDF (revisi HRD #10)
 
 - **Konteks:** HRD meminta ekspor PDF untuk resepsionis. Sebelumnya History dan ekspor hanya untuk Admin dan Super Admin, dan Resepsionis hanya punya Tamu Aktif.
 - **Keputusan:**
-  - Route `/admin/history` dan `/admin/history/export` dipindah ke grup `role:receptionist,admin,super_admin`, dan menu History tampil untuk Resepsionis. Sesuai permintaan tombol ekspor di dashboard resepsionis, Tamu Aktif Resepsionis mendapat tombol "Ekspor PDF hari ini" dan tautan ke History untuk periode lain. Tidak ada halaman atau template PDF terpisah: History, filter, dan ekspor sama dengan milik Admin, termasuk kolom telepon, alamat, email, dan tanda tangan, karena Resepsionis memang sudah melihat semua data itu di Detail Kunjungan.
+  - Route `/admin/history` dan `/admin/history/export` dipindah ke grup `role:receptionist,admin,super_admin`, dan menu History tampil untuk Resepsionis. Tombol ekspor hanya ada di halaman History (menu History di sidebar). Tombol "Ekspor PDF hari ini" yang sempat ditaruh di Tamu Aktif dihapus atas permintaan pemilik proyek agar Tamu Aktif tetap bersih; ekspor hari ini cukup lewat History dengan periode "Hari ini". Tidak ada halaman atau template PDF terpisah: History, filter, dan ekspor sama dengan milik Admin, termasuk kolom telepon, alamat, email, dan tanda tangan, karena Resepsionis memang sudah melihat semua data itu di Detail Kunjungan.
   - Cakupan kunjungan tetap dari `AccessScope` (kunjungan dari QR miliknya, apa pun status QR-nya). Pilihan dan pemeriksaan filter lokasi kini memakai `AccessScope::locationIds()`, bukan cakupan master data, karena Resepsionis tidak mengelola lokasi; lokasi di luar cakupan menghasilkan 404.
   - Halaman History Resepsionis menampilkan "hanya dari QR milik Anda", dan kepala PDF menampilkan "Cakupan: QR milik resepsionis <nama akun>" agar file yang beredar tidak terbaca sebagai data semua lokasi.
   - PIC tetap tanpa History, karena akun PIC dipakai bersama dan data tamunya sengaja dibatasi (PIC-7).

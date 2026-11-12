@@ -56,6 +56,32 @@
         return wrap;
     }
 
+    // Penanda foto dari "Lengkapi profil" tamu (TAM-18); fotonya dibuka lewat Detail.
+    function nameCell(row) {
+        var wrap = el('span');
+        wrap.appendChild(el('span', 'fw-bold', row.name));
+
+        if (!row.documents) {
+            return wrap;
+        }
+
+        var badges = el('span', 'd-flex flex-wrap gap-1 mt-1');
+
+        if (row.documents.ktp) {
+            badges.appendChild(el('span', 'badge bg-success fw-normal', 'KTP ✓'));
+        } else {
+            badges.appendChild(el('span', 'badge bg-gray-200 text-gray-800 fw-normal', 'Belum ada KTP'));
+        }
+
+        if (row.documents.selfie) {
+            badges.appendChild(el('span', 'badge bg-success fw-normal', 'Selfie ✓'));
+        }
+
+        wrap.appendChild(badges);
+
+        return wrap;
+    }
+
     function actionButtons(row) {
         var wrap = el('div', 'd-flex flex-wrap gap-1 justify-content-end justify-content-md-start');
 
@@ -95,7 +121,7 @@
         var assigned = row.assigned_department ? row.assigned_department + (row.served_by ? ' — ' + row.served_by : '') : null;
         var badge = el('span', 'badge bg-' + row.status_badge, row.status_label);
 
-        tr.appendChild(cell('Nama', row.name, 'fw-bold'));
+        tr.appendChild(cell('Nama', nameCell(row)));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
         tr.appendChild(cell('Rincian keperluan', SiTamu.excerpt(row.purpose), 'small text-break'));

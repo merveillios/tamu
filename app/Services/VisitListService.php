@@ -42,6 +42,11 @@ class VisitListService
         return $this->filteredActive($user, $filters)
             ->tap(fn (Builder $query) => $this->applyStatusFilter($query, $filters['status'] ?? null))
             ->with(self::RELATIONS)
+            // Penanda KTP dan selfie dari "Lengkapi profil" (TAM-18); fotonya hanya di Detail.
+            ->withExists([
+                'documents as has_ktp' => fn (Builder $query) => $query->where('type', 'ktp'),
+                'documents as has_selfie' => fn (Builder $query) => $query->where('type', 'selfie'),
+            ])
             ->tap(fn (Builder $query) => $this->applyPriorityOrdering($query))
             ->paginate(25);
     }
@@ -183,6 +188,11 @@ class VisitListService
             'name' => $visit->name,
             'organization' => $visit->organization,
             'vulnerable_group' => $visit->vulnerableGroupLabel(),
+            // PIC tidak berhak melihat KTP dan selfie, jadi penandanya juga tidak dikirim.
+            'documents' => $viewer->role === UserRole::Pic ? null : [
+                'ktp' => (bool) $visit->has_ktp,
+                'selfie' => (bool) $visit->has_selfie,
+            ],
             'purpose' => $visit->purpose,
             'assigned_department' => $visit->assignedDepartment?->name,
             'served_by' => $visit->servedBy?->name,

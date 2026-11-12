@@ -33,7 +33,7 @@
             <div class="col-6 col-lg-2">
                 <label for="status" class="form-label small mb-1">Status</label>
                 <select name="status" id="status" class="form-select">
-                    <option value="">Semua kecuali Dibatalkan</option>
+                    <option value="">Tanpa Dibatalkan</option>
                     @foreach ($statusLabels as $value => $label)
                         <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>
                     @endforeach
