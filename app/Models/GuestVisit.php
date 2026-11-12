@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\VisitStatus;
-use App\Enums\VulnerableGroup;
 use App\Models\Concerns\CannotBeDeleted;
 use App\Models\Concerns\LimitedByAccess;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -52,7 +51,6 @@ class GuestVisit extends Model
         'visit_date' => 'date',
         'daily_number' => 'integer',
         'email_verified_at' => 'datetime',
-        'vulnerable_group' => VulnerableGroup::class,
         'status' => VisitStatus::class,
         'check_in_at' => 'datetime',
         'assigned_at' => 'datetime',
@@ -107,6 +105,22 @@ class GuestVisit extends Model
     public function suggestedDepartment(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'suggested_department_id');
+    }
+
+    /**
+     * Kelompok rentan yang dipilih tamu, dicocokkan lewat kode (VUL-1).
+     */
+    public function vulnerableGroupOption(): BelongsTo
+    {
+        return $this->belongsTo(VulnerableGroup::class, 'vulnerable_group', 'code');
+    }
+
+    /**
+     * Nama kelompok rentan untuk tampilan dan ekspor; kode mentah bila barisnya tidak ada.
+     */
+    public function vulnerableGroupLabel(): string
+    {
+        return $this->vulnerableGroupOption?->name ?? (string) $this->vulnerable_group;
     }
 
     /**

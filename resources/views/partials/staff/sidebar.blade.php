@@ -12,6 +12,7 @@
         ['label' => 'Lokasi', 'path' => 'admin/lokasi', 'icon' => 'location', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'QR Code', 'path' => 'admin/qr', 'icon' => 'qrcode', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Petugas', 'path' => 'admin/petugas', 'icon' => 'identification', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
+        ['label' => 'Kelompok Rentan', 'path' => 'admin/kelompok-rentan', 'icon' => 'heart', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Pengguna', 'path' => 'admin/pengguna', 'icon' => 'users', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Audit Log', 'path' => 'admin/audit-log', 'icon' => 'document-text', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Ganti Password', 'path' => 'admin/password', 'icon' => 'key', 'roles' => UserRole::cases()],

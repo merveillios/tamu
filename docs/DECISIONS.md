@@ -2,6 +2,17 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Kelompok rentan menjadi master data (revisi HRD #12)
+
+- **Konteks:** Pilihan kelompok rentan ditulis di enum `VulnerableGroup`, dan urutan prioritas antrean (Lansia, Disabilitas, Ibu hamil) ditulis langsung di `VisitListService`. HRD meminta halaman tambah, ubah, dan hapus untuk Admin.
+- **Keputusan:**
+  - Tabel baru `vulnerable_groups` (`code`, `name`, `priority`, `sort_order`, `is_active`) diisi migrasi dengan lima pilihan lama memakai kode yang sama. `guest_visits.vulnerable_group` tetap menyimpan kode, jadi tidak ada migrasi data kunjungan dan tidak ada foreign key. Kode dibuat dari nama saat kelompok ditambah dan tidak bisa diubah. Enum `VulnerableGroup` dihapus; model `App\Models\VulnerableGroup` menggantikannya.
+  - Daftarnya satu untuk semua lokasi dan dikelola Admin serta Super Admin, sesuai cakupan Admin yang sudah tidak dibatasi lokasi (ADM-5). Menu baru "Kelompok Rentan".
+  - Kolom `priority` (1–99, kosong = tidak didahulukan) menggantikan urutan yang ditulis di kode. Tamu Aktif dan Penugasan mengurutkan berdasarkan prioritas lalu jam datang. Bawaan: Lansia 1, Penyandang disabilitas 2, Ibu hamil 3.
+  - "Hapus" mengikuti pola lokasi (LOK-3): hanya untuk kelompok yang belum pernah dipakai kunjungan; yang sudah dipakai hanya bisa dinonaktifkan. Kelompok aktif terakhir tidak bisa dinonaktifkan atau dihapus karena kelompok rentan wajib di formulir tamu.
+  - Kelompok nonaktif disembunyikan dari formulir tamu baru dan ditolak server. Tamu lama yang data dirinya terkunci (TAM-16) tetap boleh memakai kelompok nonaktif miliknya, karena ia tidak bisa mengubah pilihan itu.
+- **Alasan:** Kode lama dipertahankan agar data lama, tes, dan ekspor tidak berubah. Karena kunjungan menyimpan kode, nama baru kelompok langsung terlihat juga di History dan ekspor kunjungan lama.
+
 ## 2026-11-12 — Ekspor hanya PDF, tanpa batas baris (revisi HRD #13)
 
 - **Konteks:** HRD meminta semua ekspor hanya tersedia dalam format PDF. Sebelumnya History menawarkan CSV, Excel, dan PDF, dengan Excel/PDF dibatasi 500 baris (`EXPORT_RICH_MAX_ROWS`). Pemilik proyek memutuskan jumlah baris mengikuti filter.

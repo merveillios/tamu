@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VisitController;
+use App\Http\Controllers\Admin\VulnerableGroupController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Guest\GoogleVerificationController;
 use App\Http\Controllers\Guest\GuestEntryController;
@@ -114,5 +115,13 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/petugas/{id}/ubah', [StaffMemberController::class, 'edit'])->whereNumber('id')->name('staff.edit');
         Route::post('/petugas/{id}/ubah', [StaffMemberController::class, 'update'])->whereNumber('id')->name('staff.update');
         Route::post('/petugas/{id}/status', [StaffMemberController::class, 'toggleStatus'])->whereNumber('id')->name('staff.status');
+
+        Route::get('/kelompok-rentan', [VulnerableGroupController::class, 'index'])->name('vulnerable-groups.index');
+        Route::get('/kelompok-rentan/tambah', [VulnerableGroupController::class, 'create'])->name('vulnerable-groups.create');
+        Route::post('/kelompok-rentan/tambah', [VulnerableGroupController::class, 'store'])->name('vulnerable-groups.store');
+        Route::get('/kelompok-rentan/{id}/ubah', [VulnerableGroupController::class, 'edit'])->whereNumber('id')->name('vulnerable-groups.edit');
+        Route::post('/kelompok-rentan/{id}/ubah', [VulnerableGroupController::class, 'update'])->whereNumber('id')->name('vulnerable-groups.update');
+        Route::post('/kelompok-rentan/{id}/status', [VulnerableGroupController::class, 'toggleStatus'])->whereNumber('id')->name('vulnerable-groups.status');
+        Route::post('/kelompok-rentan/{id}/hapus', [VulnerableGroupController::class, 'destroy'])->whereNumber('id')->name('vulnerable-groups.destroy');
     });
 });

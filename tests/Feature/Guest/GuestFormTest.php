@@ -103,7 +103,7 @@ class GuestFormTest extends TestCase
 
         $latest = GuestVisit::latest('id')->firstOrFail();
         $this->assertSame(['Nama Lama', 'Instansi Lama', '6281111111111', 'Alamat Lama No. 1', 'lansia'], [
-            $latest->name, $latest->organization, $latest->phone, $latest->address, $latest->vulnerable_group->value,
+            $latest->name, $latest->organization, $latest->phone, $latest->address, $latest->vulnerable_group,
         ]);
     }
 

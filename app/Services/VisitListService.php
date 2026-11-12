@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Enums\UserRole;
 use App\Enums\VisitStatus;
-use App\Enums\VulnerableGroup;
 use App\Models\GuestVisit;
 use App\Models\User;
 use App\Rules\IndonesianPhone;
@@ -30,6 +29,7 @@ class VisitListService
         'qrCode:id,label',
         'assignedDepartment:id,name',
         'servedBy:id,name',
+        'vulnerableGroupOption:code,name',
     ];
 
     /**
@@ -182,7 +182,7 @@ class VisitListService
             'id' => $visit->id,
             'name' => $visit->name,
             'organization' => $visit->organization,
-            'vulnerable_group' => $visit->vulnerable_group->label(),
+            'vulnerable_group' => $visit->vulnerableGroupLabel(),
             'purpose' => $visit->purpose,
             'assigned_department' => $visit->assignedDepartment?->name,
             'served_by' => $visit->servedBy?->name,
@@ -244,25 +244,14 @@ class VisitListService
      * Mengurutkan tamu prioritas (kelompok rentan) ke posisi paling atas,
      * lalu berdasarkan waktu datang paling awal.
      *
-     * Prioritas: Lansia, Disabilitas, Ibu hamil. Kelompok "bukan rentan" dan
-     * "tidak ingin menyebutkan" tidak diprioritaskan.
+     * Prioritas diambil dari kolom `priority` master kelompok rentan (VUL-1); angka kecil
+     * didahulukan, kelompok tanpa prioritas (misalnya "Bukan kelompok rentan") di belakang.
+     * Bawaan: Lansia 1, Penyandang disabilitas 2, Ibu hamil 3.
      */
     private function applyPriorityOrdering(Builder $query): void
     {
-        $priority = [
-            VulnerableGroup::Elderly->value,
-            VulnerableGroup::Disability->value,
-            VulnerableGroup::Pregnant->value,
-        ];
-
-        $cases = implode(' ', array_map(
-            fn (string $value, int $rank) => "WHEN '{$value}' THEN {$rank}",
-            $priority,
-            array_keys($priority)
-        ));
-
         $query
-            ->orderByRaw("CASE vulnerable_group {$cases} ELSE 3 END")
+            ->orderByRaw('COALESCE((SELECT vg.priority FROM vulnerable_groups vg WHERE vg.code = guest_visits.vulnerable_group), 999)')
             ->orderBy('check_in_at')
             ->orderBy('id');
     }

@@ -5,11 +5,10 @@ namespace Tests\Unit;
 use App\Enums\QrStatus;
 use App\Enums\UserRole;
 use App\Enums\VisitStatus;
-use App\Enums\VulnerableGroup;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Memastikan pemetaan enum sesuai PRD Bab 0.4 dan Bab 11.1.
+ * Memastikan pemetaan enum sesuai PRD Bab 0.4.
  */
 class EnumTest extends TestCase
 {
@@ -33,9 +32,5 @@ class EnumTest extends TestCase
     {
         $this->assertSame(['super_admin', 'admin', 'receptionist', 'pic'], array_column(UserRole::cases(), 'value'));
         $this->assertSame(['active', 'inactive', 'revoked'], array_column(QrStatus::cases(), 'value'));
-        $this->assertSame(
-            ['bukan', 'lansia', 'disabilitas', 'ibu_hamil', 'tidak_menyebutkan'],
-            array_column(VulnerableGroup::cases(), 'value'),
-        );
     }
 }

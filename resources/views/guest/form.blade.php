@@ -47,7 +47,7 @@
                         class="form-select @error('vulnerable_group') is-invalid @enderror" aria-describedby="vulnerable_group_error">
                     <option value="">Pilih kelompok rentan</option>
                     @foreach ($vulnerableGroups as $group)
-                        <option value="{{ $group->value }}" @selected($value('vulnerable_group') === $group->value)>{{ $group->label() }}</option>
+                        <option value="{{ $group->code }}" @selected($value('vulnerable_group') === $group->code)>{{ $group->name }}</option>
                     @endforeach
                 </select>
                 @error('vulnerable_group')

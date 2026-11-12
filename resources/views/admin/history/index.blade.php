@@ -66,7 +66,7 @@
                 <select name="vulnerable_group" id="vulnerable_group" class="form-select">
                     <option value="">Semua</option>
                     @foreach ($vulnerableGroups as $group)
-                        <option value="{{ $group->value }}" @selected(($filters['vulnerable_group'] ?? '') === $group->value)>{{ $group->label() }}</option>
+                        <option value="{{ $group->code }}" @selected(($filters['vulnerable_group'] ?? '') === $group->code)>{{ $group->name }}@unless ($group->is_active) (nonaktif)@endunless</option>
                     @endforeach
                 </select>
             </div>
@@ -106,7 +106,7 @@
                             <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
                             <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
                             <td data-label="Instansi">{{ $visit->organization }}</td>
-                            <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
+                            <td data-label="Kelompok rentan">{{ $visit->vulnerableGroupLabel() }}</td>
                             <td data-label="Rincian keperluan" class="small text-break" title="{{ $visit->purpose }}">{{ \Illuminate\Support\Str::limit($visit->purpose, 80) }}</td>
                             <td data-label="Bidang/UPT">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
                             <td data-label="Lokasi">{{ $visit->location->name }}</td>

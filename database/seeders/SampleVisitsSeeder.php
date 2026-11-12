@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Enums\VisitStatus;
-use App\Enums\VulnerableGroup;
 use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\Location;
@@ -68,7 +67,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560001',
                 'address' => 'Jl. Kenanga No. 12, Surabaya',
                 'email' => 'hartono.wijaya@example.com',
-                'vulnerable_group' => VulnerableGroup::Elderly,
+                'vulnerable_group' => 'lansia',
                 'purpose' => 'Konsultasi izin usaha perdagangan untuk pensiunan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => null,
@@ -80,7 +79,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560002',
                 'address' => 'Jl. Mawar No. 5, Sidoarjo',
                 'email' => 'sari.melati@example.com',
-                'vulnerable_group' => VulnerableGroup::Pregnant,
+                'vulnerable_group' => 'ibu_hamil',
                 'purpose' => 'Pengurusan surat keterangan usaha.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => 'Sekretariat',
@@ -92,7 +91,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560003',
                 'address' => 'Jl. Anggrek No. 21, Gresik',
                 'email' => 'bambang.riyanto@example.com',
-                'vulnerable_group' => VulnerableGroup::Disability,
+                'vulnerable_group' => 'disabilitas',
                 'purpose' => 'Konsultasi pengembangan industri rumah tangga.',
                 'status' => VisitStatus::Processing,
                 'assigned_department' => 'Bidang Industri Agro',
@@ -108,7 +107,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560004',
                 'address' => 'Jl. Basuki Rahmat No. 88, Surabaya',
                 'email' => 'dedi.kurniawan@example.com',
-                'vulnerable_group' => VulnerableGroup::None,
+                'vulnerable_group' => 'bukan',
                 'purpose' => 'Konsultasi ekspor produk kerajinan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => 'Bidang Perdagangan Dalam Negeri',
@@ -120,7 +119,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560005',
                 'address' => 'Jl. Diponegoro No. 45, Surabaya',
                 'email' => 'laila.fitriani@example.com',
-                'vulnerable_group' => VulnerableGroup::None,
+                'vulnerable_group' => 'bukan',
                 'purpose' => 'Penyerahan proposal kerja sama koperasi.',
                 'status' => VisitStatus::Processing,
                 'assigned_department' => 'Sekretariat',
@@ -132,7 +131,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560006',
                 'address' => 'Jl. Raya Darmo No. 3, Surabaya',
                 'email' => 'rudi.hartanto@example.com',
-                'vulnerable_group' => VulnerableGroup::None,
+                'vulnerable_group' => 'bukan',
                 'purpose' => 'Koordinasi program pemberdayaan desa.',
                 'status' => VisitStatus::Completed,
                 'assigned_department' => 'Sekretariat',
@@ -145,7 +144,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560007',
                 'address' => 'Jl. Pahlawan No. 7, Mojokerto',
                 'email' => 'nina.kurniasih@example.com',
-                'vulnerable_group' => VulnerableGroup::None,
+                'vulnerable_group' => 'bukan',
                 'purpose' => 'Pendaftaran program pelatihan industri.',
                 'status' => VisitStatus::Cancelled,
                 'assigned_department' => null,
@@ -158,7 +157,7 @@ class SampleVisitsSeeder extends Seeder
                 'phone' => '081234560008',
                 'address' => 'Jl. Gubernur Suryo No. 15, Surabaya',
                 'email' => 'joko.susilo@example.com',
-                'vulnerable_group' => VulnerableGroup::Undisclosed,
+                'vulnerable_group' => 'tidak_menyebutkan',
                 'purpose' => 'Konsultasi sertifikasi produk perdagangan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => null,

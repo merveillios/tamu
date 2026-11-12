@@ -37,14 +37,14 @@ class LayoutTest extends TestCase
 
     public function test_pic_menu(): void
     {
-        $this->assertMenu(UserRole::Pic, ['Penugasan', 'Ganti Password'], ['Dashboard', 'Tamu Aktif', 'History', 'Pengguna']);
+        $this->assertMenu(UserRole::Pic, ['Penugasan', 'Ganti Password'], ['Dashboard', 'Tamu Aktif', 'History', 'Pengguna', 'Kelompok Rentan']);
     }
 
     public function test_admin_menu(): void
     {
         $this->assertMenu(
             UserRole::Admin,
-            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'QR Code', 'Petugas', 'Pengguna', 'Audit Log', 'Ganti Password'],
+            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'QR Code', 'Petugas', 'Kelompok Rentan', 'Pengguna', 'Audit Log', 'Ganti Password'],
             ['Penugasan'],
         );
     }
@@ -53,7 +53,7 @@ class LayoutTest extends TestCase
     {
         $this->assertMenu(
             UserRole::SuperAdmin,
-            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'Petugas', 'Pengguna', 'Audit Log', 'Ganti Password'],
+            ['Dashboard', 'Tamu Aktif', 'History', 'Lokasi', 'Petugas', 'Kelompok Rentan', 'Pengguna', 'Audit Log', 'Ganti Password'],
             ['Penugasan'],
         );
     }

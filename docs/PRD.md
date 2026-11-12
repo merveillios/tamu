@@ -248,7 +248,7 @@ Stack tetap sama dengan v0.9 (Laravel tanpa starter kit, Blade, Bootstrap, JS va
 sitamu/
 ├── app/
 │   ├── Console/Commands/    # CreateSuperAdmin (php artisan sitamu:create-superadmin)
-│   ├── Enums/               # VisitStatus, UserRole, QrStatus, VulnerableGroup
+│   ├── Enums/               # VisitStatus, UserRole, QrStatus (VulnerableGroup kini model, revisi HRD #12)
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Guest/       # GuestEntry, GuestForm, GuestHistory, GoogleVerification
@@ -444,6 +444,16 @@ Menu, halaman, dan route kategori keperluan dihapus; formulir tamu hanya berisi 
 | --- | --- | --- | --- |
 | PTG-1 | Admin dan Super Admin (semua lokasi) dapat menambah, mengubah, menonaktifkan, dan mengaktifkan kembali petugas per Bidang/UPT, yaitu orang yang dapat ditemui tamu. | Wajib | Field: nama petugas (2–100 karakter, unik per Bidang/UPT). Petugas nonaktif tidak muncul di pilihan orang yang ditemui (RSP-2). Tercatat di audit log. |
 | PTG-2 | Petugas tidak dapat dihapus. | Wajib | Hanya aktif/nonaktif, agar nama petugas pada kunjungan lama tetap terbaca. |
+
+## 6.5a Admin — Kelompok Rentan \[BARU revisi HRD #12\]
+
+Pilihan kelompok rentan di formulir tamu berasal dari tabel `vulnerable_groups`, bukan lagi enum `VulnerableGroup`. Daftarnya satu untuk semua lokasi.
+
+| ID | Kebutuhan | Prioritas | Kriteria Penerimaan |
+| --- | --- | --- | --- |
+| VUL-1 | Admin dan Super Admin dapat menambah dan mengubah kelompok rentan. | Wajib | Field: nama (2–100 karakter, unik, tidak peka huruf besar/kecil), prioritas antrean (opsional, 1–99), dan urutan tampil (0–999). Kode (`code`) dibuat otomatis dari nama saat ditambah dan tidak pernah berubah, karena `guest_visits.vulnerable_group` menyimpan kode. Prioritas terisi berarti tamu kelompok itu tampil paling atas di Tamu Aktif dan Penugasan (angka kecil lebih dulu, lalu jam datang); kosong berarti tidak didahulukan. Bawaan dari migrasi: Bukan kelompok rentan, Lansia (prioritas 1), Penyandang disabilitas (2), Ibu hamil (3), Tidak ingin menyebutkan, dengan kode lama (`bukan`, `lansia`, `disabilitas`, `ibu_hamil`, `tidak_menyebutkan`) sehingga kunjungan lama tidak diubah. Tercatat di audit log. |
+| VUL-2 | Admin dan Super Admin dapat menonaktifkan dan mengaktifkan kembali kelompok rentan. | Wajib | Kelompok nonaktif tidak tampil di formulir tamu baru dan ditolak server bila dikirim manual. Tamu lama yang data dirinya memakai kelompok nonaktif tetap dapat mengirim formulir dengan kelompok itu (TAM-16). History, Detail Kunjungan, dan ekspor tetap menampilkan namanya; filter History menandainya "(nonaktif)". Kelompok aktif terakhir tidak dapat dinonaktifkan. |
+| VUL-3 | Kelompok rentan yang belum pernah dipakai kunjungan dapat dihapus. | Wajib | Tombol Hapus hanya muncul bila jumlah kunjungan yang memakainya 0; server tetap menolak walau request dikirim manual. Kelompok yang sudah dipakai hanya dapat dinonaktifkan. Kelompok aktif terakhir tidak dapat dihapus. Tercatat di audit log. |
 
 ## 6.6 Tamu — Buku Tamu dan Riwayat
 
@@ -783,6 +793,20 @@ CREATE TABLE staff_members (               -- [BARU v0.10] daftar petugas per Bi
   CONSTRAINT fk_staff_department FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE vulnerable_groups (           -- [BARU revisi HRD #12] master kelompok rentan (VUL-1)
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  code VARCHAR(30) NOT NULL,                 -- nilai yang disimpan di guest_visits.vulnerable_group; tidak berubah
+  name VARCHAR(100) NOT NULL,
+  priority TINYINT UNSIGNED NULL,            -- prioritas antrean; NULL = tidak didahulukan
+  sort_order SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_vulnerable_groups_code (code),
+  UNIQUE KEY uq_vulnerable_groups_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE guest_visits (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   location_id BIGINT UNSIGNED NOT NULL,
@@ -796,7 +820,7 @@ CREATE TABLE guest_visits (
   suggested_department_id BIGINT UNSIGNED NULL,      -- [BARU v0.10] salinan saran dari kategori
   purpose VARCHAR(500) NOT NULL,            -- rincian keperluan
   -- [DIHAPUS v0.10] person_to_meet; orang yang ditemui = served_by_staff_id         
-  vulnerable_group VARCHAR(30) NOT NULL,    -- [BARU v0.10] nilai enum VulnerableGroup
+  vulnerable_group VARCHAR(30) NOT NULL,    -- [DIUBAH revisi HRD #12] kode dari vulnerable_groups.code (tanpa foreign key)
   name VARCHAR(100) NOT NULL,
   organization VARCHAR(150) NOT NULL,       -- [DIUBAH v0.10] wajib
   phone VARCHAR(20) NOT NULL,
@@ -1011,6 +1035,11 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | GET / POST | `/admin/petugas/tambah` | \[BARU v0.10\] Form dan simpan petugas. |
 | GET / POST | `/admin/petugas/{id}/ubah` | \[BARU v0.10\] Form dan simpan perubahan. |
 | POST | `/admin/petugas/{id}/status` | \[BARU v0.10\] Aktifkan/nonaktifkan. |
+| GET | `/admin/kelompok-rentan` | \[BARU revisi HRD #12\] Daftar kelompok rentan beserta jumlah kunjungan yang memakainya. |
+| GET / POST | `/admin/kelompok-rentan/tambah` | \[BARU revisi HRD #12\] Form dan simpan kelompok rentan. |
+| GET / POST | `/admin/kelompok-rentan/{id}/ubah` | \[BARU revisi HRD #12\] Form dan simpan perubahan. |
+| POST | `/admin/kelompok-rentan/{id}/status` | \[BARU revisi HRD #12\] Aktifkan/nonaktifkan (VUL-2). |
+| POST | `/admin/kelompok-rentan/{id}/hapus` | \[BARU revisi HRD #12\] Hapus kelompok yang belum dipakai kunjungan (VUL-3). |
 
 ## 10.7 Khusus Admin (`role:admin`)
 
@@ -1072,7 +1101,7 @@ Urutan baris mengikuti urutan field di formulir.
 | --- | --- | --- | --- |
 | `email` (Email) | Ya | **Tidak pernah** dibaca dari input browser; server memakai email terverifikasi di session (TAM-11). Ditampilkan read-only. | – (kembali ke Langkah 1) |
 | `purpose` (Rincian keperluan) | Ya | 3–500 karakter, textarea 4 baris, selalu tampil sebagai field pertama \[DIUBAH revisi HRD #6 dan #7\]. Placeholder: "Contoh: Konsultasi perizinan usaha perdagangan dengan Bidang Perdagangan Dalam Negeri", dengan teks bantuan agar tamu menyebut Bidang/UPT atau orang yang ingin ditemui bila tahu. | "Rincian keperluan wajib diisi (3–500 karakter)." |
-| `vulnerable_group` (Kelompok rentan) | Ya | Salah satu nilai enum `VulnerableGroup` \[DEFAULT\]: `bukan` (Bukan kelompok rentan), `lansia` (Lansia), `disabilitas` (Penyandang disabilitas), `ibu_hamil` (Ibu hamil), `tidak_menyebutkan` (Tidak ingin menyebutkan). Tamu lama: diambil dari database (TAM-16). | "Pilih kelompok rentan." |
+| `vulnerable_group` (Kelompok rentan) | Ya | \[DIUBAH revisi HRD #12\] Kode kelompok rentan yang aktif di `vulnerable_groups` (VUL-1), urut sesuai urutan tampil lalu nama. Tamu lama: diambil dari database (TAM-16) dan tetap diterima walau kelompoknya sudah nonaktif. | "Pilih kelompok rentan." |
 | `name` (Nama lengkap) | Ya | 2–100 karakter. Tamu lama: diambil dari database. | "Nama lengkap wajib diisi (2–100 karakter)." |
 | `organization` (Instansi/perusahaan) | Ya \[DIUBAH v0.10\] | 2–150 karakter. Petunjuk: "Tulis Pribadi jika datang atas nama pribadi." Tamu lama: diambil dari database. | "Instansi/perusahaan wajib diisi (2–150 karakter)." |
 | `phone` (Nomor telepon/WhatsApp) | Ya | Terima `08…`, `628…`, `+628…`, nomor kantor berawalan `0`, spasi, `-`, dan tanda kurung. Setelah dibersihkan dan awalan `0` dinormalisasi ke `62`, harus 10–15 digit. Disimpan `62…`, ditampilkan `0…`. `inputmode="tel"`. Tamu lama: diambil dari database. | "Nomor telepon tidak valid. Contoh: 081234567890." |
@@ -1099,9 +1128,10 @@ Untuk tamu lama, Form Request **mengabaikan** input `vulnerable_group`, `name`, 
 
 | Field | Dipakai di | Aturan |
 | --- | --- | --- |
-| `name` | Lokasi, Bidang/UPT, kategori, petugas | Wajib, 2–100 karakter; unik sesuai cakupannya (lokasi: global; Bidang/UPT dan kategori: per lokasi; petugas: per Bidang/UPT), tidak peka huruf besar/kecil. |
+| `name` | Lokasi, Bidang/UPT, kategori, petugas, kelompok rentan | Wajib, 2–100 karakter; unik sesuai cakupannya (lokasi dan kelompok rentan: global; Bidang/UPT dan kategori: per lokasi; petugas: per Bidang/UPT), tidak peka huruf besar/kecil. |
+| `priority` | Kelompok rentan \[BARU revisi HRD #12\] | Opsional; angka 1–99. Kosong berarti tidak didahulukan di antrean. |
 | `suggested_department_id` | Kategori | Opsional; Bidang/UPT aktif di lokasi yang sama. |
-| `sort_order` | Kategori | Angka 0–999; default 0. |
+| `sort_order` | Kategori, kelompok rentan | Angka 0–999; default 0. |
 | `receptionist_id` | QR | Wajib; akun aktif berperan `receptionist`. |
 | `label` | QR | Opsional, maks. 100 karakter. |
 | `role`, `department_id`, `location_ids[]` | Akun staf | `role` salah satu nilai `UserRole`; `department_id` wajib dan aktif bila `pic`, harus kosong untuk peran lain; `location_ids[]` hanya untuk `admin`. Aturan USR-4 dan USR-5 berlaku. |
@@ -1235,7 +1265,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Login | Email, password, pesan error seragam. |
 | Layout staf | Sidebar di desktop, offcanvas di ponsel. Menu sesuai peran (di bawah). Nama akun, peran, dan tombol logout di pojok kanan atas. |
-| Menu per peran | **Resepsionis:** Tamu Aktif, Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin:** Dashboard, Tamu Aktif, History, Kategori Keperluan, Petugas, Ganti Password. **Super Admin:** Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT dan QR), Kategori Keperluan, Petugas, Pengguna, Audit Log, Ganti Password. |
+| Menu per peran | **Resepsionis:** Tamu Aktif, Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin dan Super Admin:** \[DIUBAH revisi HRD #6, #7, dan #12\] Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT), QR Code, Petugas, Kelompok Rentan, Pengguna, Audit Log, Ganti Password. Menu Kategori Keperluan dihapus. |
 | Dashboard (Admin, Super Admin) | Kartu angka (DSH-1/DSH-3), Tamu Aktif ringkas, grafik 14 hari (Super Admin). |
 | Tamu Aktif — Resepsionis | Kotak pencarian dan filter label status; tabel/kartu: nama, instansi, kelompok rentan, rincian keperluan (dipotong, teks lengkap di tooltip), Bidang/UPT dan orang yang ditemui, jam datang, lama menunggu, badge status, tombol aksi. Tombol per kondisi: Menunggu → Tugaskan, Batal; Menunggu PIC → Tugaskan ulang, Batal; Sedang direview → Batal. Modal Tugaskan menampilkan rincian keperluan lengkap, lalu pilihan Bidang/UPT (saran terpilih otomatis hanya untuk kunjungan lama yang punya kategori), lalu pilihan orang yang ditemui dari daftar petugas Bidang/UPT tersebut. Modal alasan batal. Toast setelah aksi. |
 | Tamu Aktif — Admin, Super Admin | Sama dengan versi Resepsionis ditambah kolom lokasi dan QR serta filter lokasi; tombol hanya Batal dan Detail. |
@@ -1311,7 +1341,7 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 | 20 | Batas baris ekspor? | \[DIUBAH revisi HRD #13\] Tanpa batas; mengikuti filter. Hanya PDF. | Kecil: `.env` (`EXPORT_PDF_MEMORY_LIMIT`, `EXPORT_PDF_TIME_LIMIT`). |
 | 21 | \[DIUBAH v0.10\] Semua sesi diakhiri setelah ganti password? | Ya, termasuk sesi yang sedang dipakai; pengguna login kembali. | Kecil: lepas middleware `AuthenticateSession`. |
 | 22 | Sudah ada kode atau database PHP native sebelumnya? | Tidak; mulai dari nol. | Sedang: rencana migrasi data. |
-| 23 | \[BARU v0.10\] Daftar pilihan kelompok rentan? | Bukan kelompok rentan, Lansia, Penyandang disabilitas, Ibu hamil, Tidak ingin menyebutkan. | Kecil: enum `VulnerableGroup`, ekspor, filter. |
+| 23 | \[BARU v0.10\] Daftar pilihan kelompok rentan? | Bukan kelompok rentan, Lansia, Penyandang disabilitas, Ibu hamil, Tidak ingin menyebutkan. \[DIUBAH revisi HRD #12\] Kini isi awal tabel `vulnerable_groups` yang dapat diubah Admin (VUL-1). | Tidak ada perubahan kode. |
 | 24 | \[BARU v0.10\] Kategori keperluan per lokasi atau berlaku untuk semua lokasi? | Per lokasi. | Sedang: skema `purpose_categories` dan `AccessScope`. |
 | 25 | \[BARU v0.10\] Satu akun resepsionis boleh memegang lebih dari satu QR? | Ya. | Kecil: validasi QR-2/QR-6. |
 | 26 | \[BARU v0.10\] Satu Bidang/UPT tepat satu akun PIC aktif? | Ya. | Kecil: validasi USR-5. |

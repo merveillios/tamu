@@ -37,7 +37,7 @@
                         <dt class="col-5 text-gray-600 fw-normal">Kategori (lama)</dt><dd class="col-7">{{ $visit->purpose_category_name }}</dd>
                     @endif
                     <dt class="col-5 text-gray-600 fw-normal">Orang yang ditemui</dt><dd class="col-7">{{ $visit->servedBy?->name ?? '–' }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Kelompok rentan</dt><dd class="col-7">{{ $visit->vulnerable_group->label() }}</dd>
+                    <dt class="col-5 text-gray-600 fw-normal">Kelompok rentan</dt><dd class="col-7">{{ $visit->vulnerableGroupLabel() }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Nama lengkap</dt><dd class="col-7">{{ $visit->name }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Instansi/perusahaan</dt><dd class="col-7">{{ $visit->organization }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Telepon/WhatsApp</dt><dd class="col-7">{{ \App\Rules\IndonesianPhone::display($visit->phone) }}</dd>

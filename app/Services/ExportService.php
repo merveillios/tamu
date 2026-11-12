@@ -31,7 +31,7 @@ class ExportService
         'Orang yang Ditemui', 'Status', 'Hasil',
     ];
 
-    private const RELATIONS = ['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name'];
+    private const RELATIONS = ['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name', 'vulnerableGroupOption:code,name'];
 
     /**
      * Lebar maksimal gambar tanda tangan di PDF.
@@ -77,7 +77,7 @@ class ExportService
             $visit->location->name,
             $visit->name,
             $visit->organization,
-            $visit->vulnerable_group->label(),
+            $visit->vulnerableGroupLabel(),
             $visit->purpose,
             IndonesianPhone::display($visit->phone),
             $visit->address,

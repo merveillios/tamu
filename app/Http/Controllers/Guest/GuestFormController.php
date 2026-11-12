@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Guest;
 
-use App\Enums\VulnerableGroup;
+use App\Models\VulnerableGroup;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuestVisitRequest;
 use App\Services\GuestQrResolver;
@@ -39,14 +39,16 @@ class GuestFormController extends Controller
             return redirect()->route('guest.show', $token)->with('error', self::EXPIRED_MESSAGE);
         }
 
+        $profile = $returning->latestProfile($email);
+
         return view('guest.form', [
             'qr' => $qr,
             'location' => $qr->location,
             'email' => $email,
-            'profile' => $returning->latestProfile($email),
+            'profile' => $profile,
             // Tanda tangan cukup sekali; tamu yang sudah punya tanda tangan tidak diminta lagi.
             'needsSignature' => ! $returning->hasSignature($email),
-            'vulnerableGroups' => VulnerableGroup::cases(),
+            'vulnerableGroups' => VulnerableGroup::query()->forGuestForm($profile['vulnerable_group'] ?? null)->get(['code', 'name']),
             'formToken' => $this->guestSession->newFormToken($qr),
         ]);
     }

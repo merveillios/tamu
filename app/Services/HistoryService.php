@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\VisitStatus;
-use App\Enums\VulnerableGroup;
+use App\Models\VulnerableGroup;
 use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\Location;
@@ -84,7 +84,7 @@ class HistoryService
             'locations' => $locations,
             'departments' => Department::query()->whereIn('location_id', $locationIds)
                 ->with('location:id,name')->orderBy('name')->get(['id', 'name', 'location_id']),
-            'vulnerableGroups' => collect(VulnerableGroup::cases()),
+            'vulnerableGroups' => VulnerableGroup::query()->ordered()->get(['code', 'name', 'is_active']),
         ];
     }
 

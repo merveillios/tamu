@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\VulnerableGroup;
 use App\Services\HistoryService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,7 +34,7 @@ class HistoryRequest extends FormRequest
             'status' => ['nullable', Rule::in(array_keys(HistoryService::STATUS_FILTERS))],
             'location_id' => ['nullable', 'integer'],
             'department_id' => ['nullable', 'integer'],
-            'vulnerable_group' => ['nullable', Rule::enum(VulnerableGroup::class)],
+            'vulnerable_group' => ['nullable', 'string', Rule::exists('vulnerable_groups', 'code')],
             // Hanya PDF (revisi HRD #13); tautan lama ?format=csv atau xlsx ditolak, bukan diam-diam diganti.
             'format' => ['nullable', 'in:pdf'],
             'page' => ['nullable', 'integer', 'min:1'],

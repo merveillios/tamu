@@ -63,7 +63,7 @@ class ReturningGuestService
         }
 
         return [
-            'vulnerable_group' => $visit->vulnerable_group->value,
+            'vulnerable_group' => $visit->vulnerable_group,
             'name' => $visit->name,
             'organization' => $visit->organization,
             'phone' => $visit->phone,

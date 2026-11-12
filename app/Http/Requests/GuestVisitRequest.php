@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\VulnerableGroup;
 use App\Models\QrCode;
 use App\Rules\IndonesianPhone;
 use App\Rules\ValidSignatureImage;
@@ -25,6 +24,12 @@ class GuestVisitRequest extends FormRequest
      * True bila tanda tangan diambil dari kunjungan sebelumnya, bukan dari formulir.
      */
     private bool $reusesSignature = false;
+
+    /**
+     * True bila kelompok rentan diambil dari kunjungan tamu lama; kelompok itu tetap
+     * diterima walau sudah dinonaktifkan Admin.
+     */
+    private bool $reusesProfile = false;
 
     /**
      * Formulir tamu tidak memerlukan login.
@@ -58,6 +63,7 @@ class GuestVisitRequest extends FormRequest
 
         if ($profile !== null) {
             $this->merge($profile);
+            $this->reusesProfile = true;
         }
 
         $this->reusesSignature = $returning->hasSignature($email);
@@ -80,7 +86,12 @@ class GuestVisitRequest extends FormRequest
     {
         return [
             'purpose' => ['required', 'string', 'min:3', 'max:500'],
-            'vulnerable_group' => ['required', Rule::enum(VulnerableGroup::class)],
+            'vulnerable_group' => [
+                'required', 'string',
+                $this->reusesProfile
+                    ? Rule::exists('vulnerable_groups', 'code')
+                    : Rule::exists('vulnerable_groups', 'code')->where('is_active', true),
+            ],
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'organization' => ['required', 'string', 'min:2', 'max:150'],
             'phone' => ['required', 'string', 'max:30', new IndonesianPhone()],

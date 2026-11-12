@@ -112,6 +112,7 @@ Setelah instalasi, isi data sesuai urutan PRD Bab 8.1:
 4. **Admin → Pengguna:** buat akun Resepsionis per pos jaga dan satu akun PIC per Bidang/UPT.
 5. **Admin → QR Code:** buat QR untuk tiap titik masuk dan pilih akun resepsionisnya, lalu cetak dan tempel.
 6. **Admin → Petugas:** isi orang yang dapat ditemui di tiap Bidang/UPT. Bidang/UPT baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
+7. **Admin → Kelompok Rentan (opsional):** migrasi sudah mengisi lima pilihan bawaan (Lansia, Penyandang disabilitas, dan Ibu hamil didahulukan di antrean). Ubah nama, prioritas, atau urutannya bila perlu.
 
 ## Backup dan pemulihan
 
@@ -390,6 +391,9 @@ Fitur:
   membuka kunci akun **Resepsionis dan PIC**. Akun Admin dan Super Admin tampil
   di daftar tetapi hanya dapat diubah Super Admin.
 - **Kelola Petugas** di semua lokasi.
+- **Kelola Kelompok Rentan**: menambah, mengubah, menonaktifkan, dan menghapus
+  pilihan kelompok rentan di formulir tamu, serta mengatur prioritas antrean.
+  Kelompok yang sudah dipakai kunjungan hanya dapat dinonaktifkan.
 - **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke PDF sesuai
   filter (tanpa batas baris).
 - **Audit Log** (hanya baca).
