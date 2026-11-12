@@ -2,6 +2,18 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Kategori keperluan dihapus, tamu hanya mengisi Rincian keperluan (revisi HRD #6 dan #7)
+
+- **Konteks:** "Pertanyaan departemen" yang diminta HRD dihapus ternyata adalah kategori keperluan (menu Pertanyaan) yang dikelompokkan per Bidang/UPT di formulir tamu, sehingga revisi #6 dan #7 dikerjakan bersama.
+- **Keputusan:**
+  - Formulir tamu tidak lagi memilih kategori; Rincian keperluan selalu tampil, wajib, dan menjadi field pertama. Input kategori dari browser diabaikan.
+  - Menu, route, controller, request, service, dan halaman kategori keperluan dihapus. Model, tabel `purpose_categories`, dan kolom kategori di `guest_visits` (kini nullable lewat migrasi) dibiarkan agar kunjungan lama tetap utuh; Detail Kunjungan menampilkannya sebagai "Kategori (lama)".
+  - Kunjungan baru tidak punya saran Bidang/UPT. Resepsionis memilih Bidang/UPT dan orang yang ditemui sendiri; modal Tugaskan menampilkan Rincian keperluan lengkap. Ini menjawab pertanyaan HRD nomor 8.
+  - Tamu Aktif, Penugasan PIC, Dashboard Admin, History, dan riwayat tamu menampilkan Rincian keperluan (dipotong 80 karakter di tabel, teks lengkap lewat tooltip dan Detail Kunjungan). Modal Selesai PIC menampilkan Rincian keperluan lengkap di atas isian Hasil.
+  - Filter kategori di History dan kolom Kategori Keperluan di ekspor dihapus.
+  - Syarat QR dapat dipakai tamu (TAM-6) diganti dari "minimal satu kategori keperluan aktif" menjadi "minimal satu Bidang/UPT aktif", karena tanpa Bidang/UPT kunjungan tidak dapat ditugaskan.
+- **Alasan:** Tamu sering tidak tahu kategori yang tepat; rincian bebas lebih jelas bagi resepsionis yang menentukan tujuan.
+
 ## 2026-11-12 — Nomor urut tidak ditampilkan (revisi HRD #5)
 
 - **Konteks:** HRD meminta nomor urut dihapus dari semua tampilan. Pertanyaan apakah kolomnya boleh dihapus dari database belum dijawab.

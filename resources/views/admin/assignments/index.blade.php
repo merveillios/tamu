@@ -31,7 +31,7 @@
                                 <th class="border-gray-200">Nama</th>
                                 <th class="border-gray-200">Instansi</th>
                                 <th class="border-gray-200">Kelompok rentan</th>
-                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Rincian keperluan</th>
                                 <th class="border-gray-200">Orang yang ditemui</th>
                                 <th class="border-gray-200">Lokasi</th>
                                 <th class="border-gray-200">Jam datang</th>
@@ -63,7 +63,7 @@
                             <tr>
                                 <th class="border-gray-200">Nama</th>
                                 <th class="border-gray-200">Instansi</th>
-                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Rincian keperluan</th>
                                 <th class="border-gray-200">Orang yang ditemui</th>
                                 <th class="border-gray-200">Jam selesai</th>
                                 <th class="border-gray-200">Hasil</th>
@@ -90,6 +90,8 @@
                 </div>
                 <div class="modal-body">
                     <p class="small text-gray-600" data-complete-guest></p>
+                    <p class="small fw-bold mb-1">Rincian keperluan tamu</p>
+                    <p class="small border rounded p-2 text-break text-pre-line" data-complete-purpose></p>
                     <label for="complete_result" class="form-label">Hasil</label>
                     <textarea id="complete_result" name="result" class="form-control" rows="5" maxlength="2000" required
                               aria-describedby="complete_result_help"></textarea>

@@ -51,17 +51,6 @@
                 </div>
             @endif
             <div class="col-6 col-lg-3">
-                <label for="purpose_category_id" class="form-label small mb-1">Kategori keperluan</label>
-                <select name="purpose_category_id" id="purpose_category_id" class="form-select">
-                    <option value="">Semua kategori</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}" @selected((int) ($filters['purpose_category_id'] ?? 0) === $category->id)>
-                            {{ $category->name }}{{ $locations->count() > 1 ? ' — '.$category->location->name : '' }}{{ $category->is_active ? '' : ' (nonaktif)' }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-6 col-lg-3">
                 <label for="department_id" class="form-label small mb-1">Bidang/UPT tujuan</label>
                 <select name="department_id" id="department_id" class="form-select">
                     <option value="">Semua Bidang/UPT</option>
@@ -109,7 +98,7 @@
                         <th class="border-gray-200">Nama</th>
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
-                        <th class="border-gray-200">Kategori</th>
+                        <th class="border-gray-200">Rincian keperluan</th>
                         <th class="border-gray-200">Bidang/UPT tujuan</th>
                         <th class="border-gray-200">Lokasi</th>
                         <th class="border-gray-200">Jam datang</th>
@@ -124,7 +113,7 @@
                             <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
                             <td data-label="Instansi">{{ $visit->organization }}</td>
                             <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
-                            <td data-label="Kategori">{{ $visit->purpose_category_name }}</td>
+                            <td data-label="Rincian keperluan" class="small text-break" title="{{ $visit->purpose }}">{{ \Illuminate\Support\Str::limit($visit->purpose, 80) }}</td>
                             <td data-label="Bidang/UPT">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
                             <td data-label="Lokasi">{{ $visit->location->name }}</td>
                             <td data-label="Jam datang">{{ $visit->check_in_at->format('H:i') }}</td>

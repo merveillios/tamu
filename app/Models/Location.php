@@ -42,14 +42,6 @@ class Location extends Model
     }
 
     /**
-     * Kategori keperluan yang tampil di formulir tamu lokasi ini.
-     */
-    public function purposeCategories(): HasMany
-    {
-        return $this->hasMany(PurposeCategory::class);
-    }
-
-    /**
      * Kunjungan yang tercatat di lokasi ini.
      */
     public function guestVisits(): HasMany

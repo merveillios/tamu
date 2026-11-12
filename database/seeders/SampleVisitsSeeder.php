@@ -7,7 +7,6 @@ use App\Enums\VulnerableGroup;
 use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\Location;
-use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\StaffMember;
 use App\Models\User;
@@ -37,11 +36,10 @@ class SampleVisitsSeeder extends Seeder
         $qr = QrCode::where('location_id', $location->id)->first();
         $receptionist = User::where('email', 'resepsionis@sitamu.test')->first();
         $picSekretariat = User::where('email', 'pic.sekretariat@sitamu.test')->first();
-        $categories = PurposeCategory::where('location_id', $location->id)->get()->keyBy('name');
         $departments = Department::where('location_id', $location->id)->get()->keyBy('name');
         $staff = StaffMember::query()->get()->keyBy('name');
 
-        $visits = $this->visitDefinitions($location, $qr, $categories, $departments);
+        $visits = $this->visitDefinitions($location, $qr, $departments);
 
         foreach ($visits as $index => $definition) {
             $this->createVisit($definition, $index + 1, $receptionist, $picSekretariat, $staff);
@@ -56,7 +54,7 @@ class SampleVisitsSeeder extends Seeder
      *
      * @return array<int, array<string, mixed>>
      */
-    private function visitDefinitions(Location $location, ?QrCode $qr, $categories, $departments): array
+    private function visitDefinitions(Location $location, ?QrCode $qr, $departments): array
     {
         $now = now();
 
@@ -71,7 +69,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Kenanga No. 12, Surabaya',
                 'email' => 'hartono.wijaya@example.com',
                 'vulnerable_group' => VulnerableGroup::Elderly,
-                'category' => 'Konsultasi perdagangan',
                 'purpose' => 'Konsultasi izin usaha perdagangan untuk pensiunan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => null,
@@ -84,7 +81,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Mawar No. 5, Sidoarjo',
                 'email' => 'sari.melati@example.com',
                 'vulnerable_group' => VulnerableGroup::Pregnant,
-                'category' => 'Surat-menyurat',
                 'purpose' => 'Pengurusan surat keterangan usaha.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => 'Sekretariat',
@@ -97,7 +93,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Anggrek No. 21, Gresik',
                 'email' => 'bambang.riyanto@example.com',
                 'vulnerable_group' => VulnerableGroup::Disability,
-                'category' => 'Konsultasi industri',
                 'purpose' => 'Konsultasi pengembangan industri rumah tangga.',
                 'status' => VisitStatus::Processing,
                 'assigned_department' => 'Bidang Industri Agro',
@@ -114,7 +109,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Basuki Rahmat No. 88, Surabaya',
                 'email' => 'dedi.kurniawan@example.com',
                 'vulnerable_group' => VulnerableGroup::None,
-                'category' => 'Konsultasi perdagangan',
                 'purpose' => 'Konsultasi ekspor produk kerajinan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => 'Bidang Perdagangan Dalam Negeri',
@@ -127,7 +121,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Diponegoro No. 45, Surabaya',
                 'email' => 'laila.fitriani@example.com',
                 'vulnerable_group' => VulnerableGroup::None,
-                'category' => 'Surat-menyurat',
                 'purpose' => 'Penyerahan proposal kerja sama koperasi.',
                 'status' => VisitStatus::Processing,
                 'assigned_department' => 'Sekretariat',
@@ -140,7 +133,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Raya Darmo No. 3, Surabaya',
                 'email' => 'rudi.hartanto@example.com',
                 'vulnerable_group' => VulnerableGroup::None,
-                'category' => 'Lainnya',
                 'purpose' => 'Koordinasi program pemberdayaan desa.',
                 'status' => VisitStatus::Completed,
                 'assigned_department' => 'Sekretariat',
@@ -154,7 +146,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Pahlawan No. 7, Mojokerto',
                 'email' => 'nina.kurniasih@example.com',
                 'vulnerable_group' => VulnerableGroup::None,
-                'category' => 'Konsultasi industri',
                 'purpose' => 'Pendaftaran program pelatihan industri.',
                 'status' => VisitStatus::Cancelled,
                 'assigned_department' => null,
@@ -168,7 +159,6 @@ class SampleVisitsSeeder extends Seeder
                 'address' => 'Jl. Gubernur Suryo No. 15, Surabaya',
                 'email' => 'joko.susilo@example.com',
                 'vulnerable_group' => VulnerableGroup::Undisclosed,
-                'category' => 'Konsultasi perdagangan',
                 'purpose' => 'Konsultasi sertifikasi produk perdagangan.',
                 'status' => VisitStatus::Waiting,
                 'assigned_department' => null,
@@ -186,8 +176,6 @@ class SampleVisitsSeeder extends Seeder
     {
         $location = Location::where('name', 'Kantor Dinas Jl. Ahmad Yani')->first();
         $qr = QrCode::where('location_id', $location->id)->first();
-        $category = PurposeCategory::where('location_id', $location->id)
-            ->where('name', $data['category'])->first();
         $assignedDept = $data['assigned_department']
             ? Department::where('location_id', $location->id)->where('name', $data['assigned_department'])->first()
             : null;
@@ -201,9 +189,6 @@ class SampleVisitsSeeder extends Seeder
                 'daily_number' => $dailyNumber,
                 'email' => $data['email'],
                 'email_verified_at' => $data['check_in_at'],
-                'purpose_category_id' => $category?->id,
-                'purpose_category_name' => $data['category'],
-                'suggested_department_id' => $category?->suggested_department_id,
                 'purpose' => $data['purpose'],
                 'vulnerable_group' => $data['vulnerable_group'],
                 'name' => $data['name'],

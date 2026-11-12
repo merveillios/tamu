@@ -79,12 +79,6 @@ class GuestVisitRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'purpose_category_id' => [
-                'required', 'integer',
-                Rule::exists('purpose_categories', 'id')
-                    ->where('location_id', $this->qr()->location_id)
-                    ->where('is_active', true),
-            ],
             'purpose' => ['required', 'string', 'min:3', 'max:500'],
             'vulnerable_group' => ['required', Rule::enum(VulnerableGroup::class)],
             'name' => ['required', 'string', 'min:2', 'max:100'],
@@ -105,7 +99,6 @@ class GuestVisitRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'purpose_category_id.*' => 'Pilih kategori keperluan.',
             'purpose.*' => 'Rincian keperluan wajib diisi (3–500 karakter).',
             'vulnerable_group.*' => 'Pilih kelompok rentan.',
             'name.*' => 'Nama lengkap wajib diisi (2–100 karakter).',

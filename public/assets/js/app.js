@@ -88,7 +88,21 @@ window.SiTamu = (function () {
         return element;
     }
 
-    return { request: request, toast: toast, el: el };
+    /**
+     * Potongan teks panjang untuk sel tabel agar tabel tidak melebar; teks lengkap
+     * tetap terbaca lewat tooltip dan halaman Detail Kunjungan.
+     */
+    function excerpt(text, max) {
+        var full = text || '';
+        var limit = max || 80;
+        var element = el('span', null, full.length > limit ? full.slice(0, limit).trimEnd() + '…' : full);
+
+        element.title = full;
+
+        return element;
+    }
+
+    return { request: request, toast: toast, el: el, excerpt: excerpt };
 })();
 
 document.addEventListener('DOMContentLoaded', function () {

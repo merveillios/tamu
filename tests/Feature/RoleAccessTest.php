@@ -34,7 +34,6 @@ class RoleAccessTest extends TestCase
             'lokasi' => ['/admin/lokasi', [UserRole::SuperAdmin, UserRole::Admin]],
             'tambah lokasi' => ['/admin/lokasi/tambah', [UserRole::SuperAdmin, UserRole::Admin]],
             'qr code' => ['/admin/qr', [UserRole::SuperAdmin, UserRole::Admin]],
-            'kategori keperluan' => ['/admin/kategori-keperluan', [UserRole::SuperAdmin, UserRole::Admin]],
             'petugas' => ['/admin/petugas', [UserRole::SuperAdmin, UserRole::Admin]],
         ];
     }
@@ -52,6 +51,15 @@ class RoleAccessTest extends TestCase
             $response = $this->actingAs(User::factory()->role($role)->create())->get($uri);
 
             in_array($role, $allowed, true) ? $response->assertOk() : $response->assertForbidden();
+        }
+    }
+
+    public function test_purpose_category_pages_are_removed(): void
+    {
+        $admin = User::factory()->role(UserRole::Admin)->create();
+
+        foreach (['/admin/kategori-keperluan', '/admin/kategori-keperluan/tambah'] as $uri) {
+            $this->actingAs($admin)->get($uri)->assertNotFound();
         }
     }
 

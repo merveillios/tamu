@@ -31,8 +31,11 @@
                 <h3 class="h6 mb-3">Data tamu</h3>
                 <dl class="row small mb-0">
                     <dt class="col-5 text-gray-600 fw-normal">Email</dt><dd class="col-7 text-break">{{ $visit->email }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Kategori keperluan</dt><dd class="col-7">{{ $visit->purpose_category_name }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Rincian keperluan</dt><dd class="col-7 text-break">{{ $visit->purpose }}</dd>
+                    <dt class="col-5 text-gray-600 fw-normal">Rincian keperluan</dt><dd class="col-7 text-break text-pre-line">{{ $visit->purpose }}</dd>
+                    @if ($visit->purpose_category_name)
+                        {{-- Kategori hanya ada pada kunjungan sebelum kategori keperluan dihapus dari formulir. --}}
+                        <dt class="col-5 text-gray-600 fw-normal">Kategori (lama)</dt><dd class="col-7">{{ $visit->purpose_category_name }}</dd>
+                    @endif
                     <dt class="col-5 text-gray-600 fw-normal">Orang yang ditemui</dt><dd class="col-7">{{ $visit->servedBy?->name ?? '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Kelompok rentan</dt><dd class="col-7">{{ $visit->vulnerable_group->label() }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Nama lengkap</dt><dd class="col-7">{{ $visit->name }}</dd>
@@ -61,7 +64,9 @@
                 <dl class="row small mb-0">
                     <dt class="col-5 text-gray-600 fw-normal">Lokasi</dt><dd class="col-7">{{ $visit->location->name }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">QR</dt><dd class="col-7">{{ $visit->qrCode->label ?? 'QR #'.$visit->qr_code_id }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Saran Bidang/UPT</dt><dd class="col-7">{{ $visit->suggestedDepartment?->name ?? '–' }}</dd>
+                    @if ($visit->suggestedDepartment)
+                        <dt class="col-5 text-gray-600 fw-normal">Saran Bidang/UPT</dt><dd class="col-7">{{ $visit->suggestedDepartment->name }}</dd>
+                    @endif
                     <dt class="col-5 text-gray-600 fw-normal">Bidang/UPT tujuan</dt><dd class="col-7">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Diterima PIC</dt>
                     <dd class="col-7">{{ $visit->processedBy ? $visit->processedBy->name.' · '.$datetime($visit->processed_at) : '–' }}</dd>

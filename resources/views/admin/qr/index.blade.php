@@ -19,7 +19,7 @@
                     <select name="location_id" id="location_id" class="form-select" required data-qr-location>
                         <option value="">Pilih lokasi</option>
                         @foreach ($locations as $location)
-                            <option value="{{ $location->id }}" data-departments="{{ $departmentCounts->get($location->id, 0) }}" data-categories="{{ $categoryCounts->get($location->id, 0) }}"
+                            <option value="{{ $location->id }}" data-departments="{{ $departmentCounts->get($location->id, 0) }}"
                                     @selected((int) old('location_id', $selected?->id) === $location->id)>
                                 {{ $location->name }}@unless ($location->is_active) (nonaktif)@endunless
                             </option>
@@ -45,8 +45,7 @@
             </div>
             {{-- Peringatan saja: QR tetap boleh dibuat dan dicetak lebih dulu. --}}
             <div class="alert alert-warning small mt-3 mb-0" role="status" data-qr-location-warning hidden>
-                <span data-warning="no-department">Lokasi ini belum punya Bidang/UPT aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai Bidang/UPT ditambahkan di menu Lokasi dan kategori keperluan di menu Pertanyaan.</span>
-                <span data-warning="no-category">Lokasi ini belum punya kategori keperluan aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai kategori ditambahkan di menu Pertanyaan.</span>
+                Lokasi ini belum punya Bidang/UPT aktif. QR tetap bisa dibuat, tetapi belum dapat dipakai tamu sampai Bidang/UPT ditambahkan di menu Lokasi.
             </div>
             @if ($receptionists->isEmpty())
                 <p class="small text-danger mt-2 mb-0">Belum ada akun resepsionis aktif. Buat dulu di menu Pengguna.</p>

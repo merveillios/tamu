@@ -7,7 +7,6 @@ use App\Enums\VisitStatus;
 use App\Exceptions\VisitActionException;
 use App\Models\Department;
 use App\Models\GuestVisit;
-use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\StaffMember;
 use App\Models\User;
@@ -46,18 +45,20 @@ class VisitService
      * Menyimpan kunjungan dari formulir tamu dalam satu transaksi (TAM-4):
      * nomor urut, kunjungan, tanda tangan, log status awal, lalu last_used_at QR.
      *
-     * @param  array<string, mixed>  $data  data tervalidasi: kategori, rincian, data diri
+     * Kunjungan baru tidak lagi memiliki kategori keperluan maupun saran Bidang/UPT;
+     * resepsionis memilih Bidang/UPT dari Rincian keperluan (revisi HRD #6 dan #7).
+     *
+     * @param  array<string, mixed>  $data  data tervalidasi: rincian keperluan dan data diri
      */
     public function recordGuestVisit(
         QrCode $qr,
-        PurposeCategory $category,
         array $data,
         string $email,
         Carbon $emailVerifiedAt,
         string $signaturePng,
         ?string $ipAddress,
     ): GuestVisit {
-        return DB::transaction(function () use ($qr, $category, $data, $email, $emailVerifiedAt, $signaturePng, $ipAddress) {
+        return DB::transaction(function () use ($qr, $data, $email, $emailVerifiedAt, $signaturePng, $ipAddress) {
             $now = now();
             $visitDate = $now->toDateString();
 
@@ -68,9 +69,6 @@ class VisitService
                 'daily_number' => $this->nextDailyNumber($qr->location_id, $visitDate),
                 'email' => $email,
                 'email_verified_at' => $emailVerifiedAt,
-                'purpose_category_id' => $category->id,
-                'purpose_category_name' => $category->name,
-                'suggested_department_id' => $category->suggested_department_id,
                 'purpose' => $data['purpose'],
                 'vulnerable_group' => $data['vulnerable_group'],
                 'name' => $data['name'],

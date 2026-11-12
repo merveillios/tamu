@@ -43,7 +43,7 @@ class HistoryExportTest extends TestCase
         $png = base64_decode(substr($this->signatureDataUrl(), strlen('data:image/png;base64,')));
         VisitSignature::create(['visit_id' => $completed->id, 'image' => $png, 'size_bytes' => strlen($png), 'sha256' => hash('sha256', $png)]);
 
-        $this->data = compact('locationA', 'locationB', 'categoryB', 'departmentA') + [
+        $this->data = compact('locationA', 'locationB', 'departmentA') + [
             'admin' => $this->createAdmin(),
             'superAdmin' => $this->createUser(UserRole::SuperAdmin),
         ];
@@ -86,9 +86,7 @@ class HistoryExportTest extends TestCase
             ->assertOk()
             ->assertSee('Tamu Lokasi B')
             ->assertDontSee('Tamu Selesai');
-        $this->actingAs($admin)->get('/admin/history?purpose_category_id='.$this->data['categoryB']->id)->assertOk();
         $this->actingAs($admin)->get('/admin/history?location_id=999999')->assertNotFound();
-        $this->actingAs($admin)->get('/admin/history?purpose_category_id=999999')->assertNotFound();
     }
 
     public function test_csv_export_is_guarded_and_audited(): void
@@ -122,7 +120,7 @@ class HistoryExportTest extends TestCase
         $sheet = IOFactory::load($path)->getActiveSheet();
         unlink($path);
 
-        $this->assertSame('Tanda Tangan', $sheet->getCell('P1')->getValue());
+        $this->assertSame('Tanda Tangan', $sheet->getCell('O1')->getValue());
         $names = [$sheet->getCell('D2')->getValue(), $sheet->getCell('D3')->getValue(), $sheet->getCell('D4')->getValue()];
         $this->assertContains('=HYPERLINK("http://jahat.test")', $names);
         $this->assertSame('s', $sheet->getCell('D'.(array_search('=HYPERLINK("http://jahat.test")', $names) + 2))->getDataType());

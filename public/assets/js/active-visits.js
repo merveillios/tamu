@@ -98,8 +98,7 @@
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
-        tr.appendChild(cell('Keperluan', row.category));
-        tr.appendChild(cell('Bidang/UPT', row.suggested_department));
+        tr.appendChild(cell('Rincian keperluan', SiTamu.excerpt(row.purpose), 'small text-break'));
         tr.appendChild(cell('Nama PIC', assigned));
 
         if (showLocation) {
@@ -125,7 +124,7 @@
 
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
-        tr.appendChild(cell('Keperluan', row.category));
+        tr.appendChild(cell('Rincian keperluan', SiTamu.excerpt(row.purpose), 'small text-break'));
         tr.appendChild(cell('Bidang/UPT', assigned));
         tr.appendChild(cell('Status', badge));
         tr.appendChild(cell('Jam ditutup', row.closed_at));
@@ -172,7 +171,7 @@
         if (data.rows.length === 0) {
             var empty = el('tr');
             var td = el('td', 'text-center text-gray-600 py-4', 'Tidak ada tamu aktif.');
-            td.colSpan = 10;
+            td.colSpan = 9;
             empty.appendChild(td);
             tbody.appendChild(empty);
         }
@@ -295,7 +294,8 @@
     function openAssign(row) {
         currentVisit = row;
         showModalError(assignForm, '');
-        assignForm.querySelector('[data-assign-guest]').textContent = row.name + ' · ' + row.category;
+        assignForm.querySelector('[data-assign-guest]').textContent = row.name;
+        assignForm.querySelector('[data-assign-purpose]').textContent = row.purpose;
 
         SiTamu.request(actionUrl(table.dataset.departmentsUrl, row.id)).then(function (result) {
             if (!result.body.ok) {

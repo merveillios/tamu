@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
-use App\Http\Controllers\Admin\PurposeCategoryController;
 use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
@@ -109,13 +108,6 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
 
         Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
         Route::get('/history/export', [HistoryController::class, 'export'])->name('history.export');
-
-        Route::get('/kategori-keperluan', [PurposeCategoryController::class, 'index'])->name('categories.index');
-        Route::get('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'create'])->name('categories.create');
-        Route::post('/kategori-keperluan/tambah', [PurposeCategoryController::class, 'store'])->name('categories.store');
-        Route::get('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'edit'])->whereNumber('id')->name('categories.edit');
-        Route::post('/kategori-keperluan/{id}/ubah', [PurposeCategoryController::class, 'update'])->whereNumber('id')->name('categories.update');
-        Route::post('/kategori-keperluan/{id}/status', [PurposeCategoryController::class, 'toggleStatus'])->whereNumber('id')->name('categories.status');
 
         Route::get('/petugas', [StaffMemberController::class, 'index'])->name('staff.index');
         Route::get('/petugas/tambah', [StaffMemberController::class, 'create'])->name('staff.create');

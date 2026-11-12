@@ -7,13 +7,12 @@
  * mulai yang sama, lalu menjalankan satu aksi agar benar-benar berbarengan dengan proses lain.
  *
  * Pemakaian:
- *   php tests/Support/concurrent-worker.php record <waktu_mulai> <qr_id> <kategori_id> <email>
+ *   php tests/Support/concurrent-worker.php record <waktu_mulai> <qr_id> <email>
  *   php tests/Support/concurrent-worker.php accept <waktu_mulai> <kunjungan_id> <pic_id>
  */
 
 use App\Exceptions\VisitActionException;
 use App\Models\GuestVisit;
-use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\User;
 use App\Services\VisitService;
@@ -33,7 +32,7 @@ while (microtime(true) < (float) $startAt) {
 $visits = app(VisitService::class);
 
 if ($mode === 'record') {
-    [, , , $qrId, $categoryId, $email] = $argv;
+    [, , , $qrId, $email] = $argv;
 
     $image = imagecreatetruecolor(300, 120);
     imagefill($image, 0, 0, imagecolorallocate($image, 255, 255, 255));
@@ -44,7 +43,6 @@ if ($mode === 'record') {
 
     $visit = $visits->recordGuestVisit(
         QrCode::findOrFail($qrId),
-        PurposeCategory::findOrFail($categoryId),
         [
             'purpose' => 'Uji kiriman bersamaan',
             'vulnerable_group' => 'bukan',

@@ -11,7 +11,6 @@
         ['label' => 'History', 'path' => 'admin/history', 'icon' => 'clock', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Lokasi', 'path' => 'admin/lokasi', 'icon' => 'location', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'QR Code', 'path' => 'admin/qr', 'icon' => 'qrcode', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
-        ['label' => 'Pertanyaan', 'path' => 'admin/kategori-keperluan', 'icon' => 'tag', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Petugas', 'path' => 'admin/petugas', 'icon' => 'identification', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Pengguna', 'path' => 'admin/pengguna', 'icon' => 'users', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Audit Log', 'path' => 'admin/audit-log', 'icon' => 'document-text', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],

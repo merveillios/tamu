@@ -14,7 +14,8 @@ trait InteractsWithGuestPages
     use CreatesSitamuData;
 
     /**
-     * Membuat QR aktif beserta satu kategori aktif di lokasinya.
+     * Membuat QR aktif di lokasi yang punya satu Bidang/UPT aktif, beserta satu kategori
+     * untuk membuat kunjungan lama lewat createVisit(); formulir tamu tidak lagi memakainya.
      *
      * @return array{0: QrCode, 1: PurposeCategory}
      */
@@ -73,11 +74,10 @@ trait InteractsWithGuestPages
      *
      * @return array<string, mixed>
      */
-    protected function guestPayload(PurposeCategory $category, string $formToken, array $overrides = []): array
+    protected function guestPayload(string $formToken, array $overrides = []): array
     {
         return array_merge([
             'form_token' => $formToken,
-            'purpose_category_id' => $category->id,
             'purpose' => 'Konsultasi perizinan perdagangan',
             'vulnerable_group' => 'bukan',
             'name' => 'Siti Aminah',

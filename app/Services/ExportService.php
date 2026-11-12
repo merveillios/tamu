@@ -31,7 +31,7 @@ class ExportService
      */
     public const COLUMNS = [
         'No.', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
-        'Kategori Keperluan', 'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Bidang/UPT Tujuan',
+        'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Bidang/UPT Tujuan',
         'Orang yang Ditemui', 'Status', 'Hasil',
     ];
 
@@ -86,7 +86,7 @@ class ExportService
     }
 
     /**
-     * Nilai 15 kolom untuk satu kunjungan. Kolom pertama adalah nomor baris di file
+     * Nilai 14 kolom untuk satu kunjungan. Kolom pertama adalah nomor baris di file
      * ekspor, bukan nomor urut kunjungan yang tidak lagi ditampilkan (revisi HRD #5).
      *
      * @return array<int, string>
@@ -100,7 +100,6 @@ class ExportService
             $visit->name,
             $visit->organization,
             $visit->vulnerable_group->label(),
-            $visit->purpose_category_name,
             $visit->purpose,
             IndonesianPhone::display($visit->phone),
             $visit->address,
@@ -149,7 +148,7 @@ class ExportService
         $columns = array_merge(self::COLUMNS, ['Tanda Tangan']);
 
         $sheet->fromArray($columns, null, 'A1');
-        $sheet->getStyle('A1:P1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:O1')->getFont()->setBold(true);
         $sheet->freezePane('A2');
 
         $rowNumber = 2;
@@ -168,16 +167,16 @@ class ExportService
             }
         }
 
-        foreach (['H', 'J', 'O'] as $longTextColumn) {
+        foreach (['G', 'I', 'N'] as $longTextColumn) {
             $sheet->getStyle("{$longTextColumn}2:{$longTextColumn}{$rowNumber}")->getAlignment()->setWrapText(true);
             $sheet->getColumnDimension($longTextColumn)->setWidth(40);
         }
 
-        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'I', 'K', 'L', 'M', 'N'] as $column) {
+        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'H', 'J', 'K', 'L', 'M'] as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        $sheet->getColumnDimension('P')->setWidth(25);
+        $sheet->getColumnDimension('O')->setWidth(25);
 
         return response()->streamDownload(function () use ($spreadsheet) {
             (new Xlsx($spreadsheet))->save('php://output');
@@ -266,7 +265,7 @@ class ExportService
     }
 
     /**
-     * Menyisipkan gambar tanda tangan di kolom P baris tertentu.
+     * Menyisipkan gambar tanda tangan di kolom O baris tertentu.
      */
     private function addSignatureImage(Worksheet $sheet, ?string $png, int $rowNumber): void
     {
@@ -275,7 +274,7 @@ class ExportService
         }
 
         $drawing = MemoryDrawing::fromString($png);
-        $drawing->setCoordinates("P{$rowNumber}");
+        $drawing->setCoordinates("O{$rowNumber}");
         $drawing->setOffsetX(4);
         $drawing->setOffsetY(4);
         $drawing->setWorksheet($sheet);

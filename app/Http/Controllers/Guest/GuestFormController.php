@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Guest;
 use App\Enums\VulnerableGroup;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuestVisitRequest;
-use App\Models\PurposeCategory;
 use App\Services\GuestQrResolver;
 use App\Services\GuestSessionService;
 use App\Services\ReturningGuestService;
@@ -47,14 +46,6 @@ class GuestFormController extends Controller
             'profile' => $returning->latestProfile($email),
             // Tanda tangan cukup sekali; tamu yang sudah punya tanda tangan tidak diminta lagi.
             'needsSignature' => ! $returning->hasSignature($email),
-            // Pilihan keperluan dikelompokkan per departemen; nama departemen menjadi judul grup.
-            'categoryGroups' => PurposeCategory::groupByDepartment(PurposeCategory::query()
-                ->where('location_id', $qr->location_id)
-                ->where('is_active', true)
-                ->with('suggestedDepartment:id,name,is_active')
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->get(['id', 'name', 'suggested_department_id'])),
             'vulnerableGroups' => VulnerableGroup::cases(),
             'formToken' => $this->guestSession->newFormToken($qr),
         ]);
@@ -98,7 +89,6 @@ class GuestFormController extends Controller
 
         $visit = $visits->recordGuestVisit(
             $qr,
-            PurposeCategory::findOrFail($data['purpose_category_id']),
             $data,
             $email,
             $this->guestSession->verifiedAt($qr) ?? now(),

@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\QrRequest;
 use App\Models\Department;
 use App\Models\Location;
-use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\User;
 use App\Services\AccessScope;
@@ -54,8 +53,8 @@ class QrController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        // Jumlah per lokasi untuk peringatan di form buat QR dan status "Belum siap" di daftar.
-        $categoryCounts = $this->activeCountsPerLocation(PurposeCategory::query()->forUser($user));
+        // Jumlah Bidang/UPT aktif per lokasi untuk peringatan di form buat QR dan status "Belum siap" di daftar.
+        $departmentCounts = $this->activeCountsPerLocation(Department::query()->forUser($user));
 
         return view('admin.qr.index', [
             'locations' => Location::query()->forUser($user)->orderBy('name')->get(['id', 'name', 'is_active']),
@@ -63,11 +62,10 @@ class QrController extends Controller
             'qrCodes' => $qrCodes,
             'blockers' => $qrCodes->getCollection()->mapWithKeys(fn (QrCode $qr) => [
                 $qr->id => $qr->status === QrStatus::Active
-                    ? $this->resolver->blockers($qr, $categoryCounts->get($qr->location_id, 0) > 0)
+                    ? $this->resolver->blockers($qr, $departmentCounts->get($qr->location_id, 0) > 0)
                     : [],
             ]),
-            'departmentCounts' => $this->activeCountsPerLocation(Department::query()->forUser($user)),
-            'categoryCounts' => $categoryCounts,
+            'departmentCounts' => $departmentCounts,
             'receptionists' => User::query()
                 ->where('role', UserRole::Receptionist)
                 ->where('is_active', true)
@@ -77,9 +75,9 @@ class QrController extends Controller
     }
 
     /**
-     * Membuat QR baru untuk lokasi terpilih (QR-2). Lokasi tanpa kategori keperluan aktif
-     * tetap boleh dibuatkan QR agar bisa dicetak lebih dulu, disertai catatan bahwa
-     * QR belum dapat dipakai tamu (TAM-6).
+     * Membuat QR baru untuk lokasi terpilih (QR-2). Lokasi tanpa Bidang/UPT aktif tetap
+     * boleh dibuatkan QR agar bisa dicetak lebih dulu, disertai catatan bahwa QR belum
+     * dapat dipakai tamu (TAM-6).
      */
     public function store(QrRequest $request): RedirectResponse
     {
@@ -90,8 +88,8 @@ class QrController extends Controller
 
         $message = "QR Code baru untuk {$location->name} berhasil dibuat.";
 
-        if (! $location->purposeCategories()->where('is_active', true)->exists()) {
-            $message .= ' QR belum dapat dipakai tamu sampai lokasi ini punya kategori keperluan aktif.';
+        if (! $location->departments()->where('is_active', true)->exists()) {
+            $message .= ' QR belum dapat dipakai tamu sampai lokasi ini punya Bidang/UPT aktif.';
         }
 
         return redirect()->route('admin.qr.index', ['lokasi' => $location->id])->with('success', $message);

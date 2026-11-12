@@ -112,9 +112,6 @@
 
     function renderRow(row) {
         var tr = el('tr');
-        var purpose = el('div');
-        purpose.appendChild(el('div', 'fw-bold', row.category));
-        purpose.appendChild(el('div', 'small text-gray-600 text-break', row.purpose));
 
         if (knownIds && !knownIds.has(row.id)) {
             tr.classList.add('row-new');
@@ -127,7 +124,7 @@
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
-        tr.appendChild(cell('Keperluan', purpose));
+        tr.appendChild(cell('Rincian keperluan', SiTamu.excerpt(row.purpose), 'small text-break'));
         tr.appendChild(cell('Ditemui', row.served_by));
         tr.appendChild(cell('Lokasi', row.location));
         tr.appendChild(cell('Jam datang', row.check_in));
@@ -139,16 +136,13 @@
 
     function renderCompletedRow(row) {
         var tr = el('tr');
-        var purpose = el('div');
-        purpose.appendChild(el('div', 'fw-bold', row.category));
-        purpose.appendChild(el('div', 'small text-gray-600 text-break', row.purpose));
 
         var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
         detail.href = row.detail_url;
 
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
-        tr.appendChild(cell('Keperluan', purpose));
+        tr.appendChild(cell('Rincian keperluan', SiTamu.excerpt(row.purpose), 'small text-break'));
         tr.appendChild(cell('Ditemui', row.served_by));
         tr.appendChild(cell('Jam selesai', row.completed_at));
         tr.appendChild(cell('Hasil', row.result_excerpt, 'small text-break'));
@@ -253,7 +247,8 @@
         currentVisit = row;
         form.reset();
         showError('');
-        form.querySelector('[data-complete-guest]').textContent = row.name + ' · ' + row.category;
+        form.querySelector('[data-complete-guest]').textContent = row.name;
+        form.querySelector('[data-complete-purpose]').textContent = row.purpose;
         bootstrap.Modal.getOrCreateInstance(modalElement).show();
     }
 

@@ -41,7 +41,7 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
    php artisan sitamu:create-superadmin
    ```
 
-   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, Bidang/UPT, petugas, kategori, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
+   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, Bidang/UPT, petugas, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
 
    ```bash
    php artisan migrate:fresh --seed
@@ -108,11 +108,10 @@ Setelah instalasi, isi data sesuai urutan PRD Bab 8.1:
 
 1. **Super Admin → Pengguna:** buat akun Admin. Langkah berikutnya dikerjakan Admin; Super Admin hanya dipakai saat darurat.
 2. **Admin → Lokasi:** buat setiap lokasi atau gedung.
-3. **Admin → Lokasi → Bidang/UPT:** buat Bidang/UPT di tiap lokasi.
+3. **Admin → Lokasi → Bidang/UPT:** buat Bidang/UPT di tiap lokasi. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu Bidang/UPT aktif.
 4. **Admin → Pengguna:** buat akun Resepsionis per pos jaga dan satu akun PIC per Bidang/UPT.
 5. **Admin → QR Code:** buat QR untuk tiap titik masuk dan pilih akun resepsionisnya, lalu cetak dan tempel.
-6. **Admin → Pertanyaan (kategori keperluan):** isi kategori tiap lokasi beserta saran Bidang/UPT-nya. Halaman tamu baru bisa dibuka setelah lokasi punya minimal satu kategori aktif.
-7. **Admin → Petugas:** isi orang yang dapat ditemui di tiap Bidang/UPT. Bidang/UPT baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
+6. **Admin → Petugas:** isi orang yang dapat ditemui di tiap Bidang/UPT. Bidang/UPT baru muncul di pilihan penugasan bila memiliki akun PIC aktif dan minimal satu petugas aktif.
 
 ## Backup dan pemulihan
 
@@ -267,8 +266,8 @@ kembali di riwayat tamu.
 ### Alur Utama Kunjungan
 
 1. **Admin menyiapkan data awal** — membuat lokasi, Bidang/UPT di tiap
-   lokasi, akun Resepsionis dan satu akun PIC per Bidang/UPT, kategori
-   keperluan, petugas yang dapat ditemui, dan QR Code untuk tiap titik masuk.
+   lokasi, akun Resepsionis dan satu akun PIC per Bidang/UPT, petugas yang dapat
+   ditemui, dan QR Code untuk tiap titik masuk.
    Akun Admin sendiri dibuat oleh Super Admin.
 2. **Tamu memindai QR Code** yang terpasang di titik masuk. Token QR menentukan
    lokasi kunjungan, sehingga lokasi terisi otomatis dan tidak bisa diubah tamu.
@@ -278,8 +277,8 @@ kembali di riwayat tamu.
    secara digital, menyetujui pemrosesan data pribadi (UU PDP), lalu mengirim.
 5. **Sistem mencatat jam kedatangan** dari server. Kunjungan
    berstatus **Menunggu** dan langsung muncul di daftar Tamu Aktif resepsionis.
-6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan kategori
-   keperluan, sistem menampilkan Bidang/UPT terkait, dan resepsionis
+6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan Rincian keperluan yang
+   ditulis tamu, resepsionis memilih Bidang/UPT dan orang yang ditemui, lalu
    memilih PIC yang bertugas — setelah memastikan PIC tersebut sedang tersedia.
 7. **PIC menerima penugasan.** Status kunjungan berubah otomatis menjadi
    **Diproses** (bukan diubah manual oleh resepsionis).
@@ -318,8 +317,7 @@ Fitur:
 Alur tamu baru:
 
 1. Pindai QR → verifikasi Google → langsung masuk formulir kosong.
-2. Isi formulir: Keperluan (dropdown kategori), Rincian keperluan (teks, muncul
-   setelah kategori dipilih), Kelompok Rentan, Nama Lengkap,
+2. Isi formulir: Rincian keperluan (teks, wajib), Kelompok Rentan, Nama Lengkap,
    Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat, dan Tanda Tangan digital.
 3. Centang persetujuan UU PDP → Kirim → tampil konfirmasi "Kunjungan terkirim" dengan status Menunggu.
 
@@ -337,10 +335,10 @@ Fitur:
 
 - Dashboard **Tamu Aktif**: daftar kunjungan berstatus Menunggu dan Diproses
   di pos/lokasinya.
-- **Detail Kunjungan**: data tamu, keperluan dan rinciannya, bidang terkait
-  (hanya terlihat petugas, tidak terlihat tamu), dan tanda tangan tamu.
-- **Tugaskan PIC**: memilih PIC sesuai Bidang/UPT dari kategori
-  keperluan tamu, setelah memastikan PIC sedang tersedia.
+- **Detail Kunjungan**: data tamu, Rincian keperluan, Bidang/UPT tujuan, dan
+  tanda tangan tamu. Kunjungan lama tetap menampilkan kategorinya sebagai "Kategori (lama)".
+- **Tugaskan PIC**: memilih Bidang/UPT dan orang yang ditemui berdasarkan
+  Rincian keperluan tamu (tampil di modal Tugaskan), setelah memastikan PIC sedang tersedia.
 - **Tugaskan Ulang**: bila PIC ternyata tidak tersedia, penugasan dipindah ke
   PIC lain — PIC diganti, status kembali Menunggu, alasan pengalihan wajib
   diisi, dan jejaknya tercatat di audit log serta riwayat kunjungan.
@@ -391,7 +389,7 @@ Fitur:
 - **Kelola Pengguna**: membuat, mengubah, menonaktifkan, mereset password, dan
   membuka kunci akun **Resepsionis dan PIC**. Akun Admin dan Super Admin tampil
   di daftar tetapi hanya dapat diubah Super Admin.
-- **Kelola Pertanyaan Keperluan dan Petugas** di semua lokasi.
+- **Kelola Petugas** di semua lokasi.
 - **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke CSV, Excel,
   dan PDF.
 - **Audit Log** (hanya baca).

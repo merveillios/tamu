@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Enums\UserRole;
 use App\Models\Department;
 use App\Models\Location;
-use App\Models\PurposeCategory;
 use App\Models\QrCode;
 use App\Models\StaffMember;
 use App\Models\User;
@@ -31,16 +30,6 @@ class LocalSampleSeeder extends Seeder
             'Seksi Pelayanan Teknis' => ['Hendra Gunawan'],
             'Tata Usaha' => ['Lina Marlina'],
         ],
-    ];
-
-    /**
-     * Kategori keperluan lokasi pertama beserta saran departemennya.
-     */
-    private const CATEGORIES = [
-        'Konsultasi perdagangan' => 'Bidang Perdagangan Dalam Negeri',
-        'Konsultasi industri' => 'Bidang Industri Agro',
-        'Surat-menyurat' => 'Sekretariat',
-        'Lainnya' => null,
     ];
 
     /**
@@ -70,13 +59,6 @@ class LocalSampleSeeder extends Seeder
         }
 
         $this->seedAccount('PIC Contoh', 'pic@sitamu.test', UserRole::Pic, $departments['Sekretariat']->id);
-
-        foreach (self::CATEGORIES as $name => $departmentName) {
-            PurposeCategory::firstOrCreate(
-                ['location_id' => $headquarters->id, 'name' => $name],
-                ['suggested_department_id' => $departmentName ? $departments[$departmentName]->id : null],
-            );
-        }
     }
 
     /**

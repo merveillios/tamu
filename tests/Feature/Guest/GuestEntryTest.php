@@ -26,12 +26,28 @@ class GuestEntryTest extends TestCase
         [$qrInactiveLocation] = $this->usableQr();
         $qrInactiveLocation->location->update(['is_active' => false]);
 
-        $locationWithoutCategory = $this->createLocation();
-        $qrWithoutCategory = $this->createQr($locationWithoutCategory, $this->createUser(UserRole::Receptionist));
+        $locationWithoutDepartment = $this->createLocation();
+        $qrWithoutDepartment = $this->createQr($locationWithoutDepartment, $this->createUser(UserRole::Receptionist));
 
-        foreach (['tidak-valid', str_repeat('a', 64), $inactiveQr->token, $qrInactiveLocation->token, $qrWithoutCategory->token] as $token) {
+        $locationWithInactiveDepartment = $this->createLocation();
+        $this->createDepartment($locationWithInactiveDepartment)->update(['is_active' => false]);
+        $qrWithInactiveDepartment = $this->createQr($locationWithInactiveDepartment, $this->createUser(UserRole::Receptionist));
+
+        foreach ([
+            'tidak-valid', str_repeat('a', 64), $inactiveQr->token, $qrInactiveLocation->token,
+            $qrWithoutDepartment->token, $qrWithInactiveDepartment->token,
+        ] as $token) {
             $this->get("/tamu/{$token}")->assertNotFound()->assertSee(self::INACTIVE);
         }
+    }
+
+    public function test_location_with_active_department_but_no_category_is_usable(): void
+    {
+        $location = $this->createLocation();
+        $this->createDepartment($location);
+        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
+
+        $this->get("/tamu/{$qr->token}")->assertOk();
     }
 
     public function test_step_one_shows_google_button_with_nonce_and_csp_exception(): void

@@ -317,7 +317,8 @@ body {
     border-color: #e11d48;
 }
 
-.guest-result {
+.guest-result,
+.text-pre-line {
     white-space: pre-line;
 }
 

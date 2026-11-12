@@ -23,9 +23,7 @@
                 </div>
 
                 <dl class="row small mb-0">
-                    <dt class="col-5 text-gray-600 fw-normal">Keperluan</dt>
-                    <dd class="col-7 mb-1">{{ $visit->purpose_category_name }}</dd>
-                    <dt class="col-5 text-gray-600 fw-normal">Rincian</dt>
+                    <dt class="col-5 text-gray-600 fw-normal">Rincian keperluan</dt>
                     <dd class="col-7 mb-1 text-break">{{ $visit->purpose }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Bidang/UPT tujuan</dt>
                     <dd class="col-7 mb-1">{{ $visit->assignedDepartment?->name ?? '–' }}</dd>

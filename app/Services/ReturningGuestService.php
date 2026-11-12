@@ -79,7 +79,7 @@ class ReturningGuestService
         return GuestVisit::query()
             ->where('email', $email)
             ->select([
-                'id', 'location_id', 'purpose_category_name', 'purpose', 'status', 'check_in_at',
+                'id', 'location_id', 'purpose', 'status', 'check_in_at',
                 'assigned_department_id', 'served_by_staff_id', 'result',
             ])
             ->with(['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name'])

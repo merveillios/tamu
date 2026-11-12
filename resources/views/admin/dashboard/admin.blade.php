@@ -21,7 +21,7 @@
                 <thead>
                     <tr>
                         <th class="border-gray-200">Nama</th>
-                        <th class="border-gray-200">Keperluan</th>
+                        <th class="border-gray-200">Rincian keperluan</th>
                         <th class="border-gray-200">Bidang/UPT</th>
                         <th class="border-gray-200">Lokasi</th>
                         <th class="border-gray-200">Jam datang</th>
@@ -33,7 +33,7 @@
                     @forelse ($activeVisits as $visit)
                         <tr>
                             <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
-                            <td data-label="Keperluan">{{ $visit->purpose_category_name }}</td>
+                            <td data-label="Rincian keperluan" class="small text-break" title="{{ $visit->purpose }}">{{ \Illuminate\Support\Str::limit($visit->purpose, 80) }}</td>
                             <td data-label="Bidang/UPT">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
                             <td data-label="Lokasi">{{ $visit->location->name }}</td>
                             <td data-label="Jam datang">{{ $visit->check_in_at->isToday() ? $visit->check_in_at->format('H:i') : $visit->check_in_at->format('d/m H:i') }}</td>

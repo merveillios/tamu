@@ -2,10 +2,8 @@
 
 namespace Tests\Feature\Guest;
 
-use App\Enums\UserRole;
 use App\Enums\VisitStatus;
 use App\Models\GuestVisit;
-use App\Models\PurposeCategory;
 use App\Models\VisitSignature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\InteractsWithGuestPages;
@@ -28,10 +26,10 @@ class GuestFormTest extends TestCase
 
     public function test_saves_visit_with_email_from_session_and_redirects_303(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr), ['email' => 'palsu@contoh.test']))
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), ['email' => 'palsu@contoh.test']))
             ->assertStatus(303)
             ->assertRedirect(route('guest.thanks', $qr->token));
 
@@ -39,8 +37,10 @@ class GuestFormTest extends TestCase
         $this->assertSame('tamu@contoh.test', $visit->email);
         $this->assertSame(VisitStatus::Waiting, $visit->status);
         $this->assertSame('6281234567890', $visit->phone);
-        $this->assertSame($category->name, $visit->purpose_category_name);
-        $this->assertSame($category->suggested_department_id, $visit->suggested_department_id);
+        $this->assertSame('Konsultasi perizinan perdagangan', $visit->purpose);
+        $this->assertNull($visit->purpose_category_id);
+        $this->assertNull($visit->purpose_category_name);
+        $this->assertNull($visit->suggested_department_id);
         $this->assertSame(1, $visit->daily_number);
         $this->assertSame('image/png', getimagesizefromstring($visit->signature->image)['mime']);
         $this->assertNotNull($qr->refresh()->last_used_at);
@@ -49,9 +49,9 @@ class GuestFormTest extends TestCase
 
     public function test_thanks_page_confirms_submission_once_without_number_then_redirects(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr)));
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr)));
 
         $response = $this->get("/tamu/{$qr->token}/terima-kasih");
         $response->assertOk()
@@ -68,15 +68,15 @@ class GuestFormTest extends TestCase
 
     public function test_daily_number_increments_per_location_and_resets_next_day(): void
     {
-        [$qrA, $categoryA] = $this->usableQr();
-        [$qrB, $categoryB] = $this->usableQr();
+        [$qrA] = $this->usableQr();
+        [$qrB] = $this->usableQr();
 
-        $this->submitAs($qrA, $categoryA, 'a1@contoh.test');
-        $this->submitAs($qrA, $categoryA, 'a2@contoh.test');
-        $this->submitAs($qrB, $categoryB, 'b1@contoh.test');
+        $this->submitAs($qrA, 'a1@contoh.test');
+        $this->submitAs($qrA, 'a2@contoh.test');
+        $this->submitAs($qrB, 'b1@contoh.test');
 
         $this->travel(1)->days();
-        $this->submitAs($qrA, $categoryA, 'a3@contoh.test');
+        $this->submitAs($qrA, 'a3@contoh.test');
 
         $numbers = GuestVisit::orderBy('id')->pluck('daily_number', 'email')->all();
         $this->assertSame(['a1@contoh.test' => 1, 'a2@contoh.test' => 2, 'b1@contoh.test' => 1, 'a3@contoh.test' => 1], $numbers);
@@ -96,7 +96,7 @@ class GuestFormTest extends TestCase
         $this->verifiedAs($qr, 'lama@contoh.test');
 
         $this->get("/tamu/{$qr->token}/formulir")->assertOk()->assertSee('Data diri diambil dari kunjungan terakhir Anda.');
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, session("guest.{$qr->id}.form_token"), [
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload(session("guest.{$qr->id}.form_token"), [
             'name' => 'Nama Palsu',
             'phone' => '089999999999',
         ]))->assertStatus(303);
@@ -120,7 +120,7 @@ class GuestFormTest extends TestCase
             ->assertSee('Tanda tangan diambil dari kunjungan pertama Anda.')
             ->assertDontSee('data-signature-canvas', false);
 
-        $payload = $this->guestPayload($category, session("guest.{$qr->id}.form_token"), [
+        $payload = $this->guestPayload(session("guest.{$qr->id}.form_token"), [
             // Tanda tangan dari browser diabaikan; yang dipakai salinan dari kunjungan sebelumnya.
             'signature' => $this->signatureDataUrl(500, 200),
         ]);
@@ -138,15 +138,15 @@ class GuestFormTest extends TestCase
 
         $this->get("/tamu/{$qr->token}/formulir")->assertOk()->assertSee('data-signature-canvas', false);
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, session("guest.{$qr->id}.form_token"), ['signature' => null]))
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload(session("guest.{$qr->id}.form_token"), ['signature' => null]))
             ->assertSessionHasErrors(['signature' => 'Tanda tangan wajib dibubuhkan.']);
     }
 
     public function test_used_form_token_does_not_save_twice(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
-        $payload = $this->guestPayload($category, $this->formToken($qr));
+        $payload = $this->guestPayload($this->formToken($qr));
 
         $this->post("/tamu/{$qr->token}/formulir", $payload)->assertStatus(303);
         $this->post("/tamu/{$qr->token}/formulir", $payload)->assertRedirect(route('guest.thanks', $qr->token));
@@ -156,10 +156,10 @@ class GuestFormTest extends TestCase
 
     public function test_honeypot_shows_fake_success_without_saving(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr), ['website' => 'http://spam.test']))
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), ['website' => 'http://spam.test']))
             ->assertOk()
             ->assertSee('Terima kasih');
 
@@ -168,10 +168,10 @@ class GuestFormTest extends TestCase
 
     public function test_invalid_input_is_rejected_and_signature_is_not_flashed(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr), [
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), [
             'phone' => '12345',
             'consent' => null,
         ]))->assertSessionHasErrors(['phone', 'consent']);
@@ -183,80 +183,58 @@ class GuestFormTest extends TestCase
 
     public function test_blank_signature_is_rejected(): void
     {
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr), [
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), [
             'signature' => $this->signatureDataUrl(withInk: false),
         ]))->assertSessionHasErrors(['signature' => 'Tanda tangan wajib dibubuhkan.']);
     }
 
-    public function test_categories_are_grouped_by_active_department(): void
+    public function test_form_has_no_category_and_always_shows_required_purpose(): void
     {
-        $location = $this->createLocation();
-        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
-        $industry = $this->createDepartment($location, 'Bidang Industri Agro');
-        $secretariat = $this->createDepartment($location, 'Sekretariat');
-        $inactive = $this->createDepartment($location, 'Bidang Lama');
-        $inactive->update(['is_active' => false]);
-
-        foreach ([
-            ['Bagaimana cara mengurus izin usaha industri?', $industry],
-            ['Bagaimana cara ikut pelatihan IKM?', $industry],
-            ['Saya ingin mengantar surat', $secretariat],
-            ['Pertanyaan lama', $inactive],
-            ['Lainnya', null],
-        ] as [$name, $department]) {
-            PurposeCategory::create(['location_id' => $location->id, 'name' => $name, 'suggested_department_id' => $department?->id]);
-        }
+        [$qr, $category] = $this->usableQr();
 
         $this->verifiedAs($qr, 'tamu@contoh.test')
             ->get("/tamu/{$qr->token}/formulir")
             ->assertOk()
-            ->assertSeeInOrder([
-                '<optgroup label="Bidang Industri Agro">',
-                'Bagaimana cara ikut pelatihan IKM?',
-                'Bagaimana cara mengurus izin usaha industri?',
-                '<optgroup label="Sekretariat">',
-                'Saya ingin mengantar surat',
-                '<optgroup label="Umum">',
-                'Lainnya',
-                'Pertanyaan lama',
-            ], false)
-            ->assertDontSee('Bidang Lama');
+            ->assertDontSee('name="purpose_category_id"', false)
+            ->assertDontSee($category->name)
+            ->assertDontSee('data-purpose-detail', false)
+            ->assertSee('Rincian keperluan')
+            ->assertSee('name="purpose"', false);
     }
 
-    public function test_categories_without_department_are_not_grouped(): void
-    {
-        $location = $this->createLocation();
-        $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
-        $category = $this->createCategory($location);
-
-        $this->verifiedAs($qr, 'tamu@contoh.test')
-            ->get("/tamu/{$qr->token}/formulir")
-            ->assertOk()
-            ->assertSee($category->name)
-            ->assertDontSee('<optgroup', false);
-    }
-
-    public function test_category_from_other_location_is_rejected(): void
+    public function test_purpose_is_required(): void
     {
         [$qr] = $this->usableQr();
-        [, $otherCategory] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($otherCategory, $this->formToken($qr)))
-            ->assertSessionHasErrors('purpose_category_id');
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), ['purpose' => '  ']))
+            ->assertSessionHasErrors(['purpose' => 'Rincian keperluan wajib diisi (3–500 karakter).']);
+
+        $this->assertSame(0, GuestVisit::count());
+    }
+
+    public function test_category_sent_by_browser_is_ignored(): void
+    {
+        [$qr, $category] = $this->usableQr();
+        $this->verifiedAs($qr, 'tamu@contoh.test');
+
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr), ['purpose_category_id' => $category->id]))
+            ->assertStatus(303);
+
+        $this->assertNull(GuestVisit::firstOrFail()->purpose_category_id);
     }
 
     public function test_submission_is_rate_limited_per_ip_and_qr(): void
     {
         config(['sitamu.guest.rate_limit_max' => 1]);
-        [$qr, $category] = $this->usableQr();
+        [$qr] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
 
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr)))->assertStatus(303);
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, 'apa-saja'))->assertStatus(429);
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr)))->assertStatus(303);
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload('apa-saja'))->assertStatus(429);
     }
 
     public function test_form_renders_unified_banner_and_email_card_without_arrival_text(): void
@@ -291,10 +269,10 @@ class GuestFormTest extends TestCase
         return base64_decode(substr($dataUrl, strlen('data:image/png;base64,')));
     }
 
-    private function submitAs($qr, PurposeCategory $category, string $email): void
+    private function submitAs($qr, string $email): void
     {
         $this->flushSession();
         $this->verifiedAs($qr, $email);
-        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($category, $this->formToken($qr)))->assertStatus(303);
+        $this->post("/tamu/{$qr->token}/formulir", $this->guestPayload($this->formToken($qr)))->assertStatus(303);
     }
 }

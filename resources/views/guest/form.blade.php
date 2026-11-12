@@ -27,34 +27,11 @@
 
         <div class="card-body p-4">
             <div class="mb-3">
-                <label for="purpose_category_id" class="form-label">Keperluan</label>
-                <select name="purpose_category_id" id="purpose_category_id" required data-purpose-category
-                        class="form-select @error('purpose_category_id') is-invalid @enderror" aria-describedby="purpose_category_id_error">
-                    <option value="">Pilih keperluan</option>
-                    {{-- Grup hanya dipakai bila ada kategori yang punya departemen; grup tanpa departemen berjudul Umum. --}}
-                    @php($grouped = $categoryGroups->keys()->contains(fn ($group) => $group !== ''))
-                    @foreach ($categoryGroups as $group => $categories)
-                        @if ($grouped)
-                            <optgroup label="{{ $group !== '' ? $group : 'Umum' }}">
-                        @endif
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @selected((int) old('purpose_category_id') === $category->id)>{{ $category->name }}</option>
-                        @endforeach
-                        @if ($grouped)
-                            </optgroup>
-                        @endif
-                    @endforeach
-                </select>
-                @error('purpose_category_id')
-                    <div class="invalid-feedback" id="purpose_category_id_error">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3" data-purpose-detail @if (! old('purpose_category_id')) hidden @endif>
                 <label for="purpose" class="form-label">Rincian keperluan</label>
-                <textarea name="purpose" id="purpose" rows="3" maxlength="500" required
-                          placeholder="Contoh: Ingin konsultasi terkait perizinan perdagangan"
-                          class="form-control @error('purpose') is-invalid @enderror" aria-describedby="purpose_error">{{ old('purpose') }}</textarea>
+                <textarea name="purpose" id="purpose" rows="4" minlength="3" maxlength="500" required
+                          placeholder="Contoh: Konsultasi perizinan usaha perdagangan dengan Bidang Perdagangan Dalam Negeri"
+                          class="form-control @error('purpose') is-invalid @enderror" aria-describedby="purpose_help purpose_error">{{ old('purpose') }}</textarea>
+                <div class="form-text" id="purpose_help">Tuliskan maksud kunjungan dan, bila tahu, Bidang/UPT atau orang yang ingin ditemui.</div>
                 @error('purpose')
                     <div class="invalid-feedback" id="purpose_error">{{ $message }}</div>
                 @enderror

@@ -34,7 +34,6 @@ class HistoryRequest extends FormRequest
             'period' => ['nullable', Rule::in(array_keys(HistoryService::PERIODS))],
             'status' => ['nullable', Rule::in(array_keys(HistoryService::STATUS_FILTERS))],
             'location_id' => ['nullable', 'integer'],
-            'purpose_category_id' => ['nullable', 'integer'],
             'department_id' => ['nullable', 'integer'],
             'vulnerable_group' => ['nullable', Rule::enum(VulnerableGroup::class)],
             'format' => ['nullable', 'in:csv,xlsx,pdf'],

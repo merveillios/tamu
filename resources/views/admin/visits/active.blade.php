@@ -61,8 +61,7 @@
                         <th class="border-gray-200">Nama</th>
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
-                        <th class="border-gray-200">Keperluan</th>
-                        <th class="border-gray-200">Bidang/UPT</th>
+                        <th class="border-gray-200">Rincian keperluan</th>
                         <th class="border-gray-200">Nama PIC</th>
                         @unless ($isReceptionist)
                             <th class="border-gray-200">Lokasi / QR</th>
@@ -74,7 +73,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="10" class="text-center text-gray-600 py-4">Memuat data…</td>
+                        <td colspan="9" class="text-center text-gray-600 py-4">Memuat data…</td>
                     </tr>
                 </tbody>
             </table>
@@ -101,7 +100,7 @@
                             <tr>
                                 <th class="border-gray-200">Nama</th>
                                 <th class="border-gray-200">Instansi</th>
-                                <th class="border-gray-200">Keperluan</th>
+                                <th class="border-gray-200">Rincian keperluan</th>
                                 <th class="border-gray-200">Bidang/UPT dan orang ditemui</th>
                                 <th class="border-gray-200">Status</th>
                                 <th class="border-gray-200">Jam ditutup</th>
@@ -130,6 +129,7 @@
                     </div>
                     <div class="modal-body">
                         <p class="small text-gray-600" data-assign-guest></p>
+                        <p class="small border rounded p-2 text-break text-pre-line" data-assign-purpose></p>
                         <div class="mb-3">
                             <label for="assign_department" class="form-label">Bidang/UPT tujuan</label>
                             <select id="assign_department" name="department_id" class="form-select" required></select>

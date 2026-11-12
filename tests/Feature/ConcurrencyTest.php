@@ -60,11 +60,10 @@ class ConcurrencyTest extends TestCase
     {
         $location = $this->createLocation();
         $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
-        $category = $this->createCategory($location);
         $workers = 10;
 
         $results = $this->runTogether($workers, fn (int $index) => [
-            'record', (string) $qr->id, (string) $category->id, "paralel{$index}@contoh.test",
+            'record', (string) $qr->id, "paralel{$index}@contoh.test",
         ]);
 
         $numbers = array_map('intval', $results);

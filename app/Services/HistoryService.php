@@ -7,7 +7,6 @@ use App\Enums\VulnerableGroup;
 use App\Models\Department;
 use App\Models\GuestVisit;
 use App\Models\Location;
-use App\Models\PurposeCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -65,7 +64,6 @@ class HistoryService
             ->when($from, fn (Builder $query) => $query->where('check_in_at', '>=', $from))
             ->when($to, fn (Builder $query) => $query->where('check_in_at', '<=', $to))
             ->when($filters['location_id'] ?? null, fn (Builder $query, $id) => $query->where('location_id', $id))
-            ->when($filters['purpose_category_id'] ?? null, fn (Builder $query, $id) => $query->where('purpose_category_id', $id))
             ->when($filters['department_id'] ?? null, fn (Builder $query, $id) => $query->where('assigned_department_id', $id))
             ->when($filters['vulnerable_group'] ?? null, fn (Builder $query, $group) => $query->where('vulnerable_group', $group))
             ->orderByDesc('check_in_at')
@@ -73,7 +71,7 @@ class HistoryService
     }
 
     /**
-     * Pilihan dropdown filter dalam cakupan akun, termasuk kategori nonaktif (HIS-3).
+     * Pilihan dropdown filter dalam cakupan akun (HIS-3).
      *
      * @return array<string, Collection>
      */
@@ -84,8 +82,6 @@ class HistoryService
 
         return [
             'locations' => $locations,
-            'categories' => PurposeCategory::query()->whereIn('location_id', $locationIds)
-                ->with('location:id,name')->orderBy('name')->get(['id', 'name', 'location_id', 'is_active']),
             'departments' => Department::query()->whereIn('location_id', $locationIds)
                 ->with('location:id,name')->orderBy('name')->get(['id', 'name', 'location_id']),
             'vulnerableGroups' => collect(VulnerableGroup::cases()),
@@ -93,7 +89,7 @@ class HistoryService
     }
 
     /**
-     * Memastikan lokasi, kategori, dan departemen di filter berada dalam cakupan (Bab 12.2).
+     * Memastikan lokasi dan Bidang/UPT di filter berada dalam cakupan (Bab 12.2).
      *
      * @param  array<string, mixed>  $filters
      */
@@ -103,19 +99,16 @@ class HistoryService
             $this->scope->findOrDeny(Location::class, $filters['location_id'], $user);
         }
 
-        $locationIds = $this->scope->locationIds($user);
-
-        foreach (['purpose_category_id' => PurposeCategory::class, 'department_id' => Department::class] as $field => $model) {
-            if (empty($filters[$field])) {
-                continue;
-            }
-
-            $inScope = $model::query()->whereKey($filters[$field])
-                ->when($locationIds !== null, fn (Builder $query) => $query->whereIn('location_id', $locationIds))
-                ->exists();
-
-            abort_unless($inScope, 404);
+        if (empty($filters['department_id'])) {
+            return;
         }
+
+        $locationIds = $this->scope->locationIds($user);
+        $inScope = Department::query()->whereKey($filters['department_id'])
+            ->when($locationIds !== null, fn (Builder $query) => $query->whereIn('location_id', $locationIds))
+            ->exists();
+
+        abort_unless($inScope, 404);
     }
 
     /**

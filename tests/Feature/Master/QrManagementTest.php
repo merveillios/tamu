@@ -32,7 +32,7 @@ class QrManagementTest extends TestCase
     public function test_creates_qr_with_random_token_and_receptionist(): void
     {
         $location = $this->createLocation();
-        $this->createCategory($location);
+        $this->createDepartment($location);
         $receptionist = $this->createUser(UserRole::Receptionist);
 
         $this->actingAs($this->superAdmin)
@@ -53,7 +53,7 @@ class QrManagementTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'qr.create', 'entity_id' => $qr->id]);
     }
 
-    public function test_location_without_active_category_still_gets_qr_with_warning(): void
+    public function test_location_without_active_department_still_gets_qr_with_warning(): void
     {
         $location = $this->createLocation();
         $receptionist = $this->createUser(UserRole::Receptionist);
@@ -68,22 +68,23 @@ class QrManagementTest extends TestCase
         $this->assertDatabaseCount('qr_codes', 2);
     }
 
-    public function test_create_form_marks_locations_without_department_or_category(): void
+    public function test_create_form_marks_locations_without_active_department(): void
     {
         $empty = $this->createLocation('Gedung Kosong');
-        $withDepartment = $this->createLocation('Gedung Departemen');
-        $this->createDepartment($withDepartment);
+        $inactiveOnly = $this->createLocation('Gedung Bidang Nonaktif');
+        $this->createDepartment($inactiveOnly)->update(['is_active' => false]);
         $ready = $this->createLocation('Gedung Siap');
-        $this->createCategory($ready, $this->createDepartment($ready));
+        $this->createDepartment($ready);
 
         foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
             $this->actingAs($actor)->get('/admin/qr')
                 ->assertOk()
                 ->assertDontSee('name="department_id"', false)
+                ->assertDontSee('data-categories', false)
                 ->assertSee('data-qr-location-warning', false)
-                ->assertSee('value="'.$empty->id.'" data-departments="0" data-categories="0"', false)
-                ->assertSee('value="'.$withDepartment->id.'" data-departments="1" data-categories="0"', false)
-                ->assertSee('value="'.$ready->id.'" data-departments="1" data-categories="1"', false);
+                ->assertSee('value="'.$empty->id.'" data-departments="0"', false)
+                ->assertSee('value="'.$inactiveOnly->id.'" data-departments="0"', false)
+                ->assertSee('value="'.$ready->id.'" data-departments="1"', false);
         }
     }
 
@@ -97,20 +98,21 @@ class QrManagementTest extends TestCase
                 ->assertOk()
                 ->assertDontSee('<th class="border-gray-200">Bidang/UPT</th>', false)
                 ->assertSee('Belum siap')
-                ->assertSee('Belum ada kategori keperluan aktif.');
+                ->assertSee('Belum ada Bidang/UPT aktif.');
         }
         $this->get("/tamu/{$qr->token}")->assertNotFound();
 
-        $this->createCategory($location, $this->createDepartment($location));
+        $this->createDepartment($location);
 
         $this->actingAs($this->superAdmin)->get('/admin/qr')->assertOk()->assertDontSee('Belum siap');
+        $this->get("/tamu/{$qr->token}")->assertOk();
 
         $location->update(['is_active' => false]);
 
         $this->actingAs($this->superAdmin)->get('/admin/qr')
             ->assertSee('Belum siap')
             ->assertSee('Lokasi nonaktif.')
-            ->assertDontSee('Belum ada kategori keperluan aktif.');
+            ->assertDontSee('Belum ada Bidang/UPT aktif.');
     }
 
     public function test_inactive_qr_keeps_nonaktif_label_even_when_location_is_not_ready(): void
