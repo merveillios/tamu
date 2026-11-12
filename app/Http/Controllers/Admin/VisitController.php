@@ -115,7 +115,7 @@ class VisitController extends Controller
         $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $request->user());
         $this->visits->assign($visit, (int) $request->validated('department_id'), (int) $request->validated('staff_member_id'), $request->user());
 
-        return response()->json(['ok' => true, 'data' => ['message' => "Tamu No. {$visit->daily_number} ditugaskan."]]);
+        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan {$visit->name} ditugaskan."]]);
     }
 
     /**
@@ -126,7 +126,7 @@ class VisitController extends Controller
         $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $request->user());
         $this->visits->cancel($visit, $request->validated('reason'), $request->validated('reason_text'), $request->user());
 
-        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan No. {$visit->daily_number} dibatalkan."]]);
+        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan {$visit->name} dibatalkan."]]);
     }
 
     /**

@@ -30,7 +30,7 @@ class ExportService
      * Kolom yang sama untuk ketiga format; Excel dan PDF menambah kolom Tanda Tangan.
      */
     public const COLUMNS = [
-        'No. Urut', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
+        'No.', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
         'Kategori Keperluan', 'Rincian Keperluan', 'No. Telepon', 'Alamat', 'Email', 'Bidang/UPT Tujuan',
         'Orang yang Ditemui', 'Status', 'Hasil',
     ];
@@ -86,14 +86,15 @@ class ExportService
     }
 
     /**
-     * Nilai 15 kolom untuk satu kunjungan.
+     * Nilai 15 kolom untuk satu kunjungan. Kolom pertama adalah nomor baris di file
+     * ekspor, bukan nomor urut kunjungan yang tidak lagi ditampilkan (revisi HRD #5).
      *
      * @return array<int, string>
      */
-    public function row(GuestVisit $visit): array
+    public function row(GuestVisit $visit, int $rowNumber): array
     {
         return [
-            (string) $visit->daily_number,
+            (string) $rowNumber,
             $visit->check_in_at->format('d/m/Y H:i'),
             $visit->location->name,
             $visit->name,
@@ -125,8 +126,10 @@ class ExportService
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, self::COLUMNS, $delimiter);
 
+            $rowNumber = 0;
+
             foreach ($query->lazy(500) as $visit) {
-                fputcsv($output, array_map([$this, 'guardCsvCell'], $this->row($visit)), $delimiter);
+                fputcsv($output, array_map([$this, 'guardCsvCell'], $this->row($visit, ++$rowNumber)), $delimiter);
             }
 
             fclose($output);
@@ -155,7 +158,8 @@ class ExportService
             $signatures = $this->signatures($chunk);
 
             foreach ($chunk as $visit) {
-                foreach ($this->row($visit) as $index => $value) {
+                // Baris 1 adalah header, jadi nomor data = nomor baris sheet - 1.
+                foreach ($this->row($visit, $rowNumber - 1) as $index => $value) {
                     $sheet->setCellValueExplicit([$index + 1, $rowNumber], $value, DataType::TYPE_STRING);
                 }
 
@@ -195,7 +199,10 @@ class ExportService
         ));
 
         $html = view('admin.export.pdf', [
-            'rows' => $visits->map(fn (GuestVisit $visit) => ['values' => $this->row($visit), 'signature' => $signatures->get($visit->id)]),
+            'rows' => $visits->values()->map(fn (GuestVisit $visit, int $index) => [
+                'values' => $this->row($visit, $index + 1),
+                'signature' => $signatures->get($visit->id),
+            ]),
             'columns' => array_merge(self::COLUMNS, ['Tanda Tangan']),
             'locationName' => $locationName ?? 'Semua lokasi',
             'filters' => $filters,

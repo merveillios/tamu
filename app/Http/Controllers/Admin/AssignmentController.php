@@ -60,7 +60,7 @@ class AssignmentController extends Controller
         $visit = $this->visits->findForPic($id, $request->user());
         $this->visits->accept($visit, $request->user());
 
-        return response()->json(['ok' => true, 'data' => ['message' => "Tamu No. {$visit->daily_number} diterima."]]);
+        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan {$visit->name} diterima."]]);
     }
 
     /**
@@ -71,6 +71,6 @@ class AssignmentController extends Controller
         $visit = $this->visits->findForPic($id, $request->user());
         $this->visits->complete($visit, $request->validated('result'), $request->user());
 
-        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan No. {$visit->daily_number} selesai."]]);
+        return response()->json(['ok' => true, 'data' => ['message' => "Kunjungan {$visit->name} selesai."]]);
     }
 }

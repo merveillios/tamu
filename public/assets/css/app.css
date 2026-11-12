@@ -317,13 +317,6 @@ body {
     border-color: #e11d48;
 }
 
-.guest-number {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--sitamu-primary);
-    line-height: 1;
-}
-
 .guest-result {
     white-space: pre-line;
 }

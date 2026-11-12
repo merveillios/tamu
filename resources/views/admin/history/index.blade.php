@@ -106,7 +106,6 @@
                 <thead>
                     <tr>
                         <th class="border-gray-200">Tanggal</th>
-                        <th class="border-gray-200">No.</th>
                         <th class="border-gray-200">Nama</th>
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
@@ -122,7 +121,6 @@
                     @forelse ($visits as $visit)
                         <tr>
                             <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
-                            <td data-label="No.">No. {{ $visit->daily_number }}</td>
                             <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
                             <td data-label="Instansi">{{ $visit->organization }}</td>
                             <td data-label="Kelompok rentan">{{ $visit->vulnerable_group->label() }}</td>
@@ -135,7 +133,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center text-gray-600 py-4">Tidak ada kunjungan yang cocok dengan filter.</td>
+                            <td colspan="10" class="text-center text-gray-600 py-4">Tidak ada kunjungan yang cocok dengan filter.</td>
                         </tr>
                     @endforelse
                 </tbody>

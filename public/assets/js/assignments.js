@@ -124,7 +124,6 @@
             tr.classList.add('row-waiting-long');
         }
 
-        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
@@ -147,7 +146,6 @@
         var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
         detail.href = row.detail_url;
 
-        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Keperluan', purpose));
@@ -182,9 +180,9 @@
         // Pemuatan pertama tidak dianggap penugasan baru agar bunyi tidak berbunyi saat halaman dibuka.
         var hasFreshAssignment = knownIds !== null && data.new.some(function (row) { return !knownIds.has(row.id); });
 
-        renderGroup('new', data.new, renderRow, 10);
-        renderGroup('reviewing', data.reviewing, renderRow, 10);
-        renderGroup('completed', data.completed, renderCompletedRow, 8);
+        renderGroup('new', data.new, renderRow, 9);
+        renderGroup('reviewing', data.reviewing, renderRow, 9);
+        renderGroup('completed', data.completed, renderCompletedRow, 7);
 
         knownIds = knownIds || new Set();
         data.new.concat(data.reviewing).forEach(function (row) { knownIds.add(row.id); });
@@ -255,7 +253,7 @@
         currentVisit = row;
         form.reset();
         showError('');
-        form.querySelector('[data-complete-guest]').textContent = 'No. ' + row.number + ' · ' + row.name + ' · ' + row.category;
+        form.querySelector('[data-complete-guest]').textContent = row.name + ' · ' + row.category;
         bootstrap.Modal.getOrCreateInstance(modalElement).show();
     }
 

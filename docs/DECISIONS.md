@@ -2,6 +2,15 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Nomor urut tidak ditampilkan (revisi HRD #5)
+
+- **Konteks:** HRD meminta nomor urut dihapus dari semua tampilan. Pertanyaan apakah kolomnya boleh dihapus dari database belum dijawab.
+- **Keputusan:**
+  - Nomor urut tidak lagi tampil di halaman terima kasih tamu, Tamu Aktif, Penugasan PIC, Dashboard Admin, History, Detail Kunjungan, dialog Tugaskan/Batal/Selesai, maupun notifikasi; kunjungan dikenali dari nama tamu. Halaman terima kasih menampilkan "Kunjungan terkirim".
+  - Kolom pertama ekspor menjadi "No." berisi nomor baris 1, 2, 3 di file tersebut.
+  - Kolom `daily_number`, tabel `visit_counters`, pengambilan nomor atomik, dan `ConcurrencyTest` tetap ada, sehingga keputusan menghapus total bisa diambil terpisah tanpa migrasi sekarang.
+- **Alasan:** Menyembunyikan dulu tidak berisiko bagi data lama; menghapus kolom dan generator adalah langkah yang tidak bisa dibatalkan.
+
 ## 2026-11-12 — Istilah "departemen" menjadi "Bidang/UPT" (revisi HRD #1)
 
 - **Konteks:** Struktur organisasi Disperindag Jatim memakai istilah Bidang dan UPT, bukan departemen.

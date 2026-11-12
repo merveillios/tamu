@@ -107,7 +107,6 @@ class VisitListService
     {
         return [
             'id' => $visit->id,
-            'number' => $visit->daily_number,
             'name' => $visit->name,
             'organization' => $visit->organization,
             'category' => $visit->purpose_category_name,
@@ -149,7 +148,6 @@ class VisitListService
 
         return [
             'id' => $visit->id,
-            'number' => $visit->daily_number,
             'name' => $visit->name,
             'organization' => $visit->organization,
             'category' => $visit->purpose_category_name,
@@ -184,7 +182,6 @@ class VisitListService
 
         return [
             'id' => $visit->id,
-            'number' => $visit->daily_number,
             'name' => $visit->name,
             'organization' => $visit->organization,
             'vulnerable_group' => $visit->vulnerable_group->label(),

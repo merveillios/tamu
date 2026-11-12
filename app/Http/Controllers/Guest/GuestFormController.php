@@ -109,7 +109,6 @@ class GuestFormController extends Controller
         return redirect()->route('guest.thanks', $token, 303)->with('guest_thanks', [
             'name' => $visit->name,
             'location' => $qr->location->name,
-            'number' => $visit->daily_number,
             'time' => $visit->check_in_at->format('H:i'),
         ]);
     }

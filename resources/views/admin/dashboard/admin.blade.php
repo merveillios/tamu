@@ -20,7 +20,6 @@
             <table class="table table-hover align-middle mb-0 table-cards">
                 <thead>
                     <tr>
-                        <th class="border-gray-200">No.</th>
                         <th class="border-gray-200">Nama</th>
                         <th class="border-gray-200">Keperluan</th>
                         <th class="border-gray-200">Bidang/UPT</th>
@@ -33,7 +32,6 @@
                 <tbody>
                     @forelse ($activeVisits as $visit)
                         <tr>
-                            <td data-label="No.">No. {{ $visit->daily_number }}</td>
                             <td data-label="Nama" class="fw-bold">{{ $visit->name }}</td>
                             <td data-label="Keperluan">{{ $visit->purpose_category_name }}</td>
                             <td data-label="Bidang/UPT">{{ $visit->assignedDepartment?->name ?? '–' }}</td>
@@ -43,13 +41,13 @@
                             <td data-label="Aksi">
                                 <div class="d-flex flex-wrap gap-1 justify-content-end justify-content-md-start">
                                     <button type="button" class="btn btn-sm btn-outline-danger" data-cancel-visit="{{ $visit->id }}"
-                                            data-guest="No. {{ $visit->daily_number }} · {{ $visit->name }}" data-no-confirm>Batal</button>
+                                            data-guest="{{ $visit->name }}" data-no-confirm>Batal</button>
                                     <a href="{{ route('admin.visits.show', $visit->id) }}" class="btn btn-sm btn-outline-gray-800">Detail</a>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="text-center text-gray-600 py-4">Tidak ada tamu aktif.</td></tr>
+                        <tr><td colspan="7" class="text-center text-gray-600 py-4">Tidak ada tamu aktif.</td></tr>
                     @endforelse
                 </tbody>
             </table>

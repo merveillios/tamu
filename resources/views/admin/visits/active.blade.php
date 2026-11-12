@@ -58,7 +58,6 @@
                    data-cancel-url="{{ url('/admin/kunjungan/__ID__/batal') }}">
                 <thead>
                     <tr>
-                        <th class="border-gray-200">No.</th>
                         <th class="border-gray-200">Nama</th>
                         <th class="border-gray-200">Instansi</th>
                         <th class="border-gray-200">Kelompok rentan</th>
@@ -75,7 +74,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="11" class="text-center text-gray-600 py-4">Memuat data…</td>
+                        <td colspan="10" class="text-center text-gray-600 py-4">Memuat data…</td>
                     </tr>
                 </tbody>
             </table>
@@ -100,7 +99,6 @@
                     <table class="table table-hover align-middle mb-0 table-cards">
                         <thead>
                             <tr>
-                                <th class="border-gray-200">No.</th>
                                 <th class="border-gray-200">Nama</th>
                                 <th class="border-gray-200">Instansi</th>
                                 <th class="border-gray-200">Keperluan</th>
@@ -113,7 +111,7 @@
                         </thead>
                         <tbody data-closed-rows>
                             <tr>
-                                <td colspan="9" class="text-center text-gray-600 py-4">Memuat data…</td>
+                                <td colspan="8" class="text-center text-gray-600 py-4">Memuat data…</td>
                             </tr>
                         </tbody>
                     </table>

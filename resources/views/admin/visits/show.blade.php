@@ -14,7 +14,7 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
-            <h2 class="h4 mb-0">No. {{ $visit->daily_number }} · {{ $visit->name }}</h2>
+            <h2 class="h4 mb-0">{{ $visit->name }}</h2>
             <span class="small text-gray-600">{{ $visit->visit_date->format('d/m/Y') }} · {{ $visit->location->name }}</span>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -30,7 +30,6 @@
             <div class="card card-body border-0 shadow mb-4">
                 <h3 class="h6 mb-3">Data tamu</h3>
                 <dl class="row small mb-0">
-                    <dt class="col-5 text-gray-600 fw-normal">Nomor urut</dt><dd class="col-7">No. {{ $visit->daily_number }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Email</dt><dd class="col-7 text-break">{{ $visit->email }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Kategori keperluan</dt><dd class="col-7">{{ $visit->purpose_category_name }}</dd>
                     <dt class="col-5 text-gray-600 fw-normal">Rincian keperluan</dt><dd class="col-7 text-break">{{ $visit->purpose }}</dd>

@@ -276,7 +276,7 @@ kembali di riwayat tamu.
    mengecek otomatis apakah email tersebut pernah melapor sebelumnya.
 4. **Tamu mengisi formulir** (lihat rincian di bagian Tamu), menandatangani
    secara digital, menyetujui pemrosesan data pribadi (UU PDP), lalu mengirim.
-5. **Sistem memberi nomor urut** dan jam kedatangan dari server. Kunjungan
+5. **Sistem mencatat jam kedatangan** dari server. Kunjungan
    berstatus **Menunggu** dan langsung muncul di daftar Tamu Aktif resepsionis.
 6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan kategori
    keperluan, sistem menampilkan Bidang/UPT terkait, dan resepsionis
@@ -321,7 +321,7 @@ Alur tamu baru:
 2. Isi formulir: Keperluan (dropdown kategori), Rincian keperluan (teks, muncul
    setelah kategori dipilih), Kelompok Rentan, Nama Lengkap,
    Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat, dan Tanda Tangan digital.
-3. Centang persetujuan UU PDP → Kirim → menerima nomor urut dengan status Menunggu.
+3. Centang persetujuan UU PDP → Kirim → tampil konfirmasi "Kunjungan terkirim" dengan status Menunggu.
 
 Alur tamu lama (pernah melapor):
 

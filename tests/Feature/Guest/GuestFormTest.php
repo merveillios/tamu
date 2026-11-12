@@ -47,7 +47,7 @@ class GuestFormTest extends TestCase
         $this->assertDatabaseHas('visit_status_logs', ['visit_id' => $visit->id, 'from_status' => null, 'to_status' => 'waiting', 'changed_by' => null]);
     }
 
-    public function test_thanks_page_shows_number_once_then_redirects(): void
+    public function test_thanks_page_confirms_submission_once_without_number_then_redirects(): void
     {
         [$qr, $category] = $this->usableQr();
         $this->verifiedAs($qr, 'tamu@contoh.test');
@@ -55,7 +55,8 @@ class GuestFormTest extends TestCase
 
         $response = $this->get("/tamu/{$qr->token}/terima-kasih");
         $response->assertOk()
-            ->assertSee('No. 1')
+            ->assertSee('Kunjungan terkirim')
+            ->assertDontSee('No. 1')
             ->assertSee('Siti Aminah')
             ->assertSee('guest-header-banner')
             ->assertSee(config('sitamu.institution_name'))

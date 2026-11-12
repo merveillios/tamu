@@ -95,7 +95,6 @@
         var assigned = row.assigned_department ? row.assigned_department + (row.served_by ? ' — ' + row.served_by : '') : null;
         var badge = el('span', 'badge bg-' + row.status_badge, row.status_label);
 
-        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Kelompok rentan', row.vulnerable_group));
@@ -124,7 +123,6 @@
         var detail = el('a', 'btn btn-sm btn-outline-gray-800', 'Detail');
         detail.href = row.detail_url;
 
-        tr.appendChild(cell('No.', 'No. ' + row.number, 'fw-bold'));
         tr.appendChild(cell('Nama', row.name, 'fw-bold'));
         tr.appendChild(cell('Instansi', row.organization));
         tr.appendChild(cell('Keperluan', row.category));
@@ -144,7 +142,7 @@
         if (rows.length === 0) {
             var empty = el('tr');
             var td = el('td', 'text-center text-gray-600 py-4', 'Belum ada kunjungan yang ditutup hari ini.');
-            td.colSpan = 9;
+            td.colSpan = 8;
             empty.appendChild(td);
             closedBody.appendChild(empty);
         }
@@ -174,7 +172,7 @@
         if (data.rows.length === 0) {
             var empty = el('tr');
             var td = el('td', 'text-center text-gray-600 py-4', 'Tidak ada tamu aktif.');
-            td.colSpan = 11;
+            td.colSpan = 10;
             empty.appendChild(td);
             tbody.appendChild(empty);
         }
@@ -297,7 +295,7 @@
     function openAssign(row) {
         currentVisit = row;
         showModalError(assignForm, '');
-        assignForm.querySelector('[data-assign-guest]').textContent = 'No. ' + row.number + ' · ' + row.name + ' · ' + row.category;
+        assignForm.querySelector('[data-assign-guest]').textContent = row.name + ' · ' + row.category;
 
         SiTamu.request(actionUrl(table.dataset.departmentsUrl, row.id)).then(function (result) {
             if (!result.body.ok) {
@@ -356,7 +354,7 @@
         cancelForm.reset();
         otherWrap.hidden = true;
         showModalError(cancelForm, '');
-        cancelForm.querySelector('[data-cancel-guest]').textContent = 'No. ' + row.number + ' · ' + row.name;
+        cancelForm.querySelector('[data-cancel-guest]').textContent = row.name;
         bootstrap.Modal.getOrCreateInstance(cancelModalElement).show();
     }
 

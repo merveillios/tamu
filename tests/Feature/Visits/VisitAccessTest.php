@@ -52,6 +52,7 @@ class VisitAccessTest extends TestCase
         $this->assertSame(['Tamu Lokasi A'], array_column($rows, 'name'));
         $this->assertArrayNotHasKey('phone', $rows[0]);
         $this->assertArrayNotHasKey('email', $rows[0]);
+        $this->assertArrayNotHasKey('number', $rows[0]);
         $this->assertTrue($rows[0]['actions']['assign']);
         $this->assertSame(1, $response->json('data.counts.menunggu_pic'));
     }

@@ -12,10 +12,10 @@
             <x-icon name="clipboard-check" class="icon icon-lg text-success mb-3" />
 
             @if ($thanks)
-                <div class="guest-number mb-3">No. {{ $thanks['number'] }}</div>
+                <h1 class="h4 mb-3">Kunjungan terkirim</h1>
                 <p class="mb-4">
-                    Terima kasih, {{ $thanks['name'] }}. Kunjungan Anda di {{ $thanks['location'] }} tercatat dengan
-                    No. {{ $thanks['number'] }} pada pukul {{ $thanks['time'] }}. Silakan menunggu petugas.
+                    Terima kasih, {{ $thanks['name'] }}. Kunjungan Anda di {{ $thanks['location'] }} sudah kami terima
+                    pada pukul {{ $thanks['time'] }}. Silakan menunggu petugas.
                 </p>
             @else
                 <p class="mb-4">Terima kasih, data Anda tercatat. Silakan menunggu petugas.</p>

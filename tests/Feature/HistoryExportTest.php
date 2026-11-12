@@ -100,7 +100,9 @@ class HistoryExportTest extends TestCase
 
         $csv = $response->streamedContent();
         $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
-        $this->assertStringContainsString('"No. Urut";"Waktu Datang";Lokasi', $csv);
+        $this->assertStringContainsString('No.;"Waktu Datang";Lokasi', $csv);
+        // Kolom pertama nomor baris 1, 2, 3, bukan nomor urut kunjungan.
+        $this->assertMatchesRegularExpression('/\n1;.*\n2;.*\n3;/s', $csv);
         $this->assertStringContainsString('Tamu Selesai', $csv);
         $this->assertStringContainsString("'=HYPERLINK", $csv);
         $this->assertStringContainsString('Tamu Lokasi B', $csv);
