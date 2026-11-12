@@ -12,22 +12,18 @@ use Dompdf\Options;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Ekspor History ke CSV, Excel, dan PDF sesuai filter dan cakupan (HIS-4, HIS-5, PRD Bab 12.4).
+ * Ekspor History ke PDF sesuai filter dan cakupan (HIS-4, HIS-5, PRD Bab 12.4).
+ *
+ * Sejak revisi HRD #13 satu-satunya format adalah PDF, tanpa batas baris: jumlah
+ * baris mengikuti filter yang dipilih.
  */
 class ExportService
 {
     /**
-     * Kolom yang sama untuk ketiga format; Excel dan PDF menambah kolom Tanda Tangan.
+     * Kolom data per kunjungan; PDF menambah kolom Tanda Tangan di akhir.
      */
     public const COLUMNS = [
         'No.', 'Waktu Datang', 'Lokasi', 'Nama Tamu', 'Instansi/Perusahaan', 'Kelompok Rentan',
@@ -37,14 +33,8 @@ class ExportService
 
     private const RELATIONS = ['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name'];
 
-    private const MIME_TYPES = [
-        'csv' => 'text/csv; charset=UTF-8',
-        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'pdf' => 'application/pdf',
-    ];
-
     /**
-     * Lebar maksimal gambar tanda tangan di Excel dan PDF.
+     * Lebar maksimal gambar tanda tangan di PDF.
      */
     private const SIGNATURE_WIDTH = 160;
 
@@ -53,36 +43,24 @@ class ExportService
     }
 
     /**
-     * Membuat file unduhan. Batas baris Excel/PDF dicek sebelum file dibuat.
+     * Membuat file PDF unduhan dari seluruh baris hasil filter.
      *
      * @param  array<string, mixed>  $filters
      */
-    public function download(Builder $query, string $format, array $filters, ?string $locationName, User $actor): Response
+    public function download(Builder $query, array $filters, ?string $locationName, User $actor): Response
     {
         $rows = (clone $query)->count();
-        $limit = config('sitamu.export.rich_max_rows');
 
-        if ($format !== 'csv' && $rows > $limit) {
-            throw ValidationException::withMessages([
-                'format' => "Hasil filter {$rows} baris, melebihi batas {$limit} baris. Persempit filter atau gunakan ekspor CSV.",
-            ]);
-        }
+        $this->audit->record('visit.export', null, ['format' => 'pdf', 'filters' => $filters, 'rows' => $rows], $actor);
 
-        $this->audit->record('visit.export', null, ['format' => $format, 'filters' => $filters, 'rows' => $rows], $actor);
+        $filename = sprintf('sitamu_%s_%s.pdf', $locationName ? Str::slug($locationName) : 'semua', now()->format('Ymd-Hi'));
 
-        $filename = sprintf('sitamu_%s_%s.%s', $locationName ? Str::slug($locationName) : 'semua', now()->format('Ymd-Hi'), $format);
-        $headers = [
-            'Content-Type' => self::MIME_TYPES[$format],
+        return response($this->pdf($query->with(self::RELATIONS), $filters, $locationName, $rows), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             'Cache-Control' => 'private, no-store',
             'X-Content-Type-Options' => 'nosniff',
-        ];
-        $query->with(self::RELATIONS);
-
-        return match ($format) {
-            'csv' => $this->csv($query, $filename, $headers),
-            'xlsx' => $this->xlsx($query, $filename, $headers),
-            'pdf' => $this->pdf($query, $filename, $headers, $filters, $locationName, $rows),
-        };
+        ]);
     }
 
     /**
@@ -112,90 +90,23 @@ class ExportService
     }
 
     /**
-     * CSV UTF-8 dengan BOM, ditulis streaming tanpa batas baris.
-     *
-     * @param  array<string, string>  $headers
-     */
-    private function csv(Builder $query, string $filename, array $headers): StreamedResponse
-    {
-        $delimiter = config('sitamu.export.csv_delimiter');
-
-        return response()->streamDownload(function () use ($query, $delimiter) {
-            $output = fopen('php://output', 'w');
-            fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, self::COLUMNS, $delimiter);
-
-            $rowNumber = 0;
-
-            foreach ($query->lazy(500) as $visit) {
-                fputcsv($output, array_map([$this, 'guardCsvCell'], $this->row($visit, ++$rowNumber)), $delimiter);
-            }
-
-            fclose($output);
-        }, $filename, $headers);
-    }
-
-    /**
-     * Excel satu sheet: header tebal dan dibekukan, teks panjang dibungkus, semua nilai
-     * ditulis sebagai string agar tidak pernah dievaluasi sebagai rumus.
-     *
-     * @param  array<string, string>  $headers
-     */
-    private function xlsx(Builder $query, string $filename, array $headers): StreamedResponse
-    {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet()->setTitle('History');
-        $columns = array_merge(self::COLUMNS, ['Tanda Tangan']);
-
-        $sheet->fromArray($columns, null, 'A1');
-        $sheet->getStyle('A1:O1')->getFont()->setBold(true);
-        $sheet->freezePane('A2');
-
-        $rowNumber = 2;
-
-        foreach ($query->get()->chunk(100) as $chunk) {
-            $signatures = $this->signatures($chunk);
-
-            foreach ($chunk as $visit) {
-                // Baris 1 adalah header, jadi nomor data = nomor baris sheet - 1.
-                foreach ($this->row($visit, $rowNumber - 1) as $index => $value) {
-                    $sheet->setCellValueExplicit([$index + 1, $rowNumber], $value, DataType::TYPE_STRING);
-                }
-
-                $this->addSignatureImage($sheet, $signatures->get($visit->id), $rowNumber);
-                $rowNumber++;
-            }
-        }
-
-        foreach (['G', 'I', 'N'] as $longTextColumn) {
-            $sheet->getStyle("{$longTextColumn}2:{$longTextColumn}{$rowNumber}")->getAlignment()->setWrapText(true);
-            $sheet->getColumnDimension($longTextColumn)->setWidth(40);
-        }
-
-        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'H', 'J', 'K', 'L', 'M'] as $column) {
-            $sheet->getColumnDimension($column)->setAutoSize(true);
-        }
-
-        $sheet->getColumnDimension('O')->setWidth(25);
-
-        return response()->streamDownload(function () use ($spreadsheet) {
-            (new Xlsx($spreadsheet))->save('php://output');
-            $spreadsheet->disconnectWorksheets();
-        }, $filename, $headers);
-    }
-
-    /**
      * PDF A4 landscape dari view Blade dengan header tabel berulang dan nomor halaman.
      *
-     * @param  array<string, string>  $headers
      * @param  array<string, mixed>  $filters
      */
-    private function pdf(Builder $query, string $filename, array $headers, array $filters, ?string $locationName, int $rowCount): Response
+    private function pdf(Builder $query, array $filters, ?string $locationName, int $rowCount): string
     {
+        // Tanpa batas baris, Dompdf menyusun seluruh tabel di memori; batas PHP dinaikkan
+        // khusus untuk request ini agar filter yang lebar tidak terhenti di tengah jalan.
+        ini_set('memory_limit', (string) config('sitamu.export.pdf_memory_limit'));
+        set_time_limit((int) config('sitamu.export.pdf_time_limit'));
+
         $visits = $query->get();
-        $signatures = $visits->chunk(100)->flatMap(fn (Collection $chunk) => $this->signatures($chunk)->map(
-            fn (string $png) => 'data:image/png;base64,'.base64_encode($png),
-        ));
+        // union() menjaga kunci visit_id; flatMap() mengurutkan ulang kunci sehingga tanda tangan
+        // tidak pernah ketemu saat dicari per kunjungan (penyebab revisi HRD #2).
+        $signatures = $visits->chunk(100)
+            ->reduce(fn (Collection $found, Collection $chunk) => $found->union($this->signatures($chunk)), collect())
+            ->map(fn (string $png) => 'data:image/png;base64,'.base64_encode($png));
 
         $html = view('admin.export.pdf', [
             'rows' => $visits->values()->map(fn (GuestVisit $visit, int $index) => [
@@ -218,7 +129,7 @@ class ExportService
         $dompdf->render();
         $dompdf->getCanvas()->page_text(760, 570, 'Halaman {PAGE_NUM} dari {PAGE_COUNT}', null, 7, [0.3, 0.3, 0.3]);
 
-        return response($dompdf->output(), 200, $headers + ['Content-Disposition' => 'attachment; filename="'.$filename.'"']);
+        return $dompdf->output();
     }
 
     /**
@@ -262,31 +173,5 @@ class ExportService
         imagedestroy($target);
 
         return $result;
-    }
-
-    /**
-     * Menyisipkan gambar tanda tangan di kolom O baris tertentu.
-     */
-    private function addSignatureImage(Worksheet $sheet, ?string $png, int $rowNumber): void
-    {
-        if ($png === null) {
-            return;
-        }
-
-        $drawing = MemoryDrawing::fromString($png);
-        $drawing->setCoordinates("O{$rowNumber}");
-        $drawing->setOffsetX(4);
-        $drawing->setOffsetY(4);
-        $drawing->setWorksheet($sheet);
-
-        $sheet->getRowDimension($rowNumber)->setRowHeight(max(30, $drawing->getHeight() * 0.75 + 8));
-    }
-
-    /**
-     * Mencegah CSV injection: sel diawali =, +, -, @, tab, atau carriage return diberi awalan '.
-     */
-    private function guardCsvCell(string $value): string
-    {
-        return $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true) ? "'".$value : $value;
     }
 }

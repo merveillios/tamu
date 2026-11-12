@@ -180,7 +180,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | Buka kembali kunjungan Selesai/Dibatalkan | Tidak \[DEFAULT\] | Semua lokasi | Tidak | Tidak | – |
 | Detail kunjungan dan riwayat status | Semua lokasi | Semua lokasi | QR miliknya | Bidang/UPT-nya | – |
 | Gambar tanda tangan | Semua lokasi | Semua lokasi | QR miliknya | Tidak | – |
-| History: lihat, cari, filter, ekspor CSV/Excel/PDF | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
+| History: lihat, cari, filter, ekspor PDF | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola daftar petugas Bidang/UPT | Semua lokasi | Semua lokasi | Tidak | Tidak | – |
 | Kelola lokasi | Ya | Ya | Tidak | Tidak | – |
 | Kelola Bidang/UPT | Ya | Ya | Tidak | Tidak | – |
@@ -206,7 +206,7 @@ MVP mencakup seluruh siklus kunjungan dari pemindaian QR sampai hasil tampil di 
 - Kategori keperluan per lokasi dengan saran Bidang/UPT, dan daftar petugas per Bidang/UPT.
 - Tamu Aktif untuk Resepsionis (dengan penugasan), Admin, dan Super Admin; daftar Penugasan untuk PIC (terima, tulis hasil, selesaikan).
 - Pembatalan kunjungan dengan alasan dan buka kembali oleh Admin.
-- History Kunjungan dengan pencarian, filter, dan ekspor CSV, Excel, dan PDF.
+- History Kunjungan dengan pencarian, filter, dan ekspor PDF.
 - Dashboard sesuai peran, pembatasan akses berbasis peran di sisi server, audit log, dan pencatatan waktu kunjungan.
 
 ## 4.2 Di luar lingkup MVP (JANGAN diimplementasikan)
@@ -333,8 +333,8 @@ Key bawaan Laravel dibaca framework langsung. Key aplikasi dipetakan di `config/
 | `WAITING_ALERT_MINUTES` | `15` | \[DEFAULT\] Batas menunggu sebelum kunjungan ditandai. |
 | `SIGNATURE_MAX_KB` | `200` | \[DEFAULT\] Ukuran maksimal gambar tanda tangan setelah di-decode. |
 | `GUEST_HISTORY_PER_PAGE` | `10` | \[DEFAULT\] \[BARU v0.10\] Jumlah kunjungan per halaman riwayat tamu. |
-| `CSV_DELIMITER` | `;` | \[DEFAULT\] |
-| `EXPORT_RICH_MAX_ROWS` | `500` | \[DEFAULT\] Batas baris ekspor Excel dan PDF. |
+| `EXPORT_PDF_MEMORY_LIMIT` | `1024M` | \[DEFAULT\] Batas memori PHP khusus saat membuat PDF ekspor (revisi HRD #13). |
+| `EXPORT_PDF_TIME_LIMIT` | `300` | \[DEFAULT\] Batas waktu (detik) saat membuat PDF ekspor. |
 | `INSTITUTION_NAME` | `Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur (Disperindag)` | \[DEFAULT\] |
 
 &#91;DIHAPUS v0.10\] `EMERGENCY_PASS_TTL_MINUTES`.
@@ -352,7 +352,7 @@ Tidak ada password default. Super Admin pertama dibuat lewat `php artisan sitamu
 - &#91;BARU v0.10\] Tamu lama dikenali dari email Google terverifikasi yang sama, lintas semua lokasi \[DEFAULT\]. Data diri tamu lama diambil dari kunjungan terakhirnya.
 - &#91;BARU v0.10\] Seluruh tamu yang tercatat memiliki email terverifikasi Google. Tamu yang tidak dapat login Google tidak tercatat di sistem.
 - Tanda tangan adalah gambar goresan tangan sebagai bukti kehadiran, **bukan** Tanda Tangan Elektronik tersertifikasi.
-- File Excel dan PDF hasil ekspor berada di luar kendali sistem setelah diunduh.
+- File PDF hasil ekspor berada di luar kendali sistem setelah diunduh.
 - QR Code tercetak dapat difoto siapa pun. Token berfungsi sebagai penanda lokasi yang tidak dapat ditebak, **bukan** sebagai rahasia.
 - URL di QR Code dibentuk dari `APP_URL`. Jika domain berubah setelah QR dicetak, QR harus dicetak ulang.
 - HTTPS wajib di produksi. Web server mengarahkan *document root* ke folder `public/`.
@@ -531,7 +531,7 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 | HIS-2 | \[DIUBAH v0.10\] Admin dapat mencari dan memfilter. | Wajib | Pencarian teks pada nama, instansi, dan rincian keperluan. Filter: rentang tanggal `check_in_at`, preset periode (Hari ini, 7 hari terakhir, Bulan ini), status, lokasi, kategori keperluan, Bidang/UPT tujuan, dan kelompok rentan. Filter tersimpan di query string. |
 | HIS-3 | \[DIHAPUS revisi HRD #6 dan #7\] Filter kategori keperluan dihapus bersama kategori. | – | Pencarian teks pada rincian keperluan (HIS-2) tetap tersedia. |
 | HIS-4 | Admin dapat melihat detail kunjungan dan mengekspor data sesuai cakupan. | Wajib | Ekspor mengikuti filter aktif dan cakupan. Spesifikasi di Bab 12.4. Setiap ekspor tercatat di audit log beserta format, filter, dan jumlah baris. |
-| HIS-5 | Tombol **Ekspor** berupa dropdown: CSV, Excel (.xlsx), dan PDF. | Wajib | Parameter `format` hanya menerima `csv`, `xlsx`, `pdf`. Excel dan PDF ditolak bila baris melebihi `EXPORT_RICH_MAX_ROWS`; CSV tidak dibatasi. |
+| HIS-5 | \[DIUBAH revisi HRD #13\] Tombol **Ekspor PDF**; ekspor hanya tersedia dalam format PDF. | Wajib | Parameter `format` opsional dan hanya menerima `pdf`; nilai lain (termasuk `csv` dan `xlsx`) ditolak dengan pesan "Ekspor hanya tersedia dalam format PDF.". Tidak ada batas baris: semua baris hasil filter diekspor. |
 
 ## 6.11 Dashboard \[DIUBAH v0.10\]
 
@@ -914,7 +914,7 @@ CREATE TABLE audit_logs (
 - `visit_signatures.image` harus `MEDIUMBLOB`. Jika `Blueprint` tidak menyediakannya, ubah dengan `DB::statement('ALTER TABLE visit_signatures MODIFY image MEDIUMBLOB NOT NULL')` di migrasi yang sama.
 - Kolom ENUM dibuat dengan `$table->enum()`; `detail` dengan `$table->json()` (cast `array`). Model tanpa `created_at`/`updated_at` standar memakai `$timestamps = false`.
 - Tidak ada operasi `DELETE` terhadap `guest_visits`, `visit_signatures`, `visit_counters`, `visit_assignments`, `visit_status_logs`, `audit_logs`, `departments`, `purpose_categories`, dan `staff_members`. Model terkait menolak penghapusan lewat event `deleting` (melempar `LogicException`); `AuditLog`, `VisitStatusLog`, `VisitAssignment`, dan `VisitSignature` juga menolak `updating`.
-- Query daftar (Tamu Aktif, Penugasan, History, dashboard, ekspor CSV, riwayat tamu) **JANGAN** JOIN ke `visit_signatures`. Gambar hanya dibaca route tanda tangan dan `ExportService` (Excel/PDF) lewat query terpisah per batch.
+- Query daftar (Tamu Aktif, Penugasan, History, dashboard, riwayat tamu) **JANGAN** JOIN ke `visit_signatures`. Gambar hanya dibaca route tanda tangan dan `ExportService` (PDF) lewat query terpisah per batch.
 - Perkiraan kapasitas: satu tanda tangan 5–30 KB, sehingga 50.000 kunjungan membutuhkan sekitar 0,25–1,5 GB.
 
 ## 9.3 Pengambilan nomor urut (TAM-10)
@@ -1006,7 +1006,7 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | --- | --- | --- |
 | GET | `/admin/kunjungan/{id}/tanda-tangan` | Gambar PNG tanda tangan. Header: `Content-Type: image/png`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`. |
 | GET | `/admin/history` | History. Query: `q`, `from`, `to`, `period`, `status`, `location_id`, `purpose_category_id`, `department_id`, `vulnerable_group`, `page`. |
-| GET | `/admin/history/export` | Unduh ekspor dengan filter yang sama. Query tambahan: `format` (`csv`, `xlsx`, `pdf`; default `csv`). |
+| GET | `/admin/history/export` | Unduh ekspor dengan filter yang sama. Query tambahan: `format` (hanya `pdf`, opsional). Selalu menghasilkan PDF. |
 | GET | `/admin/petugas` | \[BARU v0.10\] Daftar petugas per Bidang/UPT. Query: `department_id`. |
 | GET / POST | `/admin/petugas/tambah` | \[BARU v0.10\] Form dan simpan petugas. |
 | GET / POST | `/admin/petugas/{id}/ubah` | \[BARU v0.10\] Form dan simpan perubahan. |
@@ -1178,26 +1178,17 @@ Aturan:
 
 &#91;DIHAPUS v0.10\] `emergency_pass.create`, `emergency_pass.use`. Penugasan dicatat di `visit_assignments`; perubahan status (Terima, Selesai, Batal) di `visit_status_logs`. `detail` tidak boleh berisi password, token, data URL tanda tangan, atau isi hasil. Untuk `visit.export`, `detail` berisi format, filter aktif, dan jumlah baris.
 
-## 12.4 Ekspor Data (CSV, Excel, PDF) \[DIUBAH v0.10\]
+## 12.4 Ekspor Data (PDF) \[DIUBAH revisi HRD #13\]
+
+Ekspor CSV dan Excel dihapus; satu-satunya format adalah PDF untuk semua peran yang memiliki hak ekspor.
 
 **Umum**
 
-- Tombol **Ekspor** di History berupa dropdown CSV, Excel (.xlsx), dan PDF; ketiganya mengikuti filter aktif dan cakupan.
-- Kolom sama untuk ketiga format (14 kolom): No. (nomor baris 1, 2, 3 di file ekspor, bukan nomor urut kunjungan), Waktu Datang (`dd/mm/yyyy HH:mm`), Lokasi, Nama Tamu, Instansi/Perusahaan, Kelompok Rentan, Rincian Keperluan, No. Telepon, Alamat, Email, Bidang/UPT Tujuan, Orang yang Ditemui (dipilih resepsionis), Status (Selesai, Dibatalkan, atau Sedang direview), Hasil (kosong bila belum Selesai).
-- **Excel dan PDF menambah kolom terakhir Tanda Tangan** berupa gambar (16 kolom). CSV tidak memuat tanda tangan.
-- Nama file: `sitamu_{nama-lokasi atau semua}_{YYYYMMDD-HHmm}.{csv|xlsx|pdf}`.
-- Header respons: `Content-Type` sesuai format, `Content-Disposition: attachment`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`.
-
-**CSV**
-
-- UTF-8 dengan BOM, pemisah `CSV_DELIMITER`, ditulis streaming (`response()->streamDownload()`, `fputcsv()`, `chunkById()` atau `cursor()`). Tidak dibatasi jumlah baris.
-- Pencegahan CSV injection: sel yang diawali `=`, `+`, `-`, `@`, tab, atau carriage return diberi awalan `'`.
-
-**Excel (.xlsx)**
-
-- `phpoffice/phpspreadsheet`, satu sheet, header tebal dan dibekukan, teks panjang (Rincian, Hasil, Alamat) dibungkus (wrap text).
-- Gambar tanda tangan tertanam di sel, diperkecil dengan GD (lebar maks. 160 px).
-- Seluruh nilai teks ditulis sebagai tipe string eksplisit sehingga tidak pernah dievaluasi sebagai rumus.
+- Tombol **Ekspor PDF** di History mengikuti filter aktif dan cakupan.
+- Kolom data (14 kolom): No. (nomor baris 1, 2, 3 di file ekspor, bukan nomor urut kunjungan), Waktu Datang (`dd/mm/yyyy HH:mm`), Lokasi, Nama Tamu, Instansi/Perusahaan, Kelompok Rentan, Rincian Keperluan, No. Telepon, Alamat, Email, Bidang/UPT Tujuan, Orang yang Ditemui (dipilih resepsionis), Status (Selesai, Dibatalkan, atau Sedang direview), Hasil (kosong bila belum Selesai).
+- **PDF menambah kolom terakhir Tanda Tangan** berupa gambar (15 kolom).
+- Nama file: `sitamu_{nama-lokasi atau semua}_{YYYYMMDD-HHmm}.pdf`.
+- Header respons: `Content-Type: application/pdf`, `Content-Disposition: attachment`, `Cache-Control: private, no-store`, `X-Content-Type-Options: nosniff`.
 
 **PDF**
 
@@ -1207,7 +1198,7 @@ Aturan:
 
 **Batas dan performa**
 
-- Excel dan PDF dibatasi `EXPORT_RICH_MAX_ROWS` baris, dihitung **sebelum** file dibuat: "Hasil filter X baris, melebihi batas Y baris. Persempit filter atau gunakan ekspor CSV."
+- Tidak ada batas baris (revisi HRD #13); jumlah baris mengikuti filter. Saat membuat PDF, batas memori dan waktu PHP dinaikkan sesuai `EXPORT_PDF_MEMORY_LIMIT` dan `EXPORT_PDF_TIME_LIMIT`. Filter yang sangat lebar tetap bisa lambat; persempit periode bila perlu.
 - Gambar tanda tangan diambil per batch tanpa JOIN. Kunjungan tanpa gambar dibiarkan kosong.
 
 ## 12.5 Lain-lain
@@ -1250,7 +1241,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | Tamu Aktif — Admin, Super Admin | Sama dengan versi Resepsionis ditambah kolom lokasi dan QR serta filter lokasi; tombol hanya Batal dan Detail. |
 | Penugasan — PIC \[BARU v0.10\] | Dua bagian: "Penugasan baru" dan "Sedang direview". Kartu/baris: nama, instansi, kelompok rentan, kategori dan rincian keperluan, orang yang ditemui, lokasi, jam datang, lama menunggu. Tombol: Selesai pada setiap baris (modal berisi Rincian keperluan dan isian Hasil dengan keterangan "Hasil ini akan terlihat oleh tamu."); tidak ada tombol Terima. Bagian "Sedang direview" hanya berisi kunjungan `processing` lama. Tombol "Aktifkan bunyi notifikasi" (opsional, PIC-4). |
 | Detail kunjungan | Admin dan Super Admin: 12 data Bab 6.6.1 (tanda tangan dari route tanda tangan, `loading="lazy"`), lokasi, QR, saran Bidang/UPT, Bidang/UPT tujuan, orang yang ditemui, hasil, riwayat penugasan, dan timeline status (waktu, dari → ke, oleh akun, catatan); tombol Buka Kembali hanya untuk Admin pada kunjungan Selesai/Dibatalkan. Resepsionis: sama, termasuk tanda tangan, tanpa tombol Buka Kembali. PIC: sama, tanpa tanda tangan dan tanpa tombol Buka Kembali. |
-| History | Panel filter (Bab 6.10), tabel berpaginasi (tanggal, nama, instansi, kelompok rentan, kategori, Bidang/UPT tujuan, lokasi, jam datang, status), tombol Ekspor berupa dropdown (CSV, Excel, PDF). |
+| History | Panel filter (Bab 6.10), tabel berpaginasi (tanggal, nama, instansi, kelompok rentan, kategori, Bidang/UPT tujuan, lokasi, jam datang, status), tombol Ekspor PDF. |
 | Lokasi | Tabel lokasi (nama, jumlah Bidang/UPT, jumlah QR aktif, status), tombol tambah, ubah, aktif/nonaktif, hapus (bila memenuhi syarat), tautan Bidang/UPT dan QR. |
 | Bidang/UPT per lokasi \[BARU v0.10\] | Tabel Bidang/UPT (nama, akun PIC, jumlah petugas aktif, status), tombol tambah, ubah nama, aktif/nonaktif. |
 | QR per lokasi | Tabel QR (label, akun resepsionis, status, dibuat, terakhir dipakai) dengan tombol ganti resepsionis, aktif/nonaktif, regenerate, unduh PNG/SVG, cetak. Form buat QR berisi label dan pilihan akun resepsionis. |
@@ -1315,9 +1306,9 @@ Agent memakai kolom **Default untuk MVP**; jika klien memutuskan lain, cukup uba
 | 15 | Pemilik project Google Cloud dan OAuth Client ID? | Dibuat instansi; Web application, "In production", tanpa scope sensitif. | Kecil: `.env`. Tanpa Client ID, halaman tamu tidak berjalan. |
 | 16 | Masa berlaku verifikasi email di session? | 30 menit. | Kecil: `.env`. |
 | 17 | Server produksi punya akses internet keluar ke Google? | Terkonfirmasi: ya. | Prasyarat deployment, diverifikasi di M7. |
-| 18 | Library ekspor Excel dan PDF? | `phpoffice/phpspreadsheet` dan `dompdf/dompdf`. | Sedang: `ExportService` dan ekstensi PHP. |
-| 19 | Ukuran kertas PDF untuk 16 kolom? | A4 landscape, font 7 pt. | Kecil: template PDF (misalnya F4 landscape). |
-| 20 | Batas baris ekspor Excel dan PDF? | 500 baris; CSV tanpa batas. | Kecil: `.env`. |
+| 18 | Library ekspor Excel dan PDF? | `dompdf/dompdf` untuk PDF. \[DIUBAH revisi HRD #13\] Ekspor Excel dihapus. | Sedang: `ExportService` dan ekstensi PHP. |
+| 19 | Ukuran kertas PDF untuk 15 kolom? | A4 landscape, font 7 pt. | Kecil: template PDF (misalnya F4 landscape). |
+| 20 | Batas baris ekspor? | \[DIUBAH revisi HRD #13\] Tanpa batas; mengikuti filter. Hanya PDF. | Kecil: `.env` (`EXPORT_PDF_MEMORY_LIMIT`, `EXPORT_PDF_TIME_LIMIT`). |
 | 21 | \[DIUBAH v0.10\] Semua sesi diakhiri setelah ganti password? | Ya, termasuk sesi yang sedang dipakai; pengguna login kembali. | Kecil: lepas middleware `AuthenticateSession`. |
 | 22 | Sudah ada kode atau database PHP native sebelumnya? | Tidak; mulai dari nol. | Sedang: rencana migrasi data. |
 | 23 | \[BARU v0.10\] Daftar pilihan kelompok rentan? | Bukan kelompok rentan, Lansia, Penyandang disabilitas, Ibu hamil, Tidak ingin menyebutkan. | Kecil: enum `VulnerableGroup`, ekspor, filter. |

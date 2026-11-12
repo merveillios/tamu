@@ -3,14 +3,15 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Models\GuestVisit;
 use App\Models\VisitSignature;
+use App\Services\ExportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Tests\Concerns\InteractsWithGuestPages;
 use Tests\TestCase;
 
 /**
- * Menguji History Kunjungan dan ekspor CSV, Excel, PDF (HIS-1 sampai HIS-5, Bab 12.4).
+ * Menguji History Kunjungan dan ekspor PDF (HIS-1 sampai HIS-5, Bab 12.4, revisi HRD #13).
  */
 class HistoryExportTest extends TestCase
 {
@@ -89,42 +90,47 @@ class HistoryExportTest extends TestCase
         $this->actingAs($admin)->get('/admin/history?location_id=999999')->assertNotFound();
     }
 
-    public function test_csv_export_is_guarded_and_audited(): void
+    public function test_pdf_export_of_all_filtered_rows_is_guarded_and_audited(): void
     {
-        $response = $this->actingAs($this->data['admin'])->get('/admin/history/export?format=csv')
+        $response = $this->actingAs($this->data['admin'])->get('/admin/history/export')
             ->assertOk()
-            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
+            ->assertHeader('Content-Type', 'application/pdf')
             ->assertHeader('Cache-Control', 'no-store, private');
 
-        $csv = $response->streamedContent();
-        $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
-        $this->assertStringContainsString('No.;"Waktu Datang";Lokasi', $csv);
-        // Kolom pertama nomor baris 1, 2, 3, bukan nomor urut kunjungan.
-        $this->assertMatchesRegularExpression('/\n1;.*\n2;.*\n3;/s', $csv);
-        $this->assertStringContainsString('Tamu Selesai', $csv);
-        $this->assertStringContainsString("'=HYPERLINK", $csv);
-        $this->assertStringContainsString('Tamu Lokasi B', $csv);
-        $this->assertStringNotContainsString('Tamu Menunggu', $csv);
-        $this->assertMatchesRegularExpression('/sitamu_semua_\d{8}-\d{4}\.csv/', $response->headers->get('Content-Disposition'));
-        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['admin']->id, 'detail->format' => 'csv', 'detail->rows' => 3]);
+        $pdf = $response->getContent();
+        $this->assertStringStartsWith('%PDF', $pdf);
+        // Tanda tangan disematkan sebagai gambar di PDF.
+        $this->assertStringContainsString('/Subtype /Image', $pdf);
+        $this->assertMatchesRegularExpression('/sitamu_semua_\d{8}-\d{4}\.pdf/', $response->headers->get('Content-Disposition'));
+        $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $this->data['admin']->id, 'detail->format' => 'pdf', 'detail->rows' => 3]);
     }
 
-    public function test_xlsx_export_writes_strings_and_signature_images(): void
+    public function test_pdf_table_rows_are_escaped_and_numbered(): void
     {
-        $response = $this->actingAs($this->data['admin'])->get('/admin/history/export?format=xlsx')
+        $exports = app(ExportService::class);
+        $visits = GuestVisit::query()->with(['location', 'assignedDepartment', 'servedBy'])->orderBy('id')->get();
+
+        $html = view('admin.export.pdf', [
+            'rows' => $visits->map(fn (GuestVisit $visit, int $index) => ['values' => $exports->row($visit, $index + 1), 'signature' => null]),
+            'columns' => array_merge(ExportService::COLUMNS, ['Tanda Tangan']),
+            'locationName' => 'Semua lokasi',
+            'filters' => [],
+            'rowCount' => $visits->count(),
+        ])->render();
+
+        $this->assertStringContainsString('=HYPERLINK(&quot;http://jahat.test&quot;)', $html);
+        $this->assertStringNotContainsString('No. Urut', $html);
+        $this->assertSame('1', $exports->row($visits->first(), 1)[0]);
+    }
+
+    public function test_history_page_offers_only_pdf_export(): void
+    {
+        $this->actingAs($this->data['admin'])->get('/admin/history')
             ->assertOk()
-            ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-        $path = tempnam(sys_get_temp_dir(), 'xlsx');
-        file_put_contents($path, $response->streamedContent());
-        $sheet = IOFactory::load($path)->getActiveSheet();
-        unlink($path);
-
-        $this->assertSame('Tanda Tangan', $sheet->getCell('O1')->getValue());
-        $names = [$sheet->getCell('D2')->getValue(), $sheet->getCell('D3')->getValue(), $sheet->getCell('D4')->getValue()];
-        $this->assertContains('=HYPERLINK("http://jahat.test")', $names);
-        $this->assertSame('s', $sheet->getCell('D'.(array_search('=HYPERLINK("http://jahat.test")', $names) + 2))->getDataType());
-        $this->assertCount(1, $sheet->getDrawingCollection());
+            ->assertSee('Ekspor PDF')
+            ->assertDontSee('format=csv', false)
+            ->assertDontSee('format=xlsx', false)
+            ->assertDontSee('Excel');
     }
 
     public function test_pdf_export_is_generated(): void
@@ -138,21 +144,15 @@ class HistoryExportTest extends TestCase
         $this->assertStringContainsString('sitamu_kantor-a_', $response->headers->get('Content-Disposition'));
     }
 
-    public function test_rich_exports_over_limit_are_rejected_but_csv_is_not(): void
+    public function test_csv_excel_and_other_formats_are_rejected(): void
     {
-        config(['sitamu.export.rich_max_rows' => 1]);
-        $admin = $this->data['admin'];
+        foreach (['csv', 'xlsx', 'docx'] as $format) {
+            $this->actingAs($this->data['admin'])->from('/admin/history')->get("/admin/history/export?format={$format}")
+                ->assertRedirect('/admin/history')
+                ->assertSessionHasErrors(['format' => 'Ekspor hanya tersedia dalam format PDF.']);
+        }
 
-        $this->actingAs($admin)->from('/admin/history')->get('/admin/history/export?format=xlsx')
-            ->assertRedirect('/admin/history')
-            ->assertSessionHasErrors(['format' => 'Hasil filter 3 baris, melebihi batas 1 baris. Persempit filter atau gunakan ekspor CSV.']);
-        $this->actingAs($admin)->get('/admin/history/export?format=pdf')->assertSessionHasErrors('format');
-        $this->actingAs($admin)->get('/admin/history/export?format=csv')->assertOk();
-    }
-
-    public function test_invalid_format_is_rejected(): void
-    {
-        $this->actingAs($this->data['admin'])->get('/admin/history/export?format=docx')->assertSessionHasErrors('format');
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'visit.export']);
     }
 
     public function test_receptionist_and_pic_cannot_open_history(): void

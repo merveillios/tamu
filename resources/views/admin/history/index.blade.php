@@ -79,14 +79,8 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <span class="small text-gray-600">{{ $visits->total() }} kunjungan</span>
-        <div class="dropdown">
-            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Ekspor</button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                @foreach (['csv' => 'CSV', 'xlsx' => 'Excel (.xlsx)', 'pdf' => 'PDF'] as $format => $label)
-                    <li><a class="dropdown-item" href="{{ route('admin.history.export', array_merge($filters, ['format' => $format])) }}">{{ $label }}</a></li>
-                @endforeach
-            </ul>
-        </div>
+        {{-- Ekspor hanya PDF (revisi HRD #13); seluruh baris sesuai filter ikut diekspor. --}}
+        <a href="{{ route('admin.history.export', $filters) }}" class="btn btn-primary btn-sm">Ekspor PDF</a>
     </div>
 
     <div class="card card-body border-0 shadow">

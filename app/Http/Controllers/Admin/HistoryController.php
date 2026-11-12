@@ -41,7 +41,7 @@ class HistoryController extends Controller
     }
 
     /**
-     * Unduh ekspor CSV, Excel, atau PDF mengikuti filter aktif dan cakupan (Bab 12.4).
+     * Unduh ekspor PDF mengikuti filter aktif dan cakupan (Bab 12.4, revisi HRD #13).
      */
     public function export(HistoryRequest $request, ExportService $exports): Response
     {
@@ -51,12 +51,6 @@ class HistoryController extends Controller
 
         $locationName = empty($filters['location_id']) ? null : Location::query()->whereKey($filters['location_id'])->value('name');
 
-        return $exports->download(
-            $this->history->query($user, $filters),
-            $request->validated('format') ?? 'csv',
-            $filters,
-            $locationName,
-            $user,
-        );
+        return $exports->download($this->history->query($user, $filters), $filters, $locationName, $user);
     }
 }

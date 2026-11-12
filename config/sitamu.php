@@ -35,9 +35,10 @@ return [
 
     'signature_max_kb' => (int) env('SIGNATURE_MAX_KB', 200),
 
+    // Ekspor hanya PDF tanpa batas baris (revisi HRD #13); batas PHP khusus saat membuat PDF.
     'export' => [
-        'csv_delimiter' => env('CSV_DELIMITER', ';'),
-        'rich_max_rows' => (int) env('EXPORT_RICH_MAX_ROWS', 500),
+        'pdf_memory_limit' => env('EXPORT_PDF_MEMORY_LIMIT', '1024M'),
+        'pdf_time_limit' => (int) env('EXPORT_PDF_TIME_LIMIT', 300),
     ],
 
 ];

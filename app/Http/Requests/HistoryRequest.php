@@ -36,7 +36,8 @@ class HistoryRequest extends FormRequest
             'location_id' => ['nullable', 'integer'],
             'department_id' => ['nullable', 'integer'],
             'vulnerable_group' => ['nullable', Rule::enum(VulnerableGroup::class)],
-            'format' => ['nullable', 'in:csv,xlsx,pdf'],
+            // Hanya PDF (revisi HRD #13); tautan lama ?format=csv atau xlsx ditolak, bukan diam-diam diganti.
+            'format' => ['nullable', 'in:pdf'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
@@ -51,7 +52,7 @@ class HistoryRequest extends FormRequest
         return [
             'from.*' => 'Tanggal awal tidak valid.',
             'to.*' => 'Tanggal akhir tidak valid atau sebelum tanggal awal.',
-            'format.*' => 'Format ekspor hanya CSV, Excel, atau PDF.',
+            'format.*' => 'Ekspor hanya tersedia dalam format PDF.',
         ];
     }
 

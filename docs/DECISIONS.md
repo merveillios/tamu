@@ -2,6 +2,16 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-12 — Ekspor hanya PDF, tanpa batas baris (revisi HRD #13)
+
+- **Konteks:** HRD meminta semua ekspor hanya tersedia dalam format PDF. Sebelumnya History menawarkan CSV, Excel, dan PDF, dengan Excel/PDF dibatasi 500 baris (`EXPORT_RICH_MAX_ROWS`). Pemilik proyek memutuskan jumlah baris mengikuti filter.
+- **Keputusan:**
+  - Tombol Ekspor di History menjadi satu tombol "Ekspor PDF". Kode CSV dan Excel dihapus dari `ExportService`; parameter `format` hanya menerima `pdf` sehingga tautan lama `?format=csv`/`xlsx` ditolak dengan pesan "Ekspor hanya tersedia dalam format PDF." dan tidak tercatat sebagai ekspor.
+  - Batas baris dihapus. Karena Dompdf menyusun seluruh tabel di memori, batas memori dan waktu PHP dinaikkan khusus saat membuat PDF lewat `EXPORT_PDF_MEMORY_LIMIT` (bawaan 1024M) dan `EXPORT_PDF_TIME_LIMIT` (bawaan 300 detik). `CSV_DELIMITER` dan `EXPORT_RICH_MAX_ROWS` tidak dipakai lagi.
+  - Paket `phpoffice/phpspreadsheet` tidak lagi dipakai kode, tetapi belum dihapus dari `composer.json` karena penghapusan perlu `composer remove` di lingkungan yang bisa mengunduh paket.
+  - Bug yang membuat tanda tangan tidak muncul di PDF (revisi HRD #2) ikut diperbaiki: gambar dikumpulkan per batch dengan `flatMap()`, yang mengurutkan ulang kunci `visit_id`, sehingga pencarian tanda tangan per kunjungan selalu kosong. Kini batch digabung dengan `union()`. Tes ekspor memeriksa gambar benar-benar ada di PDF.
+- **Alasan:** Satu format yang memuat tanda tangan dan rapi untuk dicetak, sesuai permintaan HRD; ekspor resepsionis (T7) akan memakai jalur PDF yang sama.
+
 ## 2026-11-12 — PIC langsung menyelesaikan tanpa Terima (PIC-2, PIC-3)
 
 - **Konteks:** PIC harus menekan Terima lalu Selesai, padahal yang dibutuhkan hanya membaca rincian keperluan dan menulis hasil.

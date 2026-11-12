@@ -8,7 +8,7 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
 
 - PHP 8.1, Laravel 10 (tanpa starter kit), MySQL 8.0+ atau MariaDB 10.6+
 - `endroid/qr-code` 5.1 untuk gambar QR Code
-- `phpoffice/phpspreadsheet` 5.8 dan `dompdf/dompdf` 3.1 untuk ekspor Excel dan PDF
+- `dompdf/dompdf` 3.1 untuk ekspor PDF (`phpoffice/phpspreadsheet` masih terpasang di `composer.json` tetapi tidak dipakai lagi sejak ekspor Excel dihapus)
 - Blade, Bootstrap 5.1 (bawaan template [Volt](https://github.com/themesberg/volt-bootstrap-5-dashboard)), JavaScript vanilla
 - Tidak butuh Node, cron, atau queue worker di server
 
@@ -390,8 +390,8 @@ Fitur:
   membuka kunci akun **Resepsionis dan PIC**. Akun Admin dan Super Admin tampil
   di daftar tetapi hanya dapat diubah Super Admin.
 - **Kelola Petugas** di semua lokasi.
-- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke CSV, Excel,
-  dan PDF.
+- **History dan ekspor**: riwayat seluruh kunjungan, diekspor ke PDF sesuai
+  filter (tanpa batas baris).
 - **Audit Log** (hanya baca).
 
 ### 5. Super Admin
