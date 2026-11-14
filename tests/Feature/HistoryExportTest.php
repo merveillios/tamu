@@ -115,6 +115,8 @@ class HistoryExportTest extends TestCase
 
         // Resepsionis tanpa QR tidak melihat kunjungan siapa pun.
         $other = $this->createUser(UserRole::Receptionist);
+        // Setiap akun memakai sesi sendiri; tanpa ini auth.session melihat hash password akun sebelumnya.
+        $this->flushSession();
         $this->actingAs($other)->get('/admin/history')->assertOk()->assertDontSee('Tamu Selesai')->assertDontSee('Tamu Lokasi B');
         $this->actingAs($other)->get('/admin/history/export')->assertOk();
         $this->assertDatabaseHas('audit_logs', ['action' => 'visit.export', 'user_id' => $other->id, 'detail->rows' => 0]);
@@ -255,12 +257,5 @@ class HistoryExportTest extends TestCase
         }
 
         $this->assertDatabaseMissing('audit_logs', ['action' => 'visit.export']);
-    }
-
-    public function test_receptionist_and_pic_cannot_open_history(): void
-    {
-        $this->actingAs($this->createUser(UserRole::Receptionist))->get('/admin/history')->assertForbidden();
-        $this->flushSession();
-        $this->actingAs($this->createPic($this->data['departmentA']))->get('/admin/history/export')->assertForbidden();
     }
 }

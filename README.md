@@ -229,7 +229,7 @@ Tes memakai database MySQL terpisah, bukan SQLite.
    vendor/bin/pint --test
    ```
 
-`ConcurrencyTest` menjalankan beberapa proses PHP paralel (`tests/Support/concurrent-worker.php`) untuk membuktikan nomor urut tidak bentrok dan satu penugasan tidak bisa diterima dua kali. Tes ini menyimpan data sungguhan di database tes lalu mengosongkannya, jadi pastikan `.env.testing` **selalu** menunjuk database khusus tes (`sitamu_test`), bukan database utama.
+`ConcurrencyTest` menjalankan beberapa proses PHP paralel (`tests/Support/concurrent-worker.php`) untuk membuktikan nomor urut internal (tidak ditampilkan, tetapi masih disimpan) tidak bentrok dan satu penugasan tidak bisa diterima dua kali. Tes ini menyimpan data sungguhan di database tes lalu mengosongkannya, jadi pastikan `.env.testing` **selalu** menunjuk database khusus tes (`sitamu_test`), bukan database utama.
 
 ## Struktur penting
 
@@ -278,27 +278,33 @@ kembali di riwayat tamu.
    secara digital, menyetujui pemrosesan data pribadi (UU PDP), lalu mengirim.
 5. **Sistem mencatat jam kedatangan** dari server. Kunjungan
    berstatus **Menunggu** dan langsung muncul di daftar Tamu Aktif resepsionis.
-6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan Rincian keperluan yang
-   ditulis tamu, resepsionis memilih Bidang/UPT dan orang yang ditemui, lalu
-   memilih PIC yang bertugas — setelah memastikan PIC tersebut sedang tersedia.
-7. **PIC menerima penugasan.** Status kunjungan berubah otomatis menjadi
-   **Diproses** (bukan diubah manual oleh resepsionis).
-8. **PIC melayani tamu lalu menulis hasil/solusi pelayanan.** Saat hasil
-   disimpan, status otomatis menjadi **Selesai** — tidak ada tombol "Selesai"
-   terpisah di peran mana pun.
-9. **Tamu melihat hasil/solusi PIC** di halaman riwayat kunjungannya.
-10. Kunjungan yang Selesai atau Dibatalkan keluar dari daftar Tamu Aktif dan
-    tersimpan di riwayat/history untuk dipantau Admin dan Super Admin.
+   Tamu yang tidak bisa login Google dapat diinput resepsionis lewat
+   **Tambah Tamu Manual**; kunjungannya bertanda **Manual** dan mengikuti alur
+   yang sama mulai langkah 6.
+6. **Resepsionis meninjau kunjungan** lalu menugaskannya: berdasarkan Rincian
+   keperluan yang ditulis tamu, resepsionis memilih Bidang/UPT dan orang yang
+   ditemui — setelah memastikan orang tersebut sedang tersedia. Status label
+   menjadi **Menunggu PIC**.
+7. **PIC melayani tamu lalu menekan Selesai**, menulis hasil/solusi pelayanan
+   di modal Selesai. Saat hasil disimpan, status menjadi **Selesai**. Tidak ada
+   langkah Terima maupun opsi menolak.
+8. **Tamu melihat hasil/solusi PIC** di halaman riwayat kunjungannya.
+9. Kunjungan yang Selesai atau Dibatalkan keluar dari daftar Tamu Aktif.
+   History menampilkan semua kunjungan kecuali yang Dibatalkan (seperti buku
+   tamu); kunjungan Dibatalkan tetap bisa dilihat lewat filter status.
 
 ### Status Kunjungan
 
 | Status | Arti |
 | --- | --- |
-| Menunggu | Formulir terkirim, belum diterima PIC |
-| Diproses | PIC sudah menerima penugasan dan sedang melayani |
-| Selesai | PIC sudah menyimpan hasil/solusi pelayanan (otomatis) |
+| Menunggu | Formulir terkirim, belum ditugaskan resepsionis |
+| Menunggu PIC | Label untuk kunjungan Menunggu yang sudah ditugaskan ke Bidang/UPT dan orang yang ditemui |
+| Sedang direview | Hanya untuk kunjungan lama (sebelum tombol Terima dihapus) atau yang dibuka kembali dari status itu |
+| Selesai | PIC sudah menyimpan hasil/solusi pelayanan |
 | Dibatalkan | Kunjungan dibatalkan resepsionis/Admin dengan alasan wajib yang tercatat |
-| Draf | Kunjungan diturunkan kembali ke Draf oleh Admin dengan alasan tercatat |
+
+Admin dapat **membuka kembali** kunjungan Selesai atau Dibatalkan dengan alasan
+tercatat; kunjungan kembali ke status sebelum ditutup.
 
 ### 1. Tamu (tanpa akun petugas, lewat QR)
 
@@ -308,7 +314,7 @@ Fitur:
 - Verifikasi email memakai Google — hanya email yang dibaca, tanpa password.
 - Deteksi otomatis tamu baru vs tamu lama berdasarkan email.
 - Riwayat kunjungan: daftar kunjungan sebelumnya beserta hasil/solusi dari PIC,
-  plus tombol **Isi Form Baru** untuk melapor lagi.
+  plus tombol **Isi formulir lagi** untuk melapor lagi.
 - Link **Tidak bisa login Google?** membuka halaman **Bantuan Login Google**:
   halaman berjudul "Tidak bisa login Google?" dengan badge lokasi, berisi
   saran "Coba buka halaman ini di Chrome atau Safari. Jika masih belum bisa,
@@ -325,10 +331,11 @@ Alur tamu baru:
 Alur tamu lama (pernah melapor):
 
 1. Pindai QR → verifikasi Google → diarahkan dulu ke halaman riwayat.
-2. Klik **Isi Form Baru** untuk melapor lagi: lima field data diri (Kelompok
+2. Klik **Isi formulir lagi** untuk melapor lagi: lima field data diri (Kelompok
    Rentan, Nama Lengkap, Instansi/Perusahaan, Nomor Telepon/WhatsApp, Alamat)
-   terisi otomatis dan terkunci; Keperluan, Rincian keperluan, tanda tangan, dan
-   persetujuan UU PDP tetap wajib diisi ulang.
+   terisi otomatis dan terkunci; Rincian keperluan dan persetujuan UU PDP tetap
+   wajib diisi. Tanda tangan cukup sekali: tanda tangan kunjungan sebelumnya
+   dipakai ulang.
 3. Opsional: di halaman riwayat, bagian **Lengkapi profil** untuk mengunggah foto
    KTP dan selfie. Foto diperkecil di HP sebelum dikirim, cukup sekali untuk
    kunjungan berikutnya, dapat diganti, tetapi tidak dapat dihapus. Foto hanya
@@ -339,10 +346,12 @@ Alur tamu lama (pernah melapor):
 
 Fitur:
 
-- Dashboard **Tamu Aktif**: daftar kunjungan berstatus Menunggu dan Diproses
-  di pos/lokasinya.
-- **Detail Kunjungan**: data tamu, Rincian keperluan, Bidang/UPT tujuan, dan
-  tanda tangan tamu. Kunjungan lama tetap menampilkan kategorinya sebagai "Kategori (lama)".
+- Dashboard **Tamu Aktif**: daftar kunjungan aktif dari QR miliknya, tamu
+  prioritas (kelompok rentan) di atas, dengan penanda **KTP ✓ / Selfie ✓ /
+  Belum ada KTP** dan **Manual**.
+- **Detail Kunjungan**: data tamu, Rincian keperluan, Bidang/UPT tujuan, tanda
+  tangan, serta foto KTP dan selfie tamu. Kunjungan lama tetap menampilkan
+  kategorinya sebagai "Kategori (lama)".
 - **Tambah Tamu Manual**: untuk tamu yang tidak bisa login Google, resepsionis
   mengisi formulir (email tamu wajib, data diri, rincian keperluan, tanda tangan
   tamu di layar, foto KTP dan selfie opsional). Kunjungan masuk Tamu Aktif dengan
@@ -361,9 +370,9 @@ Fitur:
   mengikuti saran di halaman Bantuan Login Google (membuka halaman di Chrome
   atau Safari) dan masih belum bisa, diarahkan untuk menghubungi petugas.
 
-Alur: kunjungan baru masuk (Menunggu) → tinjau detail → cek PIC tersedia →
-Tugaskan PIC → kunjungan tampil sampai status Diproses → setelah PIC menyimpan
-hasil, kunjungan selesai dan keluar dari Tamu Aktif.
+Alur: kunjungan baru masuk (Menunggu) → tinjau detail → cek orang yang ditemui
+tersedia → Tugaskan (Menunggu PIC) → setelah PIC menyimpan hasil, kunjungan
+Selesai dan keluar dari Tamu Aktif (tampil di bagian "Ditutup hari ini").
 
 ### 3. PIC (penanggung jawab pelayanan per Bidang/UPT)
 
@@ -372,17 +381,17 @@ Fitur:
 - Dashboard penugasan: daftar kunjungan yang ditugaskan ke Bidang/UPT-nya.
   **Setiap Bidang/UPT memiliki 1 akun PIC yang digunakan oleh banyak PIC**
   (petugas di Bidang/UPT tersebut secara bergantian).
-- **Terima penugasan** — status kunjungan otomatis menjadi Diproses. Tidak ada
-  opsi menolak penugasan; ketersediaan PIC dipastikan resepsionis sebelum
-  menugaskan.
-- **Detail Kunjungan**: data tamu, keperluan, rincian, dan tanda tangan tamu.
-- **Isi hasil/solusi pelayanan** (wajib) — menyimpan hasil otomatis
-  menyelesaikan kunjungan (status Selesai).
-- **Riwayat pelayanan**: arsip kunjungan yang sudah pernah dilayani
-  Bidang/UPT-nya.
+- **Selesai** — modal menampilkan Rincian keperluan tamu dan isian Hasil
+  (wajib); menyimpan hasil menyelesaikan kunjungan. Tidak ada langkah Terima
+  maupun opsi menolak; bila Bidang/UPT salah, resepsionis yang menugaskan ulang.
+- **Detail Kunjungan**: data tamu dan rincian keperluan, tanpa tanda tangan
+  maupun foto KTP.
+- **Selesai hari ini**: kunjungan yang diselesaikan hari ini.
+- **Audit Log PIC**: riwayat aksi PIC di Bidang/UPT-nya (Waktu, PIC, Tamu,
+  Instansi, Rincian Keperluan, Hasil) dengan filter dan ekspor PDF.
 
-Alur: menerima penugasan (Menunggu) → Terima (Diproses) → layani tamu →
-tulis hasil/solusi → Simpan (Selesai, otomatis).
+Alur: penugasan baru masuk (Menunggu PIC) → layani tamu → Selesai → tulis
+hasil/solusi → Simpan (Selesai).
 
 ### 4. Admin
 

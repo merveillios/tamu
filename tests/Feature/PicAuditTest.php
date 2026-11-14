@@ -173,9 +173,12 @@ class PicAuditTest extends TestCase
 
     public function test_receptionist_cannot_open(): void
     {
+        $receptionist = $this->createUser(UserRole::Receptionist);
+
         $this->actingAs($this->createUser(UserRole::SuperAdmin))->get('/admin/audit-log-pic')->assertOk();
-        $this->actingAs($this->createUser(UserRole::Receptionist))->get('/admin/audit-log-pic')->assertForbidden();
-        $this->actingAs($this->createUser(UserRole::Receptionist))->get('/admin/audit-log-pic/export')->assertForbidden();
+        $this->flushSession();
+        $this->actingAs($receptionist)->get('/admin/audit-log-pic')->assertForbidden();
+        $this->actingAs($receptionist)->get('/admin/audit-log-pic/export')->assertForbidden();
     }
 
     /**

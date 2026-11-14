@@ -2,6 +2,16 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-14 — Tes akhir revisi HRD dan perbaikan Audit Log PIC (T12)
+
+- **Konteks:** Selama revisi HRD banyak tes ditulis dan diubah tanpa dijalankan karena database tes belum ada.
+- **Keputusan:**
+  - `.env.testing` dibuat dari `.env.testing.example` dan database `sitamu_test` disiapkan; `.env.testing.example` dirapikan (setelan CSV/Excel lama dihapus, setelan foto dan PDF ditambahkan). Seluruh 251 tes lolos.
+  - Tes menemukan bug: akun PIC tanpa Bidang/UPT melihat semua entri Audit Log PIC, karena Bidang/UPT yang dipaksa `0` dianggap "tanpa filter". `PicAuditService` kini menerapkan filter Bidang/UPT bila kuncinya ada, apa pun nilainya.
+  - Tes yang berganti akun dalam satu tes kini mengosongkan sesi (`flushSession()`) seperti `RoleAccessTest`, karena `auth.session` mengeluarkan akun kedua. Tes lama yang mengharapkan Resepsionis ditolak dari History dihapus karena bertentangan dengan HIS-6.
+  - README (alur PIC tanpa Terima, tabel status tanpa "Draf", tanda tangan tamu lama dipakai ulang, PIC tanpa tanda tangan) dan PRD (v0.12 dengan ringkasan revisi HRD) disesuaikan dengan aplikasi.
+- **Alasan:** Menutup revisi HRD dengan dokumentasi yang sesuai kode dan bukti tes yang lolos.
+
 ## 2026-11-14 — Tamu tanpa Google diinput resepsionis, bukan peran baru (revisi HRD #11)
 
 - **Konteks:** Dokumen revisi HRD meminta peran baru Petugas Pendaftaran dengan akun, formulir manual, daftar kunjungan, dashboard, dan halaman cetak sendiri. Pemilik proyek memutuskan fitur ini menjadi bagian Resepsionis: resepsionis yang membantu mengisi untuk tamu yang tidak bisa login Google.

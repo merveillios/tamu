@@ -60,7 +60,8 @@ class PicAuditService
         return VisitStatusLog::query()
             ->whereHas('changedBy', fn (Builder $query) => $query
                 ->where('role', UserRole::Pic)
-                ->when($filters['department_id'] ?? null, fn (Builder $inner, $id) => $inner->where('department_id', $id)))
+                // array_key_exists, bukan nilai: akun PIC tanpa Bidang/UPT dipaksa ke 0 dan harus tetap tersaring.
+                ->when(array_key_exists('department_id', $filters), fn (Builder $inner) => $inner->where('department_id', (int) $filters['department_id'])))
             ->when($filters['staff_member_id'] ?? null, fn (Builder $query, $id) => $query->where(fn (Builder $inner) => $inner
                 ->where('staff_member_id', $id)
                 // Log lama tanpa salinan petugas memakai orang yang ditemui pada kunjungan.

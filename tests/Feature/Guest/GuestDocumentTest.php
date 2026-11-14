@@ -121,13 +121,17 @@ class GuestDocumentTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'guest_document.view', 'user_id' => $admin->id]);
         $this->actingAs($admin)->get('/admin/history')->assertSee('title="Tamu sudah mengunggah foto KTP; lihat di Detail"', false);
 
+        // Setiap akun memakai sesi sendiri; tanpa ini auth.session melihat hash password akun sebelumnya.
+        $this->flushSession();
         $this->actingAs($qr->receptionist)->get("/admin/kunjungan/{$visit->id}/foto/ktp")->assertOk();
 
         $otherReceptionist = $this->createUser(UserRole::Receptionist);
         $this->createQr($this->createLocation(), $otherReceptionist);
+        $this->flushSession();
         $this->actingAs($otherReceptionist)->get("/admin/kunjungan/{$visit->id}/foto/ktp")->assertNotFound();
 
         $pic = $this->createPic($this->createDepartment($qr->location));
+        $this->flushSession();
         $this->actingAs($pic)->get("/admin/kunjungan/{$visit->id}/foto/ktp")->assertForbidden();
     }
 

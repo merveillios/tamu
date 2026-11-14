@@ -110,9 +110,12 @@ class ManualVisitTest extends TestCase
     {
         [$qr] = $this->usableQr();
 
-        $this->actingAs($this->createAdmin())->get('/admin/tamu/manual')->assertForbidden();
+        $admin = $this->createAdmin();
+
+        $this->actingAs($admin)->get('/admin/tamu/manual')->assertForbidden();
+        $this->actingAs($admin)->get('/admin/tamu')->assertDontSee('Tambah Tamu Manual');
+        $this->flushSession();
         $this->actingAs($this->createUser(UserRole::SuperAdmin))->post('/admin/tamu/manual', $this->payload($qr->id))->assertForbidden();
-        $this->actingAs($this->createAdmin())->get('/admin/tamu')->assertDontSee('Tambah Tamu Manual');
         $this->assertSame(0, VisitStatusLog::count());
     }
 

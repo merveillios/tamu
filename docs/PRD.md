@@ -1,24 +1,25 @@
-# PRD SiTamu v0.11 — Laravel (Model 5 Peran)
+# PRD SiTamu v0.12 — Laravel (Model 5 Peran)
 
 Oct 14, 2026 · @ahmad
 
 SiTamu v0.10 mengubah buku tamu menjadi alur layanan lima peran: tamu mengisi formulir, resepsionis menugaskan ke Bidang/UPT, PIC melayani dan menulis hasil, lalu hasil kembali ke riwayat tamu.
 
-**STATUS: DRAFT v0.11 — disiapkan untuk implementasi oleh AI coding agent (framework Laravel)**
+**STATUS: v0.12 — revisi HRD #1–#13 sudah diimplementasikan (lihat Riwayat Perubahan dan `docs/DECISIONS.md`)**
 
 |  |  |
 | --- | --- |
 | **Nama Produk** | SiTamu (Sistem Informasi Buku Tamu) |
 | **Klien** | Dinas Perindustrian dan Perdagangan Provinsi Jawa Timur (Disperindag) |
-| **Versi Dokumen** | v0.11 |
+| **Versi Dokumen** | v0.12 |
 | **Disusun oleh** | TBD (Pengembang) |
-| **Tanggal** | 14 Oktober 2026 |
+| **Tanggal** | 14 Oktober 2026 (v0.12: 14 November 2026) |
 | **Dokumen Terkait** | PRD v0.9 (6 Okt 2026), dokumen Use Case & User Flow SiTamu (revisi 13 Okt 2026), hasil pembahasan alur 14 Okt 2026, prototipe HTML antarmuka. Lihat aturan A-9. |
 
 ## Riwayat Perubahan
 
 | Versi | Tanggal | Perubahan |
 | --- | --- | --- |
+| v0.12 | 14 Nov 2026 | **Revisi HRD #1–#13.** Istilah "departemen" menjadi "Bidang/UPT" (#1). Nomor urut tidak ditampilkan (#5). Kategori keperluan dihapus; tamu hanya mengisi Rincian keperluan (#6, #7). PIC langsung menyelesaikan tanpa Terima (PIC-2, PIC-3). Ekspor hanya PDF tanpa batas baris, tanda tangan tampil di PDF (#13, #2). Ekspor bergaya buku tamu 9 kolom tanpa kunjungan Dibatalkan; bawaan History = semua kecuali Dibatalkan (#3). Resepsionis membuka History dan ekspor PDF dari QR miliknya (#10, HIS-6). Kelompok rentan menjadi master data dengan prioritas antrean (#12, VUL-1–3). Foto KTP dan selfie lewat "Lengkapi profil" tamu, penanda di Tamu Aktif (#4, TAM-18). Audit Log PIC dengan filter dan ekspor PDF, juga untuk akun PIC (#8, #9, AUD-4–7). Tamu tanpa Google diinput resepsionis lewat "Tambah Tamu Manual", bukan peran baru (#11, RSP-11). |
 | v0.11 | 26 Okt 2026 | Bagian "Selesai hari ini" di halaman Penugasan PIC (PIC-7). Bagian "Ditutup hari ini" di Tamu Aktif Resepsionis (RSP-10). Dropdown formulir tamu dapat dicari dan selalu bertema terang (RSP-9, TAM-3). Pencarian pada pilihan Bidang/UPT dan orang yang ditemui di modal Tugaskan (RSP-9). Atas permintaan klien, **Admin menjadi pengelola harian untuk semua lokasi** dan Super Admin dipakai hanya untuk keadaan darurat. Admin tidak lagi dibatasi lokasi (ADM-5): pemantauan, History, ekspor, dan dashboard mencakup semua lokasi. Admin kini mengelola lokasi (LOK-1–3), Bidang/UPT (DEP-1–3), QR Code (QR-2–6), serta akun Resepsionis dan PIC (USR-1, USR-6, AUTH-4), dan dapat melihat audit log (AUD-2). Akun Admin dan Super Admin tetap hanya dikelola Super Admin (USR-6). **Dihapus**: penugasan lokasi Admin (USR-2); tabel `user_locations` dibiarkan tanpa dipakai. |
 | v0.10 | 14 Okt 2026 | **Model peran diubah menjadi 5 peran**: Super Admin, Admin, Resepsionis, PIC, dan Tamu (Bab 3). Ditambah: penugasan kunjungan ke Bidang/UPT oleh resepsionis (RSP-1–8), penerimaan, penulisan hasil, dan penyelesaian oleh PIC (PIC-1–6), riwayat kunjungan untuk tamu (TAM-17), deteksi tamu lama dan pengisian otomatis data diri (TAM-15, TAM-16), kategori keperluan dengan saran Bidang/UPT (KAT-1–3), kelompok rentan, master Bidang/UPT (DEP-1–3), dan daftar petugas Bidang/UPT (PTG-1–2). Satu QR terhubung ke tepat satu akun resepsionis (QR-6). Akun resepsionis dan PIC adalah akun bersama yang dipakai bergantian. QR hanya dikelola Super Admin. Buka kembali kunjungan dipindah dari Super Admin ke Admin (ADM-3). Instansi/perusahaan menjadi wajib. Orang yang ditemui tidak lagi diisi tamu; nilainya dipilih resepsionis saat menugaskan; PIC adalah satu akun bersama per Bidang/UPT yang mereview tamu. Ganti password kini mengakhiri semua sesi akun (USR-3). Label Diproses diganti "Sedang direview" (PIC mereview keperluan tamu yang diarahkan resepsionis); History dan ekspor dapat memuat kunjungan Sedang direview. Admin mengelola kategori keperluan dan daftar petugas untuk semua lokasi. Desain antarmuka memakai template Volt Bootstrap 5 Dashboard (Bab 5.6). **Dihapus**: QR Darurat (VIS-11, TAM-13, tabel `emergency_passes`, kolom `email_source` dan `email_authorized_by`), status Draf, dan penolakan penugasan oleh PIC. `LocationScope` diganti `AccessScope` (Bab 12.2). Skema, route, validasi, ekspor, UI, milestone, dan keputusan tertunda disusun ulang. |
 | v0.9 | 6 Okt 2026 | Implementasi dipindah dari PHP native ke framework Laravel: migrasi, Eloquent, Form Request, `RateLimiter`, guard `web`, `Http` facade, perintah artisan, aturan A-14 dan A-15. Tidak ada perubahan kebutuhan fungsional. |

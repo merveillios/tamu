@@ -59,6 +59,7 @@ class QrManagementTest extends TestCase
         $receptionist = $this->createUser(UserRole::Receptionist);
 
         foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->flushSession();
             $this->actingAs($actor)
                 ->post('/admin/qr', ['location_id' => $location->id, 'receptionist_id' => $receptionist->id])
                 ->assertSessionHasNoErrors()
@@ -77,6 +78,7 @@ class QrManagementTest extends TestCase
         $this->createDepartment($ready);
 
         foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->flushSession();
             $this->actingAs($actor)->get('/admin/qr')
                 ->assertOk()
                 ->assertDontSee('name="department_id"', false)
@@ -94,6 +96,7 @@ class QrManagementTest extends TestCase
         $qr = $this->createQr($location, $this->createUser(UserRole::Receptionist));
 
         foreach ([$this->superAdmin, $this->createAdmin()] as $actor) {
+            $this->flushSession();
             $this->actingAs($actor)->get('/admin/qr')
                 ->assertOk()
                 ->assertDontSee('<th class="border-gray-200">Bidang/UPT</th>', false)
@@ -104,6 +107,8 @@ class QrManagementTest extends TestCase
 
         $this->createDepartment($location);
 
+        // Loop di atas berakhir dengan akun Admin; ganti kembali ke Super Admin dengan sesi baru.
+        $this->flushSession();
         $this->actingAs($this->superAdmin)->get('/admin/qr')->assertOk()->assertDontSee('Belum siap');
         $this->get("/tamu/{$qr->token}")->assertOk();
 

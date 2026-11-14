@@ -149,6 +149,7 @@ class VulnerableGroupTest extends TestCase
         $department = $this->createDepartment($this->createLocation());
 
         $this->actingAs($this->createUser(UserRole::Receptionist))->get('/admin/kelompok-rentan')->assertForbidden();
+        $this->flushSession();
         $this->actingAs($this->createPic($department))->post('/admin/kelompok-rentan/tambah', ['name' => 'Coba'])->assertForbidden();
         $this->assertDatabaseMissing('vulnerable_groups', ['name' => 'Coba']);
     }
