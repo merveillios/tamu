@@ -406,6 +406,11 @@ Fitur:
   Kolom PDF: NO, NAMA, INSTANSI / PERUSAHAAN, BERTEMU, JAM, KEPERLUAN, NO. TELP,
   ALAMAT, TTD. Kunjungan Dibatalkan tidak pernah ikut ekspor.
 - **Audit Log** (hanya baca).
+- **Audit Log PIC**: daftar aksi PIC (No, Waktu, PIC, Tamu, Instansi, Rincian
+  Keperluan, Hasil). Juga tersedia untuk akun PIC, terbatas pada Bidang/UPT-nya.
+  Kolom PIC berisi orang yang ditemui yang dipilih resepsionis, bukan nama akun.
+  Filter PIC, Bidang/UPT, periode, dan pencarian tamu; dapat diekspor ke PDF
+  satu tabel landscape.
 
 ### 5. Super Admin
 

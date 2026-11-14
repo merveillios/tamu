@@ -322,6 +322,27 @@ body {
     white-space: pre-line;
 }
 
+/* Audit Log PIC: teks boleh turun baris (tema Volt memaksa nowrap di sel tabel);
+   kolom Hasil paling lebar, lalu Rincian keperluan (AUD-4) */
+.pic-audit-table td {
+    white-space: normal;
+}
+
+.pic-audit-table td.pic-audit-purpose,
+.pic-audit-table td.pic-audit-result {
+    white-space: pre-line;
+}
+
+@media (min-width: 992px) {
+    .pic-audit-purpose {
+        min-width: 11rem;
+    }
+
+    .pic-audit-result {
+        min-width: 15rem;
+    }
+}
+
 /* Foto KTP dan selfie (TAM-18): pratinjau tidak memenuhi layar */
 .guest-document-preview,
 .visit-document-photo {

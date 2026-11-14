@@ -15,6 +15,7 @@
         ['label' => 'Kelompok Rentan', 'path' => 'admin/kelompok-rentan', 'icon' => 'heart', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Pengguna', 'path' => 'admin/pengguna', 'icon' => 'users', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
         ['label' => 'Audit Log', 'path' => 'admin/audit-log', 'icon' => 'document-text', 'roles' => [UserRole::SuperAdmin, UserRole::Admin]],
+        ['label' => 'Audit Log PIC', 'path' => 'admin/audit-log-pic', 'icon' => 'clipboard-check', 'roles' => [UserRole::SuperAdmin, UserRole::Admin, UserRole::Pic]],
         ['label' => 'Ganti Password', 'path' => 'admin/password', 'icon' => 'key', 'roles' => UserRole::cases()],
     ];
 @endphp

@@ -190,6 +190,7 @@ Sistem memiliki empat peran staf yang login dan satu peran tamu tanpa akun; caku
 | Kelola akun Admin dan Super Admin | Ya | Tidak | Tidak | Tidak | – |
 | Buka kunci akun | Ya | Resepsionis dan PIC | Tidak | Tidak | – |
 | Lihat audit log | Ya | Ya | Tidak | Tidak | – |
+| \[BARU revisi HRD #8 dan #9\] Audit Log PIC: lihat, filter, ekspor PDF | Ya | Ya | Tidak | Bidang/UPT-nya | – |
 | Ganti password sendiri | Ya | Ya | Ya | Ya | – |
 
 **Catatan:** "QR miliknya" berarti QR yang kolom `receptionist_id`-nya menunjuk akun resepsionis tersebut, apa pun status QR-nya, agar kunjungan aktif dari QR yang baru dinonaktifkan tetap bisa diselesaikan. "Bidang/UPT-nya" berarti kunjungan dengan `assigned_department_id` sama dengan `department_id` akun PIC.
@@ -575,6 +576,10 @@ Selain data di atas, sistem menyimpan data proses yang tidak diisi tamu: lokasi 
 | AUTH-4 | \[DIUBAH v0.11\] Super Admin dapat membuka kunci akun yang terkunci; Admin hanya untuk akun Resepsionis dan PIC (USR-6). | Wajib | Tombol "Buka kunci" pada akun yang `locked_until`-nya masih berlaku; mereset `failed_logins` dan mengosongkan `locked_until`. Tercatat di audit log (`user.unlock`). |
 | AUD-1 | Sistem mencatat audit log untuk aksi penting. | Wajib | Daftar aksi di Bab 12.3. Audit log tidak dapat diubah atau dihapus lewat aplikasi. |
 | AUD-2 | \[DIUBAH v0.11\] Admin dan Super Admin dapat melihat audit log. | Wajib | Filter tanggal, akun, dan jenis aksi; paginasi 50 baris; urut terbaru. |
+| AUD-4 | \[BARU revisi HRD #8 dan #9\] Admin dan Super Admin dapat melihat Audit Log PIC lewat menu sidebar "Audit Log PIC" (`/admin/audit-log-pic`). | Wajib | Satu baris = satu aksi akun PIC, diambil dari `visit_status_logs` yang `changed_by`-nya berperan `pic` (tanpa tabel baru). Tujuh kolom: No (nomor baris), Waktu (`dd/mm/yyyy HH:mm`), PIC (orang yang ditemui yang dipilih resepsionis saat menugaskan, dari salinan `visit_status_logs.staff_member_id` saat aksi; log lama tanpa salinan memakai orang yang ditemui pada kunjungan; bukan nama akun karena satu akun PIC dipakai bersama per Bidang/UPT), Tamu (nama tamu, bertaut ke Detail Kunjungan), Instansi, Rincian Keperluan (teks yang ditulis tamu di formulir), Hasil. Urut terbaru di atas, paginasi 25. Resepsionis tidak dapat membuka (403); untuk PIC lihat AUD-7. |
+| AUD-5 | \[BARU revisi HRD #8 dan #9\] Kolom Hasil hanya terisi untuk aksi menyimpan hasil. | Wajib | Hasil berupa teks biasa dari hasil kunjungan (seperti di Detail) dan hanya untuk log yang statusnya menjadi Selesai; aksi lain berisi "–". Bila kunjungan dibuka kembali lalu diselesaikan ulang dengan hasil berbeda, entri Selesai yang lebih awal tetap menampilkan hasil saat itu (diambil dari catatan "Hasil sebelumnya" pada log Selesai berikutnya). Kolom Hasil paling lebar. |
+| AUD-7 | \[BARU revisi HRD #8 dan #9\] Akun PIC juga dapat membuka Audit Log PIC, hanya untuk Bidang/UPT akunnya. | Wajib | Menu "Audit Log PIC" tampil untuk PIC. Server memaksa filter Bidang/UPT ke Bidang/UPT akun PIC (parameter `department_id` dari browser diabaikan); akun PIC tanpa Bidang/UPT tidak melihat data. Pilihan filter PIC hanya petugas Bidang/UPT itu dan server menolak petugas Bidang/UPT lain; filter Bidang/UPT tidak ditampilkan. Halaman menampilkan keterangan "hanya Bidang/UPT …". Kolom dan ekspor PDF sama dengan Admin; tidak memuat telepon, alamat, email, tanda tangan, atau foto KTP. |
+| AUD-6 | \[BARU revisi HRD #8 dan #9\] Audit Log PIC dapat difilter dan diekspor ke PDF. | Wajib | Filter: pencarian nama tamu atau instansi, PIC (daftar Petugas, dikelompokkan per Bidang/UPT), Bidang/UPT (Bidang/UPT akun PIC), preset periode (Hari ini, 7 hari terakhir, Bulan ini), dan rentang tanggal. Tombol **Ekspor PDF** mengikuti filter: satu tabel A4 landscape tujuh kolom tanpa bagian rincian di bawahnya, judul tabel berwarna gelap dengan baris berselang warna, urut dari aksi paling awal, kepala berisi jumlah baris dan filter dalam kalimat, kaki halaman berisi waktu cetak dan nomor halaman. Nama file `audit-log-pic_{YYYYMMDD-HHmm}.pdf`. Setiap ekspor tercatat di audit log (`pic_audit.export`) beserta filter dan jumlah baris. |
 
 # 7. Aturan Status Kunjungan (State Machine) \[DIUBAH v0.10\]
 
@@ -1100,6 +1105,8 @@ Seluruh route ada di `routes/web.php`, diberi nama (notasi titik, misalnya `admi
 | POST | `/admin/pengguna/{id}/status` | Aktifkan/nonaktifkan akun (USR-4, USR-5). |
 | POST | `/admin/pengguna/{id}/buka-kunci` | Buka kunci akun (AUTH-4). |
 | GET | `/admin/audit-log` | Daftar audit log. |
+| GET | `/admin/audit-log-pic` | Untuk `role:pic,admin,super_admin`. \[BARU revisi HRD #8 dan #9\] Audit Log PIC (AUD-4). Query: `q`, `staff_member_id`, `department_id`, `period`, `from`, `to`, `page`. |
+| GET | `/admin/audit-log-pic/export` | \[BARU revisi HRD #8 dan #9\] Unduh PDF Audit Log PIC dengan filter yang sama (AUD-6). |
 
 ## 10.9 Kode status HTTP
 
@@ -1291,7 +1298,7 @@ Halaman tamu bertambah dua (riwayat dan formulir tamu lama), panel staf bertamba
 | --- | --- |
 | Login | Email, password, pesan error seragam. |
 | Layout staf | Sidebar di desktop, offcanvas di ponsel. Menu sesuai peran (di bawah). Nama akun, peran, dan tombol logout di pojok kanan atas. |
-| Menu per peran | **Resepsionis:** Tamu Aktif, History \[DIUBAH revisi HRD #10\], Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Ganti Password. **Admin dan Super Admin:** \[DIUBAH revisi HRD #6, #7, dan #12\] Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT), QR Code, Petugas, Kelompok Rentan, Pengguna, Audit Log, Ganti Password. Menu Kategori Keperluan dihapus. |
+| Menu per peran | **Resepsionis:** Tamu Aktif, History \[DIUBAH revisi HRD #10\], Ganti Password. **PIC:** Penugasan (dengan badge jumlah baru), Audit Log PIC \[BARU revisi HRD #8 dan #9\], Ganti Password. **Admin dan Super Admin:** \[DIUBAH revisi HRD #6, #7, dan #12\] Dashboard, Tamu Aktif, History, Lokasi (dengan Bidang/UPT), QR Code, Petugas, Kelompok Rentan, Pengguna, Audit Log, Audit Log PIC, Ganti Password. Menu Kategori Keperluan dihapus. |
 | Dashboard (Admin, Super Admin) | Kartu angka (DSH-1/DSH-3), Tamu Aktif ringkas, grafik 14 hari (Super Admin). |
 | Tamu Aktif — Resepsionis | Kotak pencarian dan filter label status; tabel/kartu: nama, instansi, kelompok rentan, rincian keperluan (dipotong, teks lengkap di tooltip), Bidang/UPT dan orang yang ditemui, jam datang, lama menunggu, badge status, tombol aksi. Tombol per kondisi: Menunggu → Tugaskan, Batal; Menunggu PIC → Tugaskan ulang, Batal; Sedang direview → Batal. Modal Tugaskan menampilkan rincian keperluan lengkap, lalu pilihan Bidang/UPT (saran terpilih otomatis hanya untuk kunjungan lama yang punya kategori), lalu pilihan orang yang ditemui dari daftar petugas Bidang/UPT tersebut. Modal alasan batal. Toast setelah aksi. \[BARU revisi HRD #4\] Di bawah nama tamu: penanda "KTP ✓", "Selfie ✓", atau "Belum ada KTP" (TAM-18); foto hanya di Detail. |
 | Tamu Aktif — Admin, Super Admin | Sama dengan versi Resepsionis ditambah kolom lokasi dan QR serta filter lokasi; tombol hanya Batal dan Detail. |

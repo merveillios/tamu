@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\PasswordController;
+use App\Http\Controllers\Admin\PicAuditController;
 use App\Http\Controllers\Admin\QrController;
 use App\Http\Controllers\Admin\StaffMemberController;
 use App\Http\Controllers\Admin\UserController;
@@ -75,6 +76,12 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
         Route::get('/penugasan', [AssignmentController::class, 'index'])->name('assignments.index');
         Route::get('/penugasan/data', [AssignmentController::class, 'data'])->name('assignments.data');
         Route::post('/kunjungan/{id}/selesai', [AssignmentController::class, 'complete'])->whereNumber('id')->name('visits.complete');
+    });
+
+    // Audit Log PIC: Admin dan Super Admin semua Bidang/UPT, PIC hanya Bidang/UPT akunnya (AUD-4, AUD-7).
+    Route::middleware('role:pic,admin,super_admin')->group(function () {
+        Route::get('/audit-log-pic', [PicAuditController::class, 'index'])->name('pic-audit.index');
+        Route::get('/audit-log-pic/export', [PicAuditController::class, 'export'])->name('pic-audit.export');
     });
 
     Route::middleware('role:admin')->group(function () {

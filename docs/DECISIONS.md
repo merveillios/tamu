@@ -2,6 +2,17 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-14 — Audit Log PIC (revisi HRD #8 dan #9)
+
+- **Konteks:** Dokumen HRD meminta pencatatan aksi PIC (termasuk tombol Proses dan status ditolak yang sudah tidak ada), riwayat per orang, PDF per kunjungan, dan halaman audit log Admin. Pemilik proyek menetapkan bentuk yang lebih ringkas: satu halaman baru di sidebar dengan filter, dan ekspor PDF berupa satu tabel landscape (No, Waktu, PIC, Tamu, Instansi, Rincian Keperluan, Hasil) tanpa bagian rincian. Kolom Rincian Keperluan (teks yang ditulis tamu) ditambahkan sebelum Hasil atas permintaan pemilik proyek; Hasil tetap kolom paling lebar. Ini juga menjawab pertanyaan HRD nomor 1.
+- **Keputusan:**
+  - Menu baru "Audit Log PIC" untuk Admin dan Super Admin (semua Bidang/UPT) serta akun PIC (hanya Bidang/UPT akunnya; server memaksa filter Bidang/UPT dan menolak petugas Bidang/UPT lain). Isinya tanpa telepon, alamat, email, tanda tangan, dan foto KTP, sehingga tidak membuka data yang tidak dilihat PIC di Penugasan; konsekuensinya, siapa pun yang memakai akun PIC bersama dapat melihat seluruh riwayat aksi Bidang/UPT itu. Datanya dibaca dari `visit_status_logs` yang dibuat akun PIC, jadi tidak ada tabel atau pencatatan baru, dan aksi lama (misalnya Terima sebelum tombol itu dihapus) ikut tampil.
+  - Kolom PIC berisi orang yang ditemui yang dipilih resepsionis saat menugaskan, bukan nama akun, karena satu akun PIC dipakai bersama oleh beberapa orang di Bidang/UPT yang sama. Nama diambil dari salinan `staff_member_id` di log saat aksi, sehingga tugaskan ulang ke orang lain tidak mengubah entri lama; log lama tanpa salinan memakai orang yang ditemui pada kunjungan. Filter PIC memakai daftar Petugas, bukan daftar akun.
+  - Hasil hanya terisi pada aksi menyimpan hasil (status menjadi Selesai), selain itu "–". Hasil lama pada kunjungan yang dibuka kembali dan diselesaikan ulang diambil dari catatan "Hasil sebelumnya", sehingga entri lama tidak tertimpa hasil baru.
+  - Filter: pencarian tamu/instansi, PIC (Petugas), Bidang/UPT, preset periode, dan rentang tanggal; ekspor mengikuti filter. Halaman urut terbaru di atas, PDF urut dari aksi paling awal seperti buku tamu.
+  - PDF satu kunjungan dan riwayat per orang di halaman PIC tidak dibuat, karena tidak termasuk bentuk yang ditetapkan.
+- **Alasan:** Data yang dibutuhkan sudah tercatat lengkap di log status, sehingga fitur ini cukup berupa tampilan dan ekspor tanpa mengubah alur PIC.
+
 ## 2026-11-13 — Foto KTP dan selfie lewat "Lengkapi profil" (revisi HRD #4)
 
 - **Konteks:** HRD meminta unggah KTP yang dapat dilihat kembali sesuai hak akses. Dokumen HRD menyebut petugas yang mengunggah dari Detail Kunjungan; pemilik proyek memutuskan tamu sendiri yang mengunggah, ditambah selfie. Pertanyaan HRD nomor 4 (boleh disimpan, berapa lama, siapa yang melihat) dijawab pemilik proyek.
