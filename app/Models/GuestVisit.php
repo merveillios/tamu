@@ -45,6 +45,7 @@ class GuestVisit extends Model
         'check_in_at',
         'consent_at',
         'ip_address',
+        'entered_by',
     ];
 
     protected $casts = [
@@ -105,6 +106,22 @@ class GuestVisit extends Model
     public function suggestedDepartment(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'suggested_department_id');
+    }
+
+    /**
+     * Akun resepsionis yang menginput kunjungan manual (RSP-11); kosong bila diisi tamu.
+     */
+    public function enteredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'entered_by');
+    }
+
+    /**
+     * Apakah kunjungan ini diinput resepsionis, bukan diisi tamu lewat Google (RSP-11).
+     */
+    public function isManual(): bool
+    {
+        return $this->entered_by !== null;
     }
 
     /**

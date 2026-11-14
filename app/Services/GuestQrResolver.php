@@ -57,9 +57,10 @@ class GuestQrResolver
     }
 
     /**
-     * Mengecek status QR, status lokasi, dan ketersediaan Bidang/UPT aktif.
+     * Mengecek status QR, status lokasi, dan ketersediaan Bidang/UPT aktif. Dipakai juga
+     * untuk pilihan pos pada formulir tamu manual resepsionis (RSP-11).
      */
-    private function isUsable(?QrCode $qr): bool
+    public function isUsable(?QrCode $qr): bool
     {
         return $qr !== null
             && $qr->status === QrStatus::Active

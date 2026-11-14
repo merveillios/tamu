@@ -115,6 +115,9 @@
                             <td data-label="Tanggal">{{ $visit->visit_date->format('d/m/Y') }}</td>
                             <td data-label="Nama" class="fw-bold">
                                 {{ $visit->name }}
+                                @if ($visit->isManual())
+                                    <span class="badge bg-info fw-normal" title="Diinput resepsionis untuk tamu tanpa login Google">Manual</span>
+                                @endif
                                 @if ($visit->has_ktp)
                                     <span class="badge bg-gray-200 text-gray-800 fw-normal" title="Tamu sudah mengunggah foto KTP; lihat di Detail">KTP</span>
                                 @endif

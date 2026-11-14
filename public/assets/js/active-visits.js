@@ -61,11 +61,20 @@
         var wrap = el('span');
         wrap.appendChild(el('span', 'fw-bold', row.name));
 
-        if (!row.documents) {
-            return wrap;
+        var badges = el('span', 'd-flex flex-wrap gap-1 mt-1');
+
+        // Kunjungan yang diinput resepsionis untuk tamu tanpa login Google (RSP-11).
+        if (row.manual) {
+            badges.appendChild(el('span', 'badge bg-info fw-normal', 'Manual'));
         }
 
-        var badges = el('span', 'd-flex flex-wrap gap-1 mt-1');
+        if (!row.documents) {
+            if (row.manual) {
+                wrap.appendChild(badges);
+            }
+
+            return wrap;
+        }
 
         if (row.documents.ktp) {
             badges.appendChild(el('span', 'badge bg-success fw-normal', 'KTP ✓'));

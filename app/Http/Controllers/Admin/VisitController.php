@@ -41,7 +41,7 @@ class VisitController extends Controller
         $user = $request->user();
         $visit = $this->scope->findOrDeny(GuestVisit::class, $id, $user)->load([
             'location:id,name', 'qrCode:id,label', 'suggestedDepartment:id,name', 'assignedDepartment:id,name',
-            'servedBy:id,name', 'processedBy:id,name', 'closedBy:id,name',
+            'servedBy:id,name', 'processedBy:id,name', 'closedBy:id,name', 'enteredBy:id,name',
             'assignments' => fn ($query) => $query->with(['department:id,name', 'staffMember:id,name', 'assignedBy:id,name'])->orderBy('id'),
             'statusLogs' => fn ($query) => $query->with(['changedBy:id,name', 'staffMember:id,name'])->orderBy('id'),
         ]);

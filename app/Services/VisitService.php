@@ -98,6 +98,56 @@ class VisitService
     }
 
     /**
+     * Menyimpan kunjungan yang diinput resepsionis untuk tamu tanpa login Google (RSP-11).
+     * Alurnya sama dengan formulir tamu (status Menunggu di Tamu Aktif), tetapi email tidak
+     * terverifikasi, entered_by diisi akun resepsionis, dan log awal tercatat atas akun itu.
+     *
+     * Dipanggil di dalam transaksi pemanggil agar foto KTP/selfie yang gagal ikut membatalkan kunjungan.
+     *
+     * @param  array<string, mixed>  $data  data tervalidasi ManualVisitRequest
+     */
+    public function recordManualVisit(QrCode $qr, array $data, User $receptionist, string $signaturePng, ?string $ipAddress): GuestVisit
+    {
+        $now = now();
+        $visitDate = $now->toDateString();
+
+        $visit = GuestVisit::create([
+            'location_id' => $qr->location_id,
+            'qr_code_id' => $qr->id,
+            'visit_date' => $visitDate,
+            'daily_number' => $this->nextDailyNumber($qr->location_id, $visitDate),
+            'email' => $data['email'],
+            'email_verified_at' => null,
+            'purpose' => $data['purpose'],
+            'vulnerable_group' => $data['vulnerable_group'],
+            'name' => $data['name'],
+            'organization' => $data['organization'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'status' => VisitStatus::Waiting,
+            'check_in_at' => $now,
+            'consent_at' => $now,
+            'ip_address' => $ipAddress,
+            'entered_by' => $receptionist->id,
+        ]);
+
+        VisitSignature::create([
+            'visit_id' => $visit->id,
+            'image' => $signaturePng,
+            'mime_type' => 'image/png',
+            'size_bytes' => strlen($signaturePng),
+            'sha256' => hash('sha256', $signaturePng),
+        ]);
+
+        $this->logStatus($visit, null, VisitStatus::Waiting, $receptionist, null, 'Diinput manual oleh resepsionis.');
+        $this->audit->record('visit.manual_create', $visit, ['qr_code_id' => $qr->id], $receptionist);
+
+        $qr->forceFill(['last_used_at' => $now])->save();
+
+        return $visit;
+    }
+
+    /**
      * Daftar departemen yang dapat dipilih untuk sebuah kunjungan: aktif, di lokasi
      * kunjungan, punya akun PIC aktif, dan punya minimal satu petugas aktif (RSP-2).
      *

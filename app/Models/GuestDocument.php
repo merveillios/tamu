@@ -39,6 +39,7 @@ class GuestDocument extends Model
         'sha256',
         'qr_code_id',
         'ip_address',
+        'uploaded_by',
     ];
 
     protected $hidden = [
@@ -57,6 +58,14 @@ class GuestDocument extends Model
     public function qrCode(): BelongsTo
     {
         return $this->belongsTo(QrCode::class);
+    }
+
+    /**
+     * Akun petugas yang mengambil foto dari formulir tamu manual (RSP-11); kosong bila diunggah tamu.
+     */
+    public function uploader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 
     /**

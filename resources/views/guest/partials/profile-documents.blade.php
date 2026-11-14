@@ -10,9 +10,10 @@
         @foreach (\App\Models\GuestDocument::TYPES as $type => $label)
             @php($document = $documents->get($type))
             <form method="POST" action="{{ route('guest.documents.store', [$qr->token, $type]) }}" enctype="multipart/form-data"
-                  class="border rounded p-3 mb-3" data-guest-document>
+                  class="border rounded p-3 mb-3" data-photo-required>
                 @csrf
-                <input type="hidden" name="image_data" data-document-data>
+                <div data-photo-field>
+                <input type="hidden" name="image_data" data-photo-data>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="fw-bold small">{{ $label }}</span>
@@ -25,7 +26,7 @@
 
                 <img @if ($document) src="{{ route('guest.documents.show', [$qr->token, $type]) }}" @endif
                      alt="{{ $label }} Anda" class="img-fluid rounded border bg-white mb-2 guest-document-preview"
-                     data-document-preview @unless ($document) hidden @endunless>
+                     data-photo-preview @unless ($document) hidden @endunless>
 
                 <label for="photo_{{ $type }}" class="form-label small mb-1">
                     {{ $document ? 'Ganti foto' : 'Pilih foto' }}
@@ -37,10 +38,11 @@
                 </label>
                 <input type="file" name="photo" id="photo_{{ $type }}" accept="image/jpeg,image/png,image/webp"
                        @if ($type === 'selfie') capture="user" @endif
-                       class="form-control form-control-sm mb-2" data-document-input>
-                <div class="small text-gray-600 mb-2" data-document-status aria-live="polite"></div>
+                       class="form-control form-control-sm mb-2" data-photo-input>
+                <div class="small text-gray-600 mb-2" data-photo-status aria-live="polite"></div>
+                </div>
 
-                <button type="submit" class="btn btn-sm btn-primary w-100" data-document-submit>
+                <button type="submit" class="btn btn-sm btn-primary w-100" data-photo-submit>
                     {{ $document ? 'Simpan foto baru' : 'Simpan foto' }}
                 </button>
             </form>

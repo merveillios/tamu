@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\GuestDocument;
 use App\Models\QrCode;
+use App\Models\User;
 use GdImage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -41,8 +42,15 @@ class GuestDocumentService
      * Menyimpan foto baru untuk email ini. Sumbernya data URL hasil kompresi browser,
      * atau file asli bila JavaScript tidak berjalan.
      */
-    public function store(QrCode $qr, string $email, string $type, ?string $dataUrl, ?UploadedFile $file, ?string $ip): GuestDocument
-    {
+    public function store(
+        QrCode $qr,
+        string $email,
+        string $type,
+        ?string $dataUrl,
+        ?UploadedFile $file,
+        ?string $ip,
+        ?User $uploadedBy = null,
+    ): GuestDocument {
         $binary = $this->binaryFrom($dataUrl, $file);
         $image = $binary === null ? false : @imagecreatefromstring($binary);
 
@@ -77,24 +85,28 @@ class GuestDocumentService
             'sha256' => hash('sha256', $jpeg),
             'qr_code_id' => $qr->id,
             'ip_address' => $ip,
+            'uploaded_by' => $uploadedBy?->id,
         ]);
 
         // Email tidak ditulis ke detail audit; baris dokumen sudah menyimpannya.
-        $this->audit->record('guest_document.upload', $document, ['type' => $type, 'qr_code_id' => $qr->id]);
+        $this->audit->record('guest_document.upload', $document, ['type' => $type, 'qr_code_id' => $qr->id], $uploadedBy);
 
         return $document;
     }
 
     /**
-     * Foto terbaru per jenis untuk email ini, tanpa kolom gambar.
+     * Foto terbaru per jenis untuk email ini, tanpa kolom gambar. Untuk tamu sendiri
+     * ($guestOnly) hanya foto yang diunggah tamu: foto dari formulir manual resepsionis
+     * memakai email yang tidak terverifikasi sehingga tidak ditampilkan ke pemilik email.
      *
      * @return Collection<string, GuestDocument>
      */
-    public function latest(string $email): Collection
+    public function latest(string $email, bool $guestOnly = false): Collection
     {
         // Satu email hanya punya sedikit baris; keyBy() menyisakan baris terakhir (terbaru) per jenis.
         return GuestDocument::query()
             ->where('email', $email)
+            ->when($guestOnly, fn ($query) => $query->whereNull('uploaded_by'))
             ->orderBy('id')
             ->get(['id', 'email', 'type', 'width', 'height', 'size_bytes', 'created_at'])
             ->keyBy('type');
@@ -103,11 +115,12 @@ class GuestDocumentService
     /**
      * Foto terbaru satu jenis beserta gambarnya, atau null bila belum pernah diunggah.
      */
-    public function latestImage(string $email, string $type): ?GuestDocument
+    public function latestImage(string $email, string $type, bool $guestOnly = false): ?GuestDocument
     {
         return GuestDocument::query()
             ->where('email', $email)
             ->where('type', $type)
+            ->when($guestOnly, fn ($query) => $query->whereNull('uploaded_by'))
             ->latest('id')
             ->first();
     }

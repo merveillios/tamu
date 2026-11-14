@@ -41,7 +41,7 @@ class GuestHistoryController extends Controller
             'visits' => $returning->history($email),
             // Profil hanya dilengkapi tamu yang sudah punya kunjungan tercatat.
             'canCompleteProfile' => $returning->isReturning($email),
-            'documents' => $documents->latest($email),
+            'documents' => $documents->latest($email, guestOnly: true),
         ]);
     }
 }

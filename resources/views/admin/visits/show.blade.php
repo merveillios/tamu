@@ -30,7 +30,17 @@
             <div class="card card-body border-0 shadow mb-4">
                 <h3 class="h6 mb-3">Data tamu</h3>
                 <dl class="row small mb-0">
-                    <dt class="col-5 text-gray-600 fw-normal">Email</dt><dd class="col-7 text-break">{{ $visit->email }}</dd>
+                    <dt class="col-5 text-gray-600 fw-normal">Email</dt>
+                    <dd class="col-7 text-break">
+                        {{ $visit->email }}
+                        @if ($visit->isManual())
+                            <span class="d-block text-gray-600">Tidak terverifikasi (diketik resepsionis)</span>
+                        @endif
+                    </dd>
+                    @if ($visit->isManual())
+                        <dt class="col-5 text-gray-600 fw-normal">Cara input</dt>
+                        <dd class="col-7"><span class="badge bg-info fw-normal">Manual</span> oleh {{ $visit->enteredBy?->name ?? '–' }}</dd>
+                    @endif
                     <dt class="col-5 text-gray-600 fw-normal">Rincian keperluan</dt><dd class="col-7 text-break text-pre-line">{{ $visit->purpose }}</dd>
                     @if ($visit->purpose_category_name)
                         {{-- Kategori hanya ada pada kunjungan sebelum kategori keperluan dihapus dari formulir. --}}

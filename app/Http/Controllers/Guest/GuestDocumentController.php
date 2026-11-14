@@ -65,7 +65,7 @@ class GuestDocumentController extends Controller
     {
         $qr = $this->resolver->resolve($token);
         $email = $this->guestSession->verifiedEmail($qr) ?? abort(404);
-        $document = $this->documents->latestImage($email, $type) ?? abort(404);
+        $document = $this->documents->latestImage($email, $type, guestOnly: true) ?? abort(404);
 
         return response($document->image, 200, [
             'Content-Type' => $document->mime_type,

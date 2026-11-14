@@ -28,6 +28,9 @@
                 <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                     <div>
                         <div class="fw-bold">{{ $visit->check_in_at->format('d/m/Y H:i') }}</div>
+                        @if ($visit->isManual())
+                            <div class="small text-gray-600">Didaftarkan oleh resepsionis</div>
+                        @endif
                         <div class="small text-gray-600">{{ $visit->location->name }}</div>
                     </div>
                     <span class="badge bg-{{ $visit->display_status['badge'] }}">{{ $visit->display_status['label'] }}</span>
@@ -70,6 +73,6 @@
 
 @if ($canCompleteProfile)
     @push('scripts')
-        <script src="{{ asset('assets/js/guest-document.js') }}?v={{ filemtime(public_path('assets/js/guest-document.js')) }}"></script>
+        <script src="{{ asset('assets/js/photo-field.js') }}?v={{ filemtime(public_path('assets/js/photo-field.js')) }}"></script>
     @endpush
 @endif

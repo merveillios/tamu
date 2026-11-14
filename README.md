@@ -343,6 +343,12 @@ Fitur:
   di pos/lokasinya.
 - **Detail Kunjungan**: data tamu, Rincian keperluan, Bidang/UPT tujuan, dan
   tanda tangan tamu. Kunjungan lama tetap menampilkan kategorinya sebagai "Kategori (lama)".
+- **Tambah Tamu Manual**: untuk tamu yang tidak bisa login Google, resepsionis
+  mengisi formulir (email tamu wajib, data diri, rincian keperluan, tanda tangan
+  tamu di layar, foto KTP dan selfie opsional). Kunjungan masuk Tamu Aktif dengan
+  tanda **Manual** lalu ditugaskan seperti biasa. Bila tamu kemudian login Google
+  dengan email yang sama, kunjungan manual tampil di riwayatnya, tetapi data
+  dirinya tidak diisi otomatis dari kunjungan manual.
 - **Tugaskan PIC**: memilih Bidang/UPT dan orang yang ditemui berdasarkan
   Rincian keperluan tamu (tampil di modal Tugaskan), setelah memastikan PIC sedang tersedia.
 - **Tugaskan Ulang**: bila PIC ternyata tidak tersedia, penugasan dipindah ke

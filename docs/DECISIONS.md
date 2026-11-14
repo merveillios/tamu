@@ -2,6 +2,16 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-14 — Tamu tanpa Google diinput resepsionis, bukan peran baru (revisi HRD #11)
+
+- **Konteks:** Dokumen revisi HRD meminta peran baru Petugas Pendaftaran dengan akun, formulir manual, daftar kunjungan, dashboard, dan halaman cetak sendiri. Pemilik proyek memutuskan fitur ini menjadi bagian Resepsionis: resepsionis yang membantu mengisi untuk tamu yang tidak bisa login Google.
+- **Keputusan:**
+  - Tidak ada peran atau akun baru. Tombol "Tambah Tamu Manual" di Tamu Aktif Resepsionis membuka formulir dengan isian yang sama seperti formulir tamu, ditambah pilihan pos (QR milik resepsionis) dan email tamu yang **wajib** diketik petugas. Pertanyaan HRD nomor 5 (pembuat akun), 6 (alur penugasan), dan 7 (format cetak) tidak diperlukan lagi: kunjungan manual masuk alur penugasan yang sama, dan ringkasan cukup lewat History serta Ekspor PDF buku tamu.
+  - Kunjungan manual ditandai `guest_visits.entered_by` (akun resepsionis) dengan `email_verified_at` kosong, tampil dengan penanda "Manual", dan ditugaskan lewat tombol Tugaskan seperti biasa; formulir tidak memilih Bidang/UPT.
+  - Foto KTP dan selfie opsional dapat diambil di formulir yang sama, karena ada keperluan yang mewajibkan identitas, sementara tamu tanpa Google tidak bisa membuka "Lengkapi profil". Foto ditandai `guest_documents.uploaded_by`.
+  - Bila tamu yang pernah diinput manual kemudian login Google dengan email yang sama, kunjungan manualnya tampil di riwayat ("Didaftarkan oleh resepsionis") dan email dianggap tamu lama. Namun data diri dan tanda tangan untuk formulir Google tidak pernah diambil dari kunjungan manual, dan foto dari resepsionis tidak tampil di "Lengkapi profil", karena email manual tidak terverifikasi dan salah ketik bisa membuka data orang lain.
+- **Alasan:** Resepsionis sudah memegang QR, lokasi, dan Tamu Aktif, sehingga fitur ini tidak memerlukan peran, cakupan akses, dan halaman baru; risiko email tidak terverifikasi dibatasi pada data yang memang aman ditampilkan ke pemilik email.
+
 ## 2026-11-14 — Audit Log PIC (revisi HRD #8 dan #9)
 
 - **Konteks:** Dokumen HRD meminta pencatatan aksi PIC (termasuk tombol Proses dan status ditolak yang sudah tidak ada), riwayat per orang, PDF per kunjungan, dan halaman audit log Admin. Pemilik proyek menetapkan bentuk yang lebih ringkas: satu halaman baru di sidebar dengan filter, dan ekspor PDF berupa satu tabel landscape (No, Waktu, PIC, Tamu, Instansi, Rincian Keperluan, Hasil) tanpa bagian rincian. Kolom Rincian Keperluan (teks yang ditulis tamu) ditambahkan sebelum Hasil atas permintaan pemilik proyek; Hasil tetap kolom paling lebar. Ini juga menjawab pertanyaan HRD nomor 1.

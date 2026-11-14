@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
  *
  * Satu-satunya tempat yang membaca guest_visits tanpa AccessScope (pengecualian A-6).
  * Email selalu berasal dari session hasil verifikasi Google, tidak pernah dari request.
+ *
+ * Kunjungan manual dari resepsionis (RSP-11) memakai email yang diketik petugas dan tidak
+ * terverifikasi. Kunjungan itu ikut menjadikan email "tamu lama" dan tampil di riwayat,
+ * tetapi tidak pernah dipakai untuk mengisi data diri atau tanda tangan tamu Google.
  */
 class ReturningGuestService
 {
@@ -54,6 +58,7 @@ class ReturningGuestService
     {
         $visit = GuestVisit::query()
             ->where('email', $email)
+            ->whereNull('entered_by')
             ->orderByDesc('check_in_at')
             ->orderByDesc('id')
             ->first(self::PROFILE_FIELDS);
@@ -80,7 +85,7 @@ class ReturningGuestService
             ->where('email', $email)
             ->select([
                 'id', 'location_id', 'purpose', 'status', 'check_in_at',
-                'assigned_department_id', 'served_by_staff_id', 'result',
+                'assigned_department_id', 'served_by_staff_id', 'result', 'entered_by',
             ])
             ->with(['location:id,name', 'assignedDepartment:id,name', 'servedBy:id,name'])
             ->orderByDesc('check_in_at')
@@ -95,6 +100,6 @@ class ReturningGuestService
     private function signatureQuery(string $email): Builder
     {
         return VisitSignature::query()
-            ->whereIn('visit_id', GuestVisit::query()->where('email', $email)->select('id'));
+            ->whereIn('visit_id', GuestVisit::query()->where('email', $email)->whereNull('entered_by')->select('id'));
     }
 }

@@ -7,6 +7,13 @@
         <div class="alert alert-warning" role="alert">Akun ini belum dihubungkan ke QR mana pun.</div>
     @endif
 
+    @if ($isReceptionist && ! $receptionistWithoutQr)
+        {{-- RSP-11: tamu yang tidak bisa login Google diinput resepsionis. --}}
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ route('admin.visits.manual.create') }}" class="btn btn-primary btn-sm">Tambah Tamu Manual</a>
+        </div>
+    @endif
+
     <form method="GET" action="{{ route('admin.visits.active') }}" class="card card-body border-0 shadow mb-3" data-active-filters>
         <div class="row g-2 align-items-end">
             <div class="col-12 col-md-5">

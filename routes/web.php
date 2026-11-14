@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\HistoryController;
 use App\Http\Controllers\Admin\LocationController;
+use App\Http\Controllers\Admin\ManualVisitController;
 use App\Http\Controllers\Admin\PasswordController;
 use App\Http\Controllers\Admin\PicAuditController;
 use App\Http\Controllers\Admin\QrController;
@@ -70,6 +71,9 @@ Route::middleware(['auth', 'auth.session', 'active'])->prefix('admin')->name('ad
     Route::middleware('role:receptionist')->group(function () {
         Route::get('/kunjungan/{id}/departemen', [VisitController::class, 'departments'])->whereNumber('id')->name('visits.departments');
         Route::post('/kunjungan/{id}/tugaskan', [VisitController::class, 'assign'])->whereNumber('id')->name('visits.assign');
+        // Tamu tanpa login Google diinput resepsionis (RSP-11, revisi HRD #11).
+        Route::get('/tamu/manual', [ManualVisitController::class, 'create'])->name('visits.manual.create');
+        Route::post('/tamu/manual', [ManualVisitController::class, 'store'])->name('visits.manual.store');
     });
 
     Route::middleware('role:pic')->group(function () {

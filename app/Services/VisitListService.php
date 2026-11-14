@@ -188,6 +188,8 @@ class VisitListService
             'name' => $visit->name,
             'organization' => $visit->organization,
             'vulnerable_group' => $visit->vulnerableGroupLabel(),
+            // Kunjungan yang diinput resepsionis untuk tamu tanpa login Google (RSP-11).
+            'manual' => $visit->isManual(),
             // PIC tidak berhak melihat KTP dan selfie, jadi penandanya juga tidak dikirim.
             'documents' => $viewer->role === UserRole::Pic ? null : [
                 'ktp' => (bool) $visit->has_ktp,
