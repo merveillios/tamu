@@ -111,13 +111,11 @@
 
                     <div class="row g-3 mb-3">
                         @foreach (\App\Models\GuestDocument::TYPES as $type => $label)
-                            <div class="col-12 col-md-6" data-photo-field>
-                                <label for="{{ $type }}_photo" class="form-label">{{ $label }} <span class="text-gray-600 fw-normal">(opsional)</span></label>
+                            <div class="col-12 col-md-6" data-photo-field data-photo-type="{{ $type }}">
+                                <div class="form-label">{{ $label }} <span class="text-gray-600 fw-normal">(opsional)</span></div>
                                 <input type="hidden" name="{{ $type }}_data" data-photo-data>
                                 <img alt="Pratinjau {{ $label }}" class="img-fluid rounded border bg-white mb-2 guest-document-preview" data-photo-preview hidden>
-                                <input type="file" name="{{ $type }}_photo" id="{{ $type }}_photo" accept="image/jpeg,image/png,image/webp"
-                                       @if ($type === 'selfie') capture="user" @else capture="environment" @endif
-                                       class="form-control form-control-sm @error($type.'_photo') is-invalid @enderror" data-photo-input>
+                                @include('partials.photo-sources', ['type' => $type, 'name' => $type.'_photo', 'id' => $type.'_photo', 'invalid' => $errors->has($type.'_photo')])
                                 <div class="small text-gray-600 mt-1" data-photo-status aria-live="polite">
                                     {{ $type === 'ktp' ? 'Pastikan tulisan KTP terbaca.' : 'Wajah tamu terlihat jelas.' }}
                                 </div>

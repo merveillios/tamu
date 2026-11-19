@@ -11,7 +11,7 @@
             <form method="POST" action="{{ route('guest.documents.store', [$qr->token, $type]) }}" enctype="multipart/form-data"
                   class="border rounded p-3 mb-3" data-photo-required>
                 @csrf
-                <div data-photo-field>
+                <div data-photo-field data-photo-type="{{ $type }}">
                 <input type="hidden" name="image_data" data-photo-data>
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -27,17 +27,15 @@
                      alt="{{ $label }} Anda" class="img-fluid rounded border bg-white mb-2 guest-document-preview"
                      data-photo-preview @unless ($document) hidden @endunless>
 
-                <label for="photo_{{ $type }}" class="form-label small mb-1">
+                <div class="small mb-1">
                     {{ $document ? 'Ganti foto' : 'Pilih foto' }}
                     @if ($type === 'ktp')
                         <span class="text-gray-600">(pastikan tulisan terbaca)</span>
                     @else
                         <span class="text-gray-600">(wajah terlihat jelas)</span>
                     @endif
-                </label>
-                <input type="file" name="photo" id="photo_{{ $type }}" accept="image/jpeg,image/png,image/webp"
-                       @if ($type === 'selfie') capture="user" @endif
-                       class="form-control form-control-sm mb-2" data-photo-input>
+                </div>
+                @include('partials.photo-sources', ['type' => $type, 'name' => 'photo', 'id' => 'photo_'.$type])
                 <div class="small text-gray-600 mb-2" data-photo-status aria-live="polite"></div>
                 </div>
 

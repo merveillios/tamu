@@ -26,7 +26,8 @@ class ManualVisitTest extends TestCase
         $receptionist = $qr->receptionist;
 
         $this->actingAs($receptionist)->get('/admin/tamu')->assertOk()->assertSee('Tambah Tamu Manual');
-        $this->actingAs($receptionist)->get('/admin/tamu/manual')->assertOk()->assertSee('Email tamu');
+        $this->actingAs($receptionist)->get('/admin/tamu/manual')->assertOk()->assertSee('Email tamu')
+            ->assertSee('Ambil foto')->assertSee('Pilih dari galeri')->assertSee('photo-field.js');
 
         $this->actingAs($receptionist)->post('/admin/tamu/manual', $this->payload($qr->id))
             ->assertRedirect(route('admin.visits.active'))

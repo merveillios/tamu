@@ -23,7 +23,9 @@ class GuestDocumentTest extends TestCase
         $this->createVisit($qr, $category, ['email' => 'lama@contoh.test']);
         $this->verifiedAs($qr, 'lama@contoh.test');
 
-        $this->get("/tamu/{$qr->token}/riwayat")->assertOk()->assertSee('Lengkapi profil')->assertSee('Belum ada');
+        $this->get("/tamu/{$qr->token}/riwayat")->assertOk()->assertSee('Lengkapi profil')->assertSee('Belum ada')
+            ->assertSee('Ambil foto')->assertSee('Pilih dari galeri')
+            ->assertSee('capture="user"', false)->assertSee('capture="environment"', false);
 
         $this->post("/tamu/{$qr->token}/profil/ktp", ['image_data' => $this->jpegDataUrl(1200, 760)])
             ->assertRedirect(route('guest.history', $qr->token))

@@ -84,6 +84,8 @@
 
         if (row.documents.selfie) {
             badges.appendChild(el('span', 'badge bg-success fw-normal', 'Selfie ✓'));
+        } else {
+            badges.appendChild(el('span', 'badge bg-gray-200 text-gray-800 fw-normal', 'Belum ada selfie'));
         }
 
         wrap.appendChild(badges);

@@ -2,6 +2,15 @@
 
 Format mengikuti aturan A-8: tanggal, konteks, keputusan, alasan.
 
+## 2026-11-19 — Foto KTP/selfie: pilih kamera atau galeri, lalu potong
+
+- **Konteks:** Pemilik proyek meminta foto KTP dan selfie bisa diambil langsung dari kamera atau dipilih dari galeri, dapat dipotong, serta penanda selfie yang belum ada di Tamu Aktif.
+- **Keputusan:**
+  - Kolom foto di "Lengkapi profil" dan "Tambah Tamu Manual" memakai partial `partials/photo-sources.blade.php`: tombol "Ambil foto" (input dengan `capture`, kamera belakang untuk KTP dan depan untuk selfie) dan "Pilih dari galeri". Tanpa JavaScript, input berkas biasa tetap dipakai.
+  - Setelah foto dipilih, `photo-field.js` membuka area potong buatan sendiri (kanvas + Pointer Events, tanpa library luar karena CSP hanya mengizinkan skrip dari domain sendiri): kotak dapat digeser dan diubah ukurannya, foto dapat diputar 90 derajat. Kanvas kerja dibatasi 2400 px agar foto beresolusi sangat tinggi tidak melampaui batas memori HP; hasil potongan dikirim sebagai JPEG 1600 px. Potongan dengan sisi terpendek di bawah 300 px ditolak di perangkat, sama dengan batas server.
+  - Tamu Aktif menampilkan "Belum ada selfie" di samping penanda KTP.
+- **Alasan:** Pemotongan hanya mengubah apa yang dikirim browser; server tetap membaca ulang foto dengan GD, membuang metadata, menolak file yang bukan gambar dan foto yang terlalu kecil, serta memakai hak lihat yang sama, sehingga keamanan tidak berubah.
+
 ## 2026-11-14 — Tes akhir revisi HRD dan perbaikan Audit Log PIC (T12)
 
 - **Konteks:** Selama revisi HRD banyak tes ditulis dan diubah tanpa dijalankan karena database tes belum ada.

@@ -862,3 +862,12 @@ body.auth-page-body {
         padding: 2.75rem 2rem;
     }
 }
+
+/* Area potong foto KTP/selfie (photo-field.js): sentuhan menggeser kotak, bukan halaman */
+.photo-cropper-canvas {
+    display: block;
+    max-width: 100%;
+    touch-action: none;
+    cursor: move;
+    border-radius: 0.25rem;
+}
