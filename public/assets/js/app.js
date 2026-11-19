@@ -264,7 +264,9 @@ document.addEventListener('DOMContentLoaded', function () {
             submitter = form.querySelector('button[type="submit"], input[type="submit"]');
         }
 
-        if (isSaveButton(submitter)) {
+        // Hanya ditahan bila halaman memuat modalnya (layout staf). Halaman tamu tidak punya
+        // modal ini; tanpa pengecekan, tombol seperti "Simpan foto" tertahan dan tidak pernah terkirim.
+        if (saveModal && isSaveButton(submitter)) {
             // Cek validitas form native HTML5 terlebih dahulu
             if (form.checkValidity && !form.checkValidity()) {
                 form.reportValidity();
@@ -283,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (isDeactivateButton(submitter, form)) {
+        if (deactivateModal && isDeactivateButton(submitter, form)) {
             event.preventDefault();
             event.stopImmediatePropagation();
 
@@ -379,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var target = event.target.closest('a, button, input');
         if (!target) return;
 
-        if (isCancelButton(target)) {
+        if (cancelModal && isCancelButton(target)) {
             event.preventDefault();
             event.stopPropagation();
 
