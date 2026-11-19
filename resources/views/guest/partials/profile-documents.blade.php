@@ -3,8 +3,7 @@
     <div class="card-body">
         <h2 id="profile-heading" class="h6 mb-1">Lengkapi profil <span class="fw-normal text-gray-600">(opsional)</span></h2>
         <p class="small text-gray-600 mb-3">
-            Foto KTP dan selfie dipakai untuk dokumentasi kunjungan dan hanya dapat dilihat petugas Disperindag.
-            Cukup diunggah sekali untuk kunjungan berikutnya. Foto yang sudah diunggah dapat diganti, tetapi tidak dapat dihapus.
+            Foto KTP &amp; selfie digunakan petugas Disperindag untuk dokumentasi kunjungan.
         </p>
 
         @foreach (\App\Models\GuestDocument::TYPES as $type => $label)
