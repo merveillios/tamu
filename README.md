@@ -41,7 +41,7 @@ Spesifikasi lengkap ada di [docs/PRD.md](docs/PRD.md); keputusan teknis di [docs
    php artisan sitamu:create-superadmin
    ```
 
-   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, Bidang/UPT, petugas, QR, dan akun per peran. Password tiap akun dibuat acak dan hanya ditampilkan sekali di konsol:
+   Untuk pengembangan lokal (`APP_ENV=local`) tersedia data contoh: lokasi, Bidang/UPT, petugas, QR, dan akun per peran (`superadmin@sitamu.test`, `admin@sitamu.test`, `resepsionis@sitamu.test`, `pic@sitamu.test`, dan PIC per Bidang/UPT). Password semua akun contoh adalah `password`, atau nilai `SAMPLE_PASSWORD` di `.env` bila diisi. **Perintah ini menghapus seluruh data** dan tidak pernah membuat data contoh di luar `APP_ENV=local`:
 
    ```bash
    php artisan migrate:fresh --seed
@@ -87,7 +87,41 @@ Prasyarat: PHP 8.1 dengan ekstensi standar Laravel ditambah `pdo_mysql`, `curl`,
    ```
 
    Hasil `400` berarti server terhubung ke Google (token uji memang ditolak). Timeout atau `000` berarti akses keluar diblokir firewall.
-7. Buat Super Admin pertama dengan `php artisan sitamu:create-superadmin`.
+7. Buat Super Admin pertama, **sekali saja** saat deploy pertama. Isi `SUPERADMIN_NAME`, `SUPERADMIN_EMAIL`, dan `SUPERADMIN_PASSWORD` (minimal 12 karakter) di `.env`, lalu jalankan:
+
+   ```bash
+   php artisan db:seed --force
+   ```
+
+   Seeder hanya membuat Super Admin bila belum ada satu pun, tidak pernah menimpa akun yang sudah ada, dan tidak membuat data contoh di produksi. Setelah akun dibuat, **kosongkan `SUPERADMIN_PASSWORD`** di `.env` lalu jalankan `php artisan config:cache`. Cara lain: `php artisan sitamu:create-superadmin` (interaktif, password disembunyikan).
+
+### Database bersih (impor SQL)
+
+Bila server tidak bisa menjalankan `php artisan migrate` (misalnya hanya ada phpMyAdmin), impor [`database/deploy/sitamu-bersih.sql`](database/deploy/sitamu-bersih.sql) ke database kosong (`utf8mb4_unicode_ci`). Isinya struktur semua tabel, catatan tabel `migrations`, dan 5 kelompok rentan bawaan; tanpa data tamu, akun, maupun data contoh. File ini tidak berisi `DROP TABLE`, jadi impor ke database yang sudah berisi tabel akan gagal dan tidak menghapus data.
+
+```bash
+mysql --default-character-set=utf8mb4 -u USER -p sitamu < database/deploy/sitamu-bersih.sql
+```
+
+Setelah impor, `php artisan migrate --force` menjawab "Nothing to migrate", lalu buat Super Admin dengan langkah 7 di atas.
+
+Bila ada migrasi baru, buat ulang file ini dari database tes yang baru dimigrasi. Perintah pertama **mengosongkan database**, jadi nama database tes harus ditulis eksplisit; tanpa awalan `DB_DATABASE=sitamu_test`, yang dikosongkan adalah database utama di `.env`:
+
+```bash
+DB_DATABASE=sitamu_test php artisan migrate:fresh --force
+```
+
+Di PowerShell: `$env:DB_DATABASE='sitamu_test'; php artisan migrate:fresh --force; Remove-Item Env:DB_DATABASE`.
+
+```bash
+mysqldump --default-character-set=utf8mb4 --single-transaction --skip-dump-date --skip-comments --skip-add-drop-table --skip-add-locks --skip-triggers --set-gtid-purged=OFF --column-statistics=0 --no-tablespaces --no-data -u USER -p sitamu_test > struktur.sql
+```
+
+```bash
+mysqldump --default-character-set=utf8mb4 --single-transaction --skip-dump-date --skip-comments --skip-add-locks --no-create-info --complete-insert -u USER -p sitamu_test migrations vulnerable_groups > data.sql
+```
+
+Gabungkan keduanya (struktur dulu, lalu data) menjadi `database/deploy/sitamu-bersih.sql` dan pertahankan komentar kepala file.
 
 Setiap kali kode diperbarui, ulangi `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, lalu ketiga perintah cache di atas.
 
@@ -218,7 +252,7 @@ Catatan: alamat *quick tunnel* berubah setiap kali dijalankan, sehingga langkah 
 
 Tes memakai database MySQL terpisah, bukan SQLite.
 
-1. Buat database `sitamu_test`, lalu salin `.env.testing.example` menjadi `.env.testing` dan isi `APP_KEY` serta kredensial database.
+1. Buat database kosong `sitamu_test` (`utf8mb4_unicode_ci`). Tidak perlu file env tambahan: tes memakai host, user, dan password MySQL dari `.env`, sedangkan `phpunit.xml` memaksa `DB_DATABASE=sitamu_test` serta setelan tes lain (`APP_URL=http://localhost`, cookie tidak secure, cache dan sesi di memori).
 2. Jalankan:
 
    ```bash
@@ -229,15 +263,15 @@ Tes memakai database MySQL terpisah, bukan SQLite.
    vendor/bin/pint --test
    ```
 
-`ConcurrencyTest` menjalankan beberapa proses PHP paralel (`tests/Support/concurrent-worker.php`) untuk membuktikan nomor urut internal (tidak ditampilkan, tetapi masih disimpan) tidak bentrok dan satu penugasan tidak bisa diterima dua kali. Tes ini menyimpan data sungguhan di database tes lalu mengosongkannya, jadi pastikan `.env.testing` **selalu** menunjuk database khusus tes (`sitamu_test`), bukan database utama.
+`ConcurrencyTest` menjalankan beberapa proses PHP paralel (`tests/Support/concurrent-worker.php`) untuk membuktikan nomor urut internal (tidak ditampilkan, tetapi masih disimpan) tidak bentrok dan satu penugasan tidak bisa diterima dua kali. Tes ini menyimpan data sungguhan di database tes lalu mengosongkannya. Sebagai pengaman, `tests/CreatesApplication.php` menghentikan tes bila nama database yang terpakai tidak berakhiran `_test`, sehingga database utama tidak pernah dikosongkan walau `phpunit.xml` salah diubah.
 
 ## Struktur penting
 
 | Lokasi | Isi |
 | --- | --- |
-| `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus`, `VulnerableGroup` |
+| `app/Enums` | `VisitStatus`, `UserRole`, `QrStatus` (kelompok rentan kini model `VulnerableGroup`) |
 | `app/Models` | Model Eloquent dan trait `Concerns` (termasuk `LimitedByAccess`) |
-| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `PurposeCategoryService`, `StaffMemberService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `VisitService`, `VisitListService`, `HistoryService`, `ExportService`, `DashboardService` |
+| `app/Services` | `AccessScope`, `AuditService`, `LoginService`, `UserAccountService`, `LocationService`, `DepartmentService`, `QrService`, `StaffMemberService`, `VulnerableGroupService`, `GuestQrResolver`, `GuestSessionService`, `GoogleTokenVerifier`, `ReturningGuestService`, `SignatureService`, `GuestDocumentService`, `VisitService`, `VisitListService`, `HistoryService`, `ExportService`, `PicAuditService`, `DashboardService` |
 | `app/Http/Middleware` | `SecurityHeaders`, `EnsureUserIsActive` (`active`), `EnsureRole` (`role:`) |
 | `config/sitamu.php` | Key aplikasi dari `.env` (PRD Bab 5.4) |
 | `resources/views/layouts` | Layout staf, tamu, login, cetak, dan error berbasis Volt |

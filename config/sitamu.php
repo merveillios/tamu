@@ -33,6 +33,14 @@ return [
 
     'google_client_id' => env('GOOGLE_CLIENT_ID'),
 
+    // Super Admin pertama untuk SuperAdminSeeder (php artisan db:seed --force). Kosongkan
+    // SUPERADMIN_PASSWORD lagi setelah akun dibuat; seeder tidak pernah menimpa akun yang ada.
+    'initial_super_admin' => [
+        'name' => env('SUPERADMIN_NAME', 'Super Admin'),
+        'email' => env('SUPERADMIN_EMAIL'),
+        'password' => env('SUPERADMIN_PASSWORD'),
+    ],
+
     'poll_interval_seconds' => (int) env('POLL_INTERVAL_SECONDS', 30),
 
     'waiting_alert_minutes' => (int) env('WAITING_ALERT_MINUTES', 15),
