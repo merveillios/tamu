@@ -85,7 +85,8 @@ class VisitAccessTest extends TestCase
         $response = $this->as('picA')->getJson('/admin/penugasan/data')->assertOk();
 
         $this->assertSame(['Tamu Lokasi A'], array_column($response->json('data.new'), 'name'));
-        $this->assertSame([], $response->json('data.reviewing'));
+        // Bagian "Sedang direview" dihapus; semua penugasan aktif ada di satu daftar.
+        $this->assertNull($response->json('data.reviewing'));
         $this->assertSame([], $response->json('data.completed'));
         $this->assertSame(1, $response->json('data.new_count'));
     }

@@ -871,3 +871,14 @@ body.auth-page-body {
     cursor: move;
     border-radius: 0.25rem;
 }
+
+/* Footer panel staf selalu di dasar halaman: isi yang pendek tidak membuat footer melayang di tengah */
+.staff-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.staff-main > .staff-page {
+    flex: 1 0 auto;
+}

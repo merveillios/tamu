@@ -33,7 +33,9 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Data JSON untuk polling: penugasan baru, sedang direview, selesai hari ini, jumlah baru, dan waktu server.
+     * Data JSON untuk polling: semua penugasan aktif dalam satu daftar, selesai hari ini, jumlah
+     * penugasan baru, dan waktu server. Kunjungan lama berstatus processing (sebelum tombol Terima
+     * dihapus) ikut di daftar yang sama dan tetap bisa diselesaikan; bagian "Sedang direview" dihapus.
      */
     public function data(Request $request): JsonResponse
     {
@@ -43,8 +45,7 @@ class AssignmentController extends Controller
         return response()->json([
             'ok' => true,
             'data' => [
-                'new' => $rows->where('status', VisitStatus::Waiting->value)->values(),
-                'reviewing' => $rows->where('status', VisitStatus::Processing->value)->values(),
+                'new' => $rows->values(),
                 'completed' => $this->lists->picCompletedToday($user)->map(fn ($visit) => $this->lists->completedRow($visit))->values(),
                 'new_count' => $rows->where('status', VisitStatus::Waiting->value)->count(),
                 'server_time' => now()->format('H:i:s'),

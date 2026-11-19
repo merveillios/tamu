@@ -169,11 +169,10 @@
         var hasFreshAssignment = knownIds !== null && data.new.some(function (row) { return !knownIds.has(row.id); });
 
         renderGroup('new', data.new, renderRow, 9);
-        renderGroup('reviewing', data.reviewing, renderRow, 9);
         renderGroup('completed', data.completed, renderCompletedRow, 7);
 
         knownIds = knownIds || new Set();
-        data.new.concat(data.reviewing).forEach(function (row) { knownIds.add(row.id); });
+        data.new.forEach(function (row) { knownIds.add(row.id); });
 
         if (hasFreshAssignment) {
             playNotification();

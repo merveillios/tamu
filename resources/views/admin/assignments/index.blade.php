@@ -20,7 +20,8 @@
          data-url="{{ route('admin.assignments.data') }}"
          data-poll="{{ config('sitamu.poll_interval_seconds') }}"
          data-complete-url="{{ url('/admin/kunjungan/__ID__/selesai') }}">
-        @foreach (['new' => 'Penugasan baru', 'reviewing' => 'Sedang direview'] as $group => $heading)
+        {{-- Satu daftar penugasan aktif; bagian "Sedang direview" dihapus karena PIC tidak lagi menekan Terima. --}}
+        @foreach (['new' => 'Penugasan'] as $group => $heading)
             <section class="card card-body border-0 shadow mb-4">
                 <h2 class="h6 mb-3">{{ $heading }} <span class="badge bg-gray-200 text-gray-800" data-group-count="{{ $group }}">0</span></h2>
                 <div class="table-responsive">

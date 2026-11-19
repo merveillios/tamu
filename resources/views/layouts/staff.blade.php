@@ -24,10 +24,10 @@
 
     @include('partials.staff.sidebar')
 
-    <main class="content">
+    <main class="content staff-main">
         @include('partials.staff.topbar')
 
-        <div class="py-4">
+        <div class="py-4 staff-page">
             @yield('content')
         </div>
 
