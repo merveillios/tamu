@@ -346,7 +346,7 @@ Key bawaan Laravel dibaca framework langsung. Key aplikasi dipetakan di `config/
 
 &#91;DIHAPUS v0.10\] `EMERGENCY_PASS_TTL_MINUTES`.
 
-Tidak ada password default. Super Admin pertama dibuat lewat `php artisan sitamu:create-superadmin` yang meminta nama, email, dan password secara interaktif (input password disembunyikan). \[BARU 19 Nov 2026\] Alternatif saat deploy: `php artisan db:seed --force` menjalankan `SuperAdminSeeder` yang membuat Super Admin dari `SUPERADMIN_NAME`, `SUPERADMIN_EMAIL`, dan `SUPERADMIN_PASSWORD` di `.env` (password minimal 12 karakter, bukan password umum), hanya bila belum ada Super Admin, tanpa menimpa akun mana pun; data contoh tetap hanya untuk `APP_ENV=local`. `SUPERADMIN_PASSWORD` dikosongkan lagi setelah akun dibuat. Untuk server tanpa akses `artisan migrate`, tersedia `database/deploy/sitamu-bersih.sql` (struktur tabel, catatan `migrations`, dan kelompok rentan bawaan; tanpa akun dan tanpa `DROP TABLE`).
+Tidak ada password default. Super Admin pertama dibuat lewat `php artisan sitamu:create-superadmin` yang meminta nama, email, dan password secara interaktif (input password disembunyikan). \[BARU 19 Nov 2026\] Alternatif saat deploy: `php artisan db:seed --force` menjalankan `SuperAdminSeeder` yang membuat Super Admin dari `SUPERADMIN_NAME`, `SUPERADMIN_EMAIL`, dan `SUPERADMIN_PASSWORD` di `.env` (password minimal 12 karakter, bukan password umum), hanya bila belum ada Super Admin, tanpa menimpa akun mana pun; data contoh tetap hanya untuk `APP_ENV=local`. `SUPERADMIN_PASSWORD` dikosongkan lagi setelah akun dibuat. Untuk server tanpa akses `artisan migrate`, tersedia `sitamu.sql` (struktur tabel, catatan `migrations`, dan kelompok rentan bawaan; tanpa akun dan tanpa `DROP TABLE`).
 
 ## 5.5 Asumsi & batasan
 

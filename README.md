@@ -97,10 +97,10 @@ Prasyarat: PHP 8.1 dengan ekstensi standar Laravel ditambah `pdo_mysql`, `curl`,
 
 ### Database bersih (impor SQL)
 
-Bila server tidak bisa menjalankan `php artisan migrate` (misalnya hanya ada phpMyAdmin), impor [`database/deploy/sitamu-bersih.sql`](database/deploy/sitamu-bersih.sql) ke database kosong (`utf8mb4_unicode_ci`). Isinya struktur semua tabel, catatan tabel `migrations`, dan 5 kelompok rentan bawaan; tanpa data tamu, akun, maupun data contoh. File ini tidak berisi `DROP TABLE`, jadi impor ke database yang sudah berisi tabel akan gagal dan tidak menghapus data.
+Bila server tidak bisa menjalankan `php artisan migrate` (misalnya hanya ada phpMyAdmin), impor [`sitamu.sql`](sitamu.sql) di akar proyek (sejajar `.env`) ke database kosong (`utf8mb4_unicode_ci`). Isinya struktur semua tabel, catatan tabel `migrations`, dan 5 kelompok rentan bawaan; tanpa data tamu, akun, maupun data contoh. File ini tidak berisi `DROP TABLE`, jadi impor ke database yang sudah berisi tabel akan gagal dan tidak menghapus data.
 
 ```bash
-mysql --default-character-set=utf8mb4 -u USER -p sitamu < database/deploy/sitamu-bersih.sql
+mysql --default-character-set=utf8mb4 -u USER -p sitamu < sitamu.sql
 ```
 
 Setelah impor, `php artisan migrate --force` menjawab "Nothing to migrate", lalu buat Super Admin dengan langkah 7 di atas.
@@ -121,7 +121,7 @@ mysqldump --default-character-set=utf8mb4 --single-transaction --skip-dump-date 
 mysqldump --default-character-set=utf8mb4 --single-transaction --skip-dump-date --skip-comments --skip-add-locks --no-create-info --complete-insert -u USER -p sitamu_test migrations vulnerable_groups > data.sql
 ```
 
-Gabungkan keduanya (struktur dulu, lalu data) menjadi `database/deploy/sitamu-bersih.sql` dan pertahankan komentar kepala file.
+Gabungkan keduanya (struktur dulu, lalu data) menjadi `sitamu.sql` dan pertahankan komentar kepala file.
 
 Setiap kali kode diperbarui, ulangi `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, lalu ketiga perintah cache di atas.
 

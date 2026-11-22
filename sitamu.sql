@@ -9,7 +9,7 @@
 -- `php artisan sitamu:create-superadmin`.
 --
 -- Cara pakai: buat database kosong (utf8mb4_unicode_ci), lalu impor file ini, misalnya
---   mysql --default-character-set=utf8mb4 -u USER -p NAMA_DB < sitamu-bersih.sql
+--   mysql --default-character-set=utf8mb4 -u USER -p NAMA_DB < sitamu.sql
 -- atau lewat menu Import di phpMyAdmin. File ini tidak berisi DROP TABLE, jadi impor ke
 -- database yang sudah berisi tabel akan gagal dan tidak menghapus data.
 --
